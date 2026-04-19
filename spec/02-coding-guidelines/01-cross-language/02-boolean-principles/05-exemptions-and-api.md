@@ -1,8 +1,8 @@
 # Boolean Principles — Static factory exemption, Result wrapper API
 
 > **Parent:** [Boolean Principles](./00-overview.md)  
-> **Version:** 2.6.0  
-> **Updated:** 2026-03-31
+> **Version:** 2.7.0  
+> **Updated:** 2026-04-19
 
 ---
 
