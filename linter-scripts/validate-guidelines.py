@@ -3,6 +3,8 @@
 Cross-Language Coding Guidelines Validator
 ==========================================
 
+Version: 1.5.0  (2026-04-19) — Added P2/P3/P5/P7 boolean-principle checks.
+
 Validates Go, PHP, TypeScript, and Rust source files against the coding
 guidelines defined in spec/02-coding-guidelines/03-coding-guidelines-spec/.
 
@@ -14,7 +16,7 @@ Usage:
 
 Rules Enforced:
     CODE-RED-001  No nested if statements
-    CODE-RED-002  Boolean naming (is/has/can/should/was prefix)
+    CODE-RED-002  Boolean naming (is/has/can/should/was prefix)         [P1]
     CODE-RED-003  No magic strings in comparisons
     CODE-RED-004  Max 15 lines per function
     CODE-RED-005  No fmt.Errorf() in Go (use apperror)
@@ -32,7 +34,11 @@ Rules Enforced:
     CODE-RED-018  Sequential independent async (use Promise.all / errgroup)
     CODE-RED-019  SQL string concatenation (injection risk)
     CODE-RED-020  Go: missing stack trace (raw errors.New instead of apperror)
-    CODE-RED-021  Mixed && and || in single expression
+    CODE-RED-021  Mixed && and || in single expression                  [P4]
+    CODE-RED-022  Negative words in boolean identifiers (isNot*, hasNo*) [P2]
+    CODE-RED-023  Raw `!` on function/method calls (use semantic inverse) [P3]
+    CODE-RED-024  Bare true/false as positional argument                [P5]
+    CODE-RED-025  Assignment inside if/while condition                  [P7]
     STYLE-001     Blank line before return (R4)
     STYLE-002     No else after return (R7)
     STYLE-003     Blank line after closing brace (R5)
