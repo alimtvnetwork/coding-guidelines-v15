@@ -1108,6 +1108,10 @@ def validate_file(filepath: str) -> List[Violation]:
     violations.extend(check_mixed_operators(lines, filepath))
     violations.extend(check_style_rules(lines, filepath))
     violations.extend(check_generic_file_errors(lines, filepath, lang))
+    violations.extend(check_negative_words(lines, filepath, lang))
+    violations.extend(check_bang_on_call(lines, filepath, lang))
+    violations.extend(check_bare_bool_args(lines, filepath, lang))
+    violations.extend(check_assignment_in_condition(lines, filepath, lang))
 
     # Language-specific rules
     if lang == "go":
