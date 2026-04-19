@@ -872,6 +872,10 @@ func validateFile(path string, maxLines int) []Violation {
 	violations = append(violations, checkFunctionLength(lines, path, lang, maxLines)...)
 	violations = append(violations, checkVariableMutation(lines, path, lang)...)
 	violations = append(violations, checkStyleRules(lines, path)...)
+	violations = append(violations, checkNegativeWords(lines, path)...)
+	violations = append(violations, checkBangOnCall(lines, path)...)
+	violations = append(violations, checkBareBoolArgs(lines, path)...)
+	violations = append(violations, checkAssignInCondition(lines, path, lang)...)
 
 	// Language-specific
 	if lang == "go" {
