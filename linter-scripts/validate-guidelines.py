@@ -3,6 +3,8 @@
 Cross-Language Coding Guidelines Validator
 ==========================================
 
+Version: 1.5.0  (2026-04-19) — Added P2/P3/P5/P7 boolean-principle checks.
+
 Validates Go, PHP, TypeScript, and Rust source files against the coding
 guidelines defined in spec/02-coding-guidelines/03-coding-guidelines-spec/.
 
@@ -14,7 +16,7 @@ Usage:
 
 Rules Enforced:
     CODE-RED-001  No nested if statements
-    CODE-RED-002  Boolean naming (is/has/can/should/was prefix)
+    CODE-RED-002  Boolean naming (is/has/can/should/was prefix)         [P1]
     CODE-RED-003  No magic strings in comparisons
     CODE-RED-004  Max 15 lines per function
     CODE-RED-005  No fmt.Errorf() in Go (use apperror)
@@ -32,7 +34,11 @@ Rules Enforced:
     CODE-RED-018  Sequential independent async (use Promise.all / errgroup)
     CODE-RED-019  SQL string concatenation (injection risk)
     CODE-RED-020  Go: missing stack trace (raw errors.New instead of apperror)
-    CODE-RED-021  Mixed && and || in single expression
+    CODE-RED-021  Mixed && and || in single expression                  [P4]
+    CODE-RED-022  Negative words in boolean identifiers (isNot*, hasNo*) [P2]
+    CODE-RED-023  Raw `!` on function/method calls (use semantic inverse) [P3]
+    CODE-RED-024  Bare true/false as positional argument                [P5]
+    CODE-RED-025  Assignment inside if/while condition                  [P7]
     STYLE-001     Blank line before return (R4)
     STYLE-002     No else after return (R7)
     STYLE-003     Blank line after closing brace (R5)
@@ -893,6 +899,171 @@ def check_generic_file_errors(lines: List[str], filepath: str, lang: str) -> Lis
 # Main Validation
 # ═══════════════════════════════════════════════════════════════════════
 
+# ═══════════════════════════════════════════════════════════════════════
+# Boolean Principles — P2/P3/P5/P7 (added v1.5.0)
+# ═══════════════════════════════════════════════════════════════════════
+
+# P2: identifiers using negative words
+NEGATIVE_BOOL_PATTERNS = [
+    re.compile(r"\b(is|has|can|should|was|will)(Not|No)[A-Z]\w*"),
+    re.compile(r"\b(is|has|can|should|was|will)(Not|No)_\w+"),
+]
+
+# P3: raw `!` applied to a function/method call
+P3_BANG_CALL = re.compile(r"(?:^|[\s(=,&|!])!\s*[A-Za-z_$][\w$.]*\s*\(")
+
+# P5: bare true/false as a positional argument in a call
+P5_BARE_BOOL_ARG = re.compile(r"[A-Za-z_$][\w$.]*\s*\([^)\n]*?(?<![\w.])(true|false)(?![\w])(?:\s*,\s*[^)\n]*?)?\s*\)")
+
+# P7: assignment inside a condition (excludes ==, !=, <=, >=, :=)
+P7_ASSIGN_IN_COND = re.compile(r"\b(?:if|while)\s*\(?[^()=!<>]*?[^=!<>]=[^=][^)]*\)?\s*\{")
+
+
+def check_negative_words(lines, filepath, lang):
+    """CODE-RED-022 (P2): No negative words in boolean identifiers."""
+    violations = []
+
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+
+        if isCommentLine(stripped):
+            continue
+
+        for pat in NEGATIVE_BOOL_PATTERNS:
+            match = pat.search(line)
+
+            if match is None:
+                continue
+
+            violations.append(Violation(
+                file=filepath,
+                line=i + 1,
+                rule="CODE-RED-022",
+                severity="CODE-RED",
+                message=f'Negative-word boolean identifier "{match.group(0)}". Use a positive synonym (e.g. isPending, isInvalid, lacksAccess).',
+                code_snippet=stripped[:120],
+            ))
+
+    return violations
+
+
+def check_bang_on_call(lines, filepath, lang):
+    """CODE-RED-023 (P3): Raw `!` on function/method calls is forbidden."""
+    violations = []
+
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+
+        if isCommentLine(stripped):
+            continue
+
+        match = P3_BANG_CALL.search(line)
+
+        if match is None:
+            continue
+
+        if isAllowedBangContext(line, match):
+            continue
+
+        violations.append(Violation(
+            file=filepath,
+            line=i + 1,
+            rule="CODE-RED-023",
+            severity="CODE-RED",
+            message="Raw `!` on a function/method call is forbidden. Use a positive guard function or semantic inverse method.",
+            code_snippet=stripped[:120],
+        ))
+
+    return violations
+
+
+def check_bare_bool_args(lines, filepath, lang):
+    """CODE-RED-024 (P5): Bare true/false as positional argument."""
+    violations = []
+    exempt_callers = ("expect", "assert", "should", "describe", "it", "test", "console.log", "JSON.stringify")
+
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+
+        if isCommentLine(stripped):
+            continue
+
+        if isAllowedBoolArgCall(stripped, exempt_callers):
+            continue
+
+        match = P5_BARE_BOOL_ARG.search(stripped)
+
+        if match is None:
+            continue
+
+        violations.append(Violation(
+            file=filepath,
+            line=i + 1,
+            rule="CODE-RED-024",
+            severity="CODE-RED",
+            message=f'Bare `{match.group(1)}` as positional argument. Use a named flag, options object, or dedicated method.',
+            code_snippet=stripped[:120],
+        ))
+
+    return violations
+
+
+def check_assignment_in_condition(lines, filepath, lang):
+    """CODE-RED-025 (P7): No assignment inside if/while conditions."""
+    violations = []
+
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+
+        if isCommentLine(stripped):
+            continue
+
+        if lang == "go" and ":=" in stripped:
+            continue  # Go comma-ok / short var decl is exempt
+
+        match = P7_ASSIGN_IN_COND.search(stripped)
+
+        if match is None:
+            continue
+
+        violations.append(Violation(
+            file=filepath,
+            line=i + 1,
+            rule="CODE-RED-025",
+            severity="CODE-RED",
+            message="Assignment inside if/while condition is forbidden. Hoist the assignment to a prior line.",
+            code_snippet=stripped[:120],
+        ))
+
+    return violations
+
+
+def isCommentLine(stripped):
+    return stripped.startswith("//") or stripped.startswith("#") or stripped.startswith("*")
+
+
+def isAllowedBangContext(line, match):
+    # Skip `!=`, `!==`, `!!`
+    after = line[match.end() - 1:]
+
+    if after.startswith("!="):
+        return True
+
+    return False
+
+
+def isAllowedBoolArgCall(stripped, exempt_callers):
+    for caller in exempt_callers:
+        if caller in stripped:
+            return True
+
+    return False
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# Main Validation
+# ═══════════════════════════════════════════════════════════════════════
+
 def validate_file(filepath: str) -> List[Violation]:
     lang = detect_language(filepath)
 
@@ -937,6 +1108,10 @@ def validate_file(filepath: str) -> List[Violation]:
     violations.extend(check_mixed_operators(lines, filepath))
     violations.extend(check_style_rules(lines, filepath))
     violations.extend(check_generic_file_errors(lines, filepath, lang))
+    violations.extend(check_negative_words(lines, filepath, lang))
+    violations.extend(check_bang_on_call(lines, filepath, lang))
+    violations.extend(check_bare_bool_args(lines, filepath, lang))
+    violations.extend(check_assignment_in_condition(lines, filepath, lang))
 
     # Language-specific rules
     if lang == "go":
