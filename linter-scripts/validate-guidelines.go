@@ -694,6 +694,162 @@ func shouldSkip(path string) bool {
 	return strings.HasSuffix(base, ".test.ts") || strings.HasSuffix(base, ".spec.ts")
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+// Boolean Principles — P2/P3/P5/P7 (added v1.5.0)
+// ═══════════════════════════════════════════════════════════════════════
+
+var (
+	negBoolPattern   = regexp.MustCompile(`\b(is|has|can|should|was|will)(Not|No)[A-Z_]\w*`)
+	bangCallPattern  = regexp.MustCompile(`(?:^|[\s(=,&|!])!\s*[A-Za-z_$][\w$.]*\s*\(`)
+	bareBoolArgPat   = regexp.MustCompile(`[A-Za-z_$][\w$.]*\s*\([^)\n]*?(?:^|[^.\w])(true|false)(?:[^.\w]|$)[^)\n]*\)`)
+	assignInCondPat  = regexp.MustCompile(`\b(?:if|while)\s*\(?[^()=!<>]*?[^=!<>]=[^=][^)]*\)?\s*\{`)
+	bangAllowedAfter = regexp.MustCompile(`!\s*[A-Za-z_$][\w$.]*\s*\(.*\)\s*!=`)
+)
+
+func isCommentOrEmpty(stripped string) bool {
+	if stripped == "" {
+		return true
+	}
+
+	return strings.HasPrefix(stripped, "//") || strings.HasPrefix(stripped, "#") || strings.HasPrefix(stripped, "*")
+}
+
+func checkNegativeWords(lines []string, path string) []Violation {
+	var violations []Violation
+
+	for i, line := range lines {
+		stripped := strings.TrimSpace(line)
+
+		if isCommentOrEmpty(stripped) {
+			continue
+		}
+
+		match := negBoolPattern.FindString(line)
+
+		if match == "" {
+			continue
+		}
+
+		violations = append(violations, Violation{
+			File:        path,
+			Line:        i + 1,
+			Rule:        "CODE-RED-022",
+			Severity:    "CODE-RED",
+			Message:     fmt.Sprintf(`Negative-word boolean identifier "%s". Use a positive synonym (e.g. isPending, isInvalid, lacksAccess).`, match),
+			CodeSnippet: truncate(stripped, 120),
+		})
+	}
+
+	return violations
+}
+
+func checkBangOnCall(lines []string, path string) []Violation {
+	var violations []Violation
+
+	for i, line := range lines {
+		stripped := strings.TrimSpace(line)
+
+		if isCommentOrEmpty(stripped) {
+			continue
+		}
+
+		if !bangCallPattern.MatchString(line) {
+			continue
+		}
+
+		if bangAllowedAfter.MatchString(line) {
+			continue
+		}
+
+		violations = append(violations, Violation{
+			File:        path,
+			Line:        i + 1,
+			Rule:        "CODE-RED-023",
+			Severity:    "CODE-RED",
+			Message:     "Raw `!` on a function/method call is forbidden. Use a positive guard function or semantic inverse method.",
+			CodeSnippet: truncate(stripped, 120),
+		})
+	}
+
+	return violations
+}
+
+func isExemptBoolArgCall(stripped string) bool {
+	exempt := []string{"expect", "assert", "should", "describe", "it(", "test(", "fmt.Print", "log.Print", "console.log"}
+
+	for _, c := range exempt {
+		if strings.Contains(stripped, c) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func checkBareBoolArgs(lines []string, path string) []Violation {
+	var violations []Violation
+
+	for i, line := range lines {
+		stripped := strings.TrimSpace(line)
+
+		if isCommentOrEmpty(stripped) {
+			continue
+		}
+
+		if isExemptBoolArgCall(stripped) {
+			continue
+		}
+
+		match := bareBoolArgPat.FindStringSubmatch(stripped)
+
+		if match == nil {
+			continue
+		}
+
+		violations = append(violations, Violation{
+			File:        path,
+			Line:        i + 1,
+			Rule:        "CODE-RED-024",
+			Severity:    "CODE-RED",
+			Message:     fmt.Sprintf("Bare `%s` as positional argument. Use a named flag, options object, or dedicated method.", match[1]),
+			CodeSnippet: truncate(stripped, 120),
+		})
+	}
+
+	return violations
+}
+
+func checkAssignInCondition(lines []string, path string, lang string) []Violation {
+	var violations []Violation
+
+	for i, line := range lines {
+		stripped := strings.TrimSpace(line)
+
+		if isCommentOrEmpty(stripped) {
+			continue
+		}
+
+		if lang == "go" && strings.Contains(stripped, ":=") {
+			continue
+		}
+
+		if !assignInCondPat.MatchString(stripped) {
+			continue
+		}
+
+		violations = append(violations, Violation{
+			File:        path,
+			Line:        i + 1,
+			Rule:        "CODE-RED-025",
+			Severity:    "CODE-RED",
+			Message:     "Assignment inside if/while condition is forbidden. Hoist the assignment to a prior line.",
+			CodeSnippet: truncate(stripped, 120),
+		})
+	}
+
+	return violations
+}
+
 func validateFile(path string, maxLines int) []Violation {
 	lang := detectLanguage(path)
 	if lang == "" || shouldSkip(path) {
