@@ -1,0 +1,127 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Resolve version
+        id: version
+        run: |
+          VERSION="${GITHUB_REF_NAME}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Resolved version: $VERSION"
+
+      - name: Run release script
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: bash release.sh
+
+      - name: Verify release artifacts
+        run: |
+          test -d release-artifacts || { echo "::error::release-artifacts directory missing"; exit 1; }
+          test -f release-artifacts/checksums.txt || { echo "::error::checksums.txt missing"; exit 1; }
+
+      # ── Slides app build (separate Vite app under slides-app/) ──────
+      - name: Setup Bun (for slides-app)
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Build slides-app
+        working-directory: slides-app
+        run: |
+          bun install --frozen-lockfile || bun install
+          bun run build
+          bun run package
+
+      - name: Verify slides-app artifact
+        run: |
+          test -f slides-app/dist.zip || { echo "::error::slides-app/dist.zip missing"; exit 1; }
+          ls -lh slides-app/dist.zip
+
+      - name: Rename slides-app zip with version
+        run: |
+          cp slides-app/dist.zip "slides-app/coding-guidelines-slides-${{ steps.version.outputs.version }}.zip"
+
+      # ── Linters CI/CD pack (linters-cicd/) ──────────────────────────
+      - name: Package linters-cicd
+        run: |
+          ZIP_NAME="coding-guidelines-linters-${{ steps.version.outputs.version }}.zip"
+          zip -rq "$ZIP_NAME" linters-cicd \
+            -x "linters-cicd/**/__pycache__/*" \
+            -x "linters-cicd/**/*.pyc"
+          ls -lh "$ZIP_NAME"
+          sha256sum "$ZIP_NAME" >> release-artifacts/checksums.txt
+          mv "$ZIP_NAME" release-artifacts/
+          cp linters-cicd/install.sh release-artifacts/linters-install.sh
+
+      - name: Verify linters-cicd artifact
+        run: |
+          test -f "release-artifacts/coding-guidelines-linters-${{ steps.version.outputs.version }}.zip" \
+            || { echo "::error::linters-cicd zip missing"; exit 1; }
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release-artifacts/*.zip
+            release-artifacts/*.tar.gz
+            release-artifacts/checksums.txt
+            install.sh
+            install.ps1
+            install-config.json
+            slides-app/coding-guidelines-slides-*.zip
+            release-artifacts/linters-install.sh
+          body: |
+            ## Installation
+
+            **Windows (PowerShell)**
+            ```powershell
+            irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v14/main/install.ps1 | iex
+            ```
+
+            **Linux / macOS**
+            ```bash
+            curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v14/main/install.sh | bash
+            ```
+
+            ## Slide Deck
+
+            Download `coding-guidelines-slides-${{ steps.version.outputs.version }}.zip`,
+            unzip it, and double-click `index.html` to launch the offline training deck.
+
+            ## CI/CD Linter Pack (NEW)
+
+            GitHub composite Action one-liner:
+            ```yaml
+            - uses: alimtvnetwork/coding-guidelines-v14/linters-cicd@${{ steps.version.outputs.version }}
+              with: { path: . }
+            ```
+            Any other CI:
+            ```bash
+            curl -fsSL https://github.com/alimtvnetwork/coding-guidelines-v14/releases/download/${{ steps.version.outputs.version }}/linters-install.sh | bash
+            bash ./linters-cicd/run-all.sh --path .
+            ```
+
+            ## Checksums
+            See `checksums.txt` for SHA-256 verification hashes.
+          prerelease: ${{ contains(steps.version.outputs.version, '-') }}
+          make_latest: ${{ !contains(steps.version.outputs.version, '-') }}

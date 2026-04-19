@@ -1,0 +1,91 @@
+# Current Plan
+
+**Version:** 3.6.0  
+**Updated:** 2026-04-19
+
+---
+
+## Active Work
+
+| # | Task | Status | Priority |
+|---|------|--------|----------|
+| 01 | Smoke-test BOOL-NEG-001 in `run-all.sh` end-to-end | ⏳ Pending | Medium |
+| 02 | Add Go-aware `checks/boolean-column-negative/go.py` (parse `db:""` in `embed.FS`) | ⏳ Pending | Medium |
+| 03 | Unit tests for BOOL-NEG-001 (`checks/_tests/boolean_column_negative_test.py`) | ⏳ Pending | Medium |
+| 04 | Round-trip tests for codegen inversion table (`linters-cicd/codegen/_tests/`) | ⏳ Pending | Medium |
+| 05 | Wire codegen into CI (`run-all.sh` → `git diff --exit-code`) | ⏳ Pending | Medium |
+| 06 | Linter for missing `Description` / `Notes` / `Comments` columns (Rules 10–12) | ⏳ Pending | Medium |
+| 07 | Strengthen BOOL-NEG-001 with replacement hints (`HasNoAccess` → `IsUnauthorized`, etc.) | ⏳ Pending | Low |
+| 08 | Cross-link link-checker over `spec/` (Rule 9 / BOOL-NEG-001 / codegen-README anchors) | ⏳ Pending | Low |
+| 09 | End-to-end test: `./run.sh slides` on a clean checkout (verify build + browser open) | ⏳ Pending | Medium |
+| 10 | End-to-end test: `install.sh` on a clean dest dir pulls all 4 folders incl. `linters-cicd/` | ⏳ Pending | Medium |
+
+---
+
+## Completed Plans (Historical)
+
+| # | Task | Date |
+|---|------|------|
+| 01 | Coding guidelines consolidation (5 sources → 1, 6 phases, 85 files) | 2026-04-02 |
+| 02 | Phase 2 content overlap audit | 2026-04-03 |
+| 03 | Phase 3 consolidated structure design | 2026-04-03 |
+| 04 | Spec viewer UI — syntax highlighting | 2026-04-05 |
+| 05 | Light/dark syntax theme toggle | 2026-04-05 |
+| 06 | Persistent syntax theme preference | 2026-04-05 |
+| 07 | Discriminated union + enum pattern for toast | 2026-04-05 |
+| 08 | TypeScript standards spec update | 2026-04-05 |
+| 09 | Validate-guidelines — zero violations (95 files) | 2026-04-05 |
+| 10 | Spec cross-reference validation | 2026-04-05 |
+| 11 | specTree.json regeneration (371 files) | 2026-04-05 |
+| 12 | Sidebar folder structure restoration | 2026-04-05 |
+| 13 | Download folder as ZIP | 2026-04-05 |
+| 14 | Dashboard data regeneration | 2026-04-16 |
+| 15 | Consistency report update | 2026-04-16 |
+| 16 | Folder structure doc update | 2026-04-16 |
+| 17 | Version bump — all 319 spec files + UI to v3.1.0 | 2026-04-16 |
+| 18 | Placeholder consolidated guidelines 11/12/13 filled | 2026-04-16 |
+| 19 | Expanded `01-spec-authoring.md` 90% → 95% | 2026-04-16 |
+| 20 | Expanded `16-app-design-system-and-ui.md` 88% → 93% | 2026-04-16 |
+| 21 | Created `22-app-database.md` | 2026-04-16 |
+| 22 | Updated AI onboarding prompt | 2026-04-16 |
+| 23 | Created write-memory prompt v3.3 | 2026-04-16 |
+| 24 | FAQ features in code (suppression parsing, baseline flags, TOML) | 2026-04-19 |
+| 25 | STYLE-099 SuppressionWithoutReason synthetic finding | 2026-04-19 |
+| 26 | Created `99-troubleshooting.md` (CICD) | 2026-04-19 |
+| 27 | Performance impl: middle-out walker, `--jobs`, `--check-timeout`, TOOL-TIMEOUT (linters-cicd v3.12.0) | 2026-04-19 |
+| 28 | `--version` flag on every check script (v3.13.0) | 2026-04-19 |
+| 29 | `01-naming-conventions.md` v3.3.0 — Rule 2 clarification + Rule 9 | 2026-04-19 |
+| 30 | `02-schema-design.md` v3.3.0 — §6 Mandatory Descriptive Columns | 2026-04-19 |
+| 31 | BOOL-NEG-001 linter (v3.14.0) | 2026-04-19 |
+| 32 | Inverted-field codegen tool (Go + PHP + TS) | 2026-04-19 |
+| 33 | Cross-linked Rule 9 from boolean-principles + no-negatives (v2.2.0) | 2026-04-19 |
+| 34 | `01-naming-conventions.md` v3.4.0 — Rule 8 three-bucket table | 2026-04-19 |
+| 35 | `01-naming-conventions.md` v3.5.0 — Rules 10/11/12 (Description/Notes/Comments) | 2026-04-19 |
+| 36 | Restructured `.lovable/` to single-file convention; saved write-memory prompt v1.0.0 | 2026-04-19 |
+| 37 | Aligned `02-schema-design.md` §6 wording with naming v3.5.0 (v3.4.0) | 2026-04-19 |
+| 38 | Removed `.gitmap/` and `src/.gitmap/` directories | 2026-04-19 |
+| 39 | Created `spec/15-distribution-and-runner/` (00–04, v1.0.0) — install/runner/release/config contracts | 2026-04-19 |
+| 40 | Added `linters-cicd` to `install-config.json` default folders | 2026-04-19 |
+| 41 | Extended root `run.ps1` / `run.sh` with `slides`/`lint`/`help` sub-commands | 2026-04-19 |
+
+---
+
+## Pending (Backlog)
+
+| # | Task | Priority |
+|---|------|----------|
+| 01 | Publish the app for external access | Medium |
+| 02 | End-to-end testing of docs viewer | Medium |
+| 03 | Cross-reference link check across all specs | Low |
+| 04 | Mobile responsiveness testing | Low |
+| 05 | Expand remaining gap analysis items below 90% | Medium |
+| 06 | Update `99-consistency-report.md` for recent expansions | Medium |
+| 07 | Bootstrap PHP plugins for CODE-RED-001..004 (Phase 1 roadmap) | Medium |
+| 08 | `--total-timeout` in `run-all.sh` + per-file 2s parse timeouts | Low |
+| 09 | `exclude-paths` glob support in `.codeguidelines.toml` + `walker.py` | Medium |
+| 10 | `--strict` flag in `scripts/load-config.py` (AC-CI-014) | Low |
+| 11 | `--split-by severity` flag in `run-all.sh` (AC-CI-013) | Low |
+
+---
+
+*Plan — v3.5.0 — 2026-04-19*
