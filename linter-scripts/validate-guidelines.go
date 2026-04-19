@@ -1,5 +1,7 @@
 // Package main — Cross-Language Coding Guidelines Validator (Go Edition)
 //
+// Version: 1.5.0  (2026-04-19) — Added P2/P3/P5/P7 boolean-principle checks.
+//
 // A Go port of validate-guidelines.py that validates Go, PHP, TypeScript,
 // and Rust source files against the coding guidelines defined in
 // spec/02-coding-guidelines/03-coding-guidelines-spec/.
@@ -11,7 +13,7 @@
 // Rules Enforced:
 //
 //	CODE-RED-001  No nested if statements
-//	CODE-RED-002  Boolean naming (is/has/can/should/was prefix)
+//	CODE-RED-002  Boolean naming (is/has/can/should/was prefix)         [P1]
 //	CODE-RED-003  No magic strings in comparisons
 //	CODE-RED-004  Max 15 lines per function
 //	CODE-RED-005  No fmt.Errorf() in Go (use apperror)
@@ -20,6 +22,10 @@
 //	CODE-RED-008  No raw string error codes — use apperrtype enum
 //	CODE-RED-011  No magic numbers in logic
 //	CODE-RED-012  Immutable by default (const over let/var, no reassignment)
+//	CODE-RED-022  Negative words in boolean identifiers (isNot*, hasNo*) [P2]
+//	CODE-RED-023  Raw `!` on function/method calls                       [P3]
+//	CODE-RED-024  Bare true/false as positional argument                 [P5]
+//	CODE-RED-025  Assignment inside if/while condition                   [P7]
 //	STYLE-001     Blank line before return
 //	STYLE-002     No else after return
 //	STYLE-003     Blank line after closing brace
