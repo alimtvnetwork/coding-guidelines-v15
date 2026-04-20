@@ -7,6 +7,18 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.18.0] - 2026-04-20
+
+### Added
+- **`STALE-MODULE-PATH` forbidden-strings rule.** Guards against legacy module
+  path references (`movie-cli-v1`) that should be `movie-cli-v2` per the
+  global namespace standard.
+  - Pattern: `movie-cli-v1\\b`
+  - Allowlist: `spec/14-update/23-install-script-version-probe.md` (legitimate
+    historical migration docs).
+  - Added to `linter-scripts/forbidden-strings.toml` as the second `[[rule]]`
+    demonstrating the TOML-driven scanner's extensibility.
+
 ## [3.17.0] - 2026-04-20
 
 ### Refactored
