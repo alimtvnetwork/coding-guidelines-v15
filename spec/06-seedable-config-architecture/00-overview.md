@@ -51,6 +51,7 @@ This ensures configuration is always traceable, auditable, and version-aware.
 | 02.03 | `02-features/03-rag-validation-tests.md` | Unit test specifications for validators |
 | 02.04 | `02-features/04-rag-test-coverage-matrix.md` | Test coverage matrix for RAG validation |
 | 02.05 | `02-features/05-validation-data-seeding.md` | CW Config → Root DB seeding pattern |
+| 02.06 | `02-features/06-update-check-keys.md` | `Update.*` and `Storage.Backend` keys for update-check subsystem |
 | 03 | `03-issues/00-overview.md` | Issues tracker |
 | 97 | `97-acceptance-criteria.md` | Acceptance criteria |
 | 97b | `97-changelog.md` | Changelog |
