@@ -26,25 +26,25 @@ No clone, no download, no local files required. Open a terminal **in the directo
 #### PowerShell (Windows)
 
 ```powershell
-irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v14/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.ps1 | iex
 ```
 
 Skip the latest-version probe (install whatever this URL points to, no questions asked):
 
 ```powershell
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v14/main/install.ps1))) -n
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.ps1))) -n
 ```
 
 #### Bash (Linux / macOS)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v14/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.sh | bash
 ```
 
 Skip the latest-version probe:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v14/main/install.sh | bash -s -- -n
+curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.sh | bash -s -- -n
 ```
 
 > **What does `-n` / `--no-latest` do?** By default the installer probes 20 candidate "next" repository versions in parallel (e.g. `coding-guidelines-v15` … `coding-guidelines-v34`) and hands off to the newest one it finds. Pass `-n` (PowerShell) or `-n` / `--no-latest` (bash) to skip that probe entirely and run **this exact installer** without the network round-trip. Aliases for the same switch: PowerShell `-NoProbe`, `-NoLatest`; bash `--no-probe`, `--no-latest`.
@@ -59,11 +59,11 @@ What happens:
 To pass other flags through the pipe, use the explicit `bash -s` / scriptblock forms:
 
 ```powershell
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v14/main/install.ps1))) -Folders spec -DryRun
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.ps1))) -Folders spec -DryRun
 ```
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v14/main/install.sh | bash -s -- --folders spec --dry-run
+curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.sh | bash -s -- --folders spec --dry-run
 ```
 
 ### Option 2 — Local script (after cloning the repo)
@@ -137,11 +137,11 @@ Discover what's available:
 Override repo/branch (legacy form, still supported):
 
 ```bash
-./install.sh --repo alimtvnetwork/coding-guidelines-v14 --branch develop
+./install.sh --repo alimtvnetwork/coding-guidelines-v15 --branch develop
 ```
 
 ```powershell
-.\install.ps1 -Repo "alimtvnetwork/coding-guidelines-v14" -Branch "develop"
+.\install.ps1 -Repo "alimtvnetwork/coding-guidelines-v15" -Branch "develop"
 ```
 
 ### Configuration (`install-config.json`)
@@ -150,7 +150,7 @@ The scripts read `install-config.json` to determine which repo, branch, and fold
 
 ```json
 {
-  "repo": "alimtvnetwork/coding-guidelines-v14",
+  "repo": "alimtvnetwork/coding-guidelines-v15",
   "branch": "main",
   "folders": [
     "spec",

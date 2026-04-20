@@ -96,7 +96,7 @@ the canonical superset.
   - `run-all.sh` orchestrator with text + SARIF formats and proper exit codes
     (0 clean / 1 findings / 2 tool error).
   - **GitHub composite Action** at `linters-cicd/action.yml`:
-    `uses: alimtvnetwork/coding-guidelines-v14/linters-cicd@v3.9.0`.
+    `uses: alimtvnetwork/coding-guidelines-v15/linters-cicd@v3.9.0`.
   - **`install.sh` one-liner** with SHA-256 verification and `-d`/`-v`/`-n` flags.
   - Ready-to-paste CI templates for GitHub Actions, GitLab CI, Azure DevOps,
     Bitbucket Pipelines, Jenkins, plus a pre-commit hook.
