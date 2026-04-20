@@ -1,5 +1,8 @@
 # Generic CLI Creation Guidelines — Overview
 
+> **Version:** 1.0.0  
+> **Updated:** 2026-04-20  
+> **Status:** Active  
 > **Related specs:**
 > - [02-project-structure.md](02-project-structure.md) — package layout and file organization
 > - [03-subcommand-architecture.md](03-subcommand-architecture.md) — dispatch pattern and entry point
