@@ -5,6 +5,20 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+---
+
+## [3.16.0] - 2026-04-20
+
+### Added
+- **`check-stale-repo-slug.sh` linter safeguard.** Scans repository for pre-renumber
+  repo slug references (`coding-guidelines-v1` through `v14`). The current canonical
+  slug is `coding-guidelines-v15`; any older slug is a bug from incomplete bulk rename.
+- **Allowlist-driven filtering** via `linter-scripts/stale-repo-slug.allowlist` --
+  permits legitimate historical references in changelogs, migration docs, and
+  install-script version-probe specs (v5→v15 is the canonical worked example).
+- **CI wiring** -- added to `.github/workflows/ci.yml` lint job; fails build if
+  stale references are found outside allowlisted paths.
+
 ## [3.12.0] — 2026-04-19
 
 ### Refactored
