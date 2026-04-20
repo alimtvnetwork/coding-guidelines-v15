@@ -33,6 +33,7 @@ RAW=$(grep -rEn -I "$PATTERN" . \
   --exclude-dir=build \
   --exclude-dir=release-artifacts \
   --exclude="check-stale-repo-slug.sh" \
+  --exclude="stale-repo-slug.allowlist" \
   2>/dev/null || true)
 
 # Filter out paths matched by the allowlist (one glob/path-prefix per line).
@@ -46,8 +47,9 @@ with open('$ALLOWLIST') as f:
         if s and not s.startswith('#'):
             allow.append(s)
 for line in sys.stdin:
-    path = line.split(':', 1)[0].lstrip('./')
-    if any(fnmatch.fnmatch(path, p) or path.startswith(p) for p in allow):
+    raw = line.split(':', 1)[0]
+    path = raw[2:] if raw.startswith('./') else raw
+    if any(fnmatch.fnmatch(path, p) or path == p or path.startswith(p + '/') for p in allow):
         continue
     sys.stdout.write(line)
 ")
