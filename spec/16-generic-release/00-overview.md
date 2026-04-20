@@ -1,5 +1,8 @@
 # Generic Release Pipeline Specification
 
+> **Version:** 1.0.0  
+> **Updated:** 2026-04-20  
+> **Status:** Active  
 > **Imported from:** sibling reference implementation `spec/16-generic-release`
 >
 > **Related local specs:**
