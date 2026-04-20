@@ -20,14 +20,13 @@
 set -uo pipefail
 
 CURRENT_SLUG="coding-guidelines-v15"
-# Match v1..v14 but NOT v15+ (negative lookahead emulated by listing).
-# Pattern: coding-guidelines-v(1|2|3|4|5|6|7|8|9|10|11|12|13|14)
+ALLOWLIST="linter-scripts/stale-repo-slug.allowlist"
+# Match v1..v14 but NOT v15+.
 PATTERN='coding-guidelines-v(1[0-4]|[1-9])\b'
 
 echo "🔍 Scanning for stale repo slug references (pre-${CURRENT_SLUG})..."
 
-# grep -E with word boundary; -r recursive; -n with line numbers; -I skip binary
-MATCHES=$(grep -rEn -I "$PATTERN" . \
+RAW=$(grep -rEn -I "$PATTERN" . \
   --exclude-dir=.git \
   --exclude-dir=node_modules \
   --exclude-dir=dist \
@@ -35,6 +34,26 @@ MATCHES=$(grep -rEn -I "$PATTERN" . \
   --exclude-dir=release-artifacts \
   --exclude="check-stale-repo-slug.sh" \
   2>/dev/null || true)
+
+# Filter out paths matched by the allowlist (one glob/path-prefix per line).
+if [[ -f "$ALLOWLIST" && -n "$RAW" ]]; then
+  MATCHES=$(echo "$RAW" | python3 -c "
+import sys, fnmatch
+allow = []
+with open('$ALLOWLIST') as f:
+    for line in f:
+        s = line.strip()
+        if s and not s.startswith('#'):
+            allow.append(s)
+for line in sys.stdin:
+    path = line.split(':', 1)[0].lstrip('./')
+    if any(fnmatch.fnmatch(path, p) or path.startswith(p) for p in allow):
+        continue
+    sys.stdout.write(line)
+")
+else
+  MATCHES="$RAW"
+fi
 
 if [[ -z "$MATCHES" ]]; then
   echo "✅ PASS: no stale repo slug references found."
