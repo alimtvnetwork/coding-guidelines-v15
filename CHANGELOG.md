@@ -7,6 +7,25 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.17.0] - 2026-04-20
+
+### Refactored
+- **`forbidden-strings` TOML-driven linter.** Generalized the single-purpose
+  `check-stale-repo-slug.sh` into a reusable, configuration-driven scanner.
+  - New `linter-scripts/forbidden-strings.toml` — each `[[rule]]` defines a
+    regex `pattern`, human-readable `description`, `fix_hint`, `allowlist` paths,
+    and exclusion lists.
+  - New `linter-scripts/check-forbidden-strings.py` — parses the TOML config
+    and validates all rules in a single pass with unified reporting.
+- **CI migration** — removed `check-stale-repo-slug.sh` and
+  `stale-repo-slug.allowlist`; the generic checker now runs via Python in the
+  lint job.
+
+### Benefits
+- Adding new rename guards no longer requires new scripts — just append a
+  `[[rule]]` block to the TOML.
+- Allowlists live next to their rules, making intent explicit and reviews easier.
+
 ## [3.16.0] - 2026-04-20
 
 ### Added
