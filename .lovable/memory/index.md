@@ -13,7 +13,7 @@
 - DB Booleans: forbidden `Not`/`No` prefixes; Approved Inverses (`IsDisabled`, `IsInvalid`, `IsIncomplete`, `IsUnavailable`, `IsUnread`, `IsHidden`, `IsBroken`, `IsLocked`, `IsUnpublished`, `IsUnverified`) allowed. Inverses derived in code via Rule 9 codegen.
 - DB Descriptive columns: entity tables MUST have `Description TEXT NULL`; transactional tables MUST have `Notes TEXT NULL` and `Comments TEXT NULL`.
 - Workflow: Spec-First (`spec/`) and Issue-First (`03-issues/`).
-- Repo: `alimtvnetwork/coding-guidelines-v14`. Install scripts live at repo root (`install.ps1` / `install.sh`).
+- Repo: `alimtvnetwork/coding-guidelines-v15`. Install scripts live at repo root (`install.ps1` / `install.sh`).
 - `.lovable/` structure: single-file convention — `plan.md`, `suggestions.md`, `strictly-avoid.md` each hold their full history. Never create per-task folders.
 - Execution: Break complex requests into discrete tasks. Wait for "next" prompt to continue.
 
