@@ -311,6 +311,12 @@ trap cleanup EXIT
 
 ## Version Pinning via Placeholder Substitution
 
+> **Authoritative reference:** See
+> [08-version-pinned-release-installers.md](08-version-pinned-release-installers.md)
+> for the full contract — embedded-version constants, forbidden
+> "latest" probes, the §7a CI render stage, and the §10 test matrix.
+> This section is a short summary; the dedicated spec governs.
+
 During CI, the install scripts are generated from templates using
 placeholder substitution:
 
