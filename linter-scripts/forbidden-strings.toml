@@ -44,3 +44,16 @@ exclude_files = ["forbidden-strings.toml", "check-forbidden-strings.py"]
 allowlist = [
   "spec/14-update/23-install-script-version-probe.md",
 ]
+
+# --- Rule: legacy CDN domain references ---
+[[rule]]
+id = "LEGACY-CDN-DOMAIN"
+description = "Legacy CDN domain (cdn.riseup-asia.com). Current canonical domain is cdn.riseup.asia."
+pattern = 'cdn\.riseup-asia\.com'
+fix_hint = "grep -rlE '$PATTERN' . | xargs sed -i 's|cdn.riseup-asia.com|cdn.riseup.asia|g'"
+exclude_dirs = ["release-artifacts"]
+exclude_files = ["forbidden-strings.toml", "check-forbidden-strings.py"]
+allowlist = [
+  "spec/15-domain-migration/",
+  "docs/legacy-domains.md",
+]
