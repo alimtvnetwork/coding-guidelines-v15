@@ -41,7 +41,7 @@ confirm zero contradictions before handing off to implementer AIs.
 | [PascalCase key naming](../../02-coding-guidelines/01-cross-language/11-key-naming-pascalcase.md) | All files | ✅ |
 | [Code Red — boolean principles](../../02-coding-guidelines/01-cross-language/02-boolean-principles/) | 05 (positive booleans), 07 (no nested if), 08 (no swallow) | ✅ |
 | [Database naming](../../02-coding-guidelines/01-cross-language/07-database-naming.md) | 04 | ✅ PK = `UpdateCheckerId`, lookup PK = `UpdateStatusId` |
-| [Enum standards](../../11-consolidated-guidelines/04-enum-standards.md) | 04, 05 | ✅ Strict `ParseUpdateStatus()` mandated |
+| [Enum standards](../../17-consolidated-guidelines/04-enum-standards.md) | 04, 05 | ✅ Strict `ParseUpdateStatus()` mandated |
 | [Error handling — apperror](mem://architecture/error-handling) | 08 | ✅ File + line metadata required |
 
 ---
