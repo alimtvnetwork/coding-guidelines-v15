@@ -4,15 +4,15 @@
   "name": "coding-guidelines",
   "description": "Cross-language coding standards, error handling, CI/CD, and self-update specifications. Synced from package.json by scripts/sync-version.mjs.",
   "git": {
-    "sha": "93f55a533059fd8283688e311bcfec3662cbfecf",
-    "shortSha": "93f55a5",
-    "branch": "edit/edt-c72531a0-2be6-484b-a5d4-7ee48ab4c840"
+    "sha": "a24796f54065e7950b4a57804f5ab5a3ca26c8c2",
+    "shortSha": "a24796f",
+    "branch": "edit/edt-cbd0694b-86b9-4da3-b675-b0085b020ddc"
   },
   "stats": {
-    "totalFiles": 587,
-    "totalLines": 125209,
+    "totalFiles": 588,
+    "totalLines": 125348,
     "totalFolders": 22,
-    "totalBytes": 4184056,
+    "totalBytes": 4189262,
     "rootFiles": 5
   },
   "folders": [
@@ -90,9 +90,9 @@
       "status": "Active",
       "aiConfidence": "Production-Ready",
       "ambiguity": "Low",
-      "fileCount": 14,
-      "lineCount": 3817,
-      "byteCount": 116801
+      "fileCount": 15,
+      "lineCount": 3942,
+      "byteCount": 121520
     },
     {
       "path": "07-design-system",
@@ -176,14 +176,14 @@
       "path": "13-generic-cli",
       "name": "Generic CLI",
       "title": "Generic CLI Creation Guidelines",
-      "version": null,
-      "updated": null,
-      "status": null,
+      "version": "1.0.0",
+      "updated": "2026-04-20",
+      "status": "Active",
       "aiConfidence": null,
       "ambiguity": null,
       "fileCount": 22,
-      "lineCount": 4440,
-      "byteCount": 142763
+      "lineCount": 4443,
+      "byteCount": 142837
     },
     {
       "path": "14-update",
@@ -215,14 +215,14 @@
       "path": "16-generic-release",
       "name": "Generic Release",
       "title": "Generic Release Pipeline Specification",
-      "version": null,
-      "updated": null,
-      "status": null,
+      "version": "1.0.0",
+      "updated": "2026-04-20",
+      "status": "Active",
       "aiConfidence": null,
       "ambiguity": null,
       "fileCount": 10,
-      "lineCount": 2113,
-      "byteCount": 67427
+      "lineCount": 2116,
+      "byteCount": 67501
     },
     {
       "path": "17-consolidated-guidelines",
