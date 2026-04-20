@@ -44,3 +44,16 @@ exclude_files = ["forbidden-strings.toml", "check-forbidden-strings.py"]
 allowlist = [
   "spec/14-update/23-install-script-version-probe.md",
 ]
+
+# --- Rule: deprecated API version patterns ---
+[[rule]]
+id = "DEPRECATED-API-VERSION"
+description = "Deprecated API v1 endpoint references. Current canonical version is v2."
+pattern = '/api/v1/|api\.riseup-asia\.com/v1'
+fix_hint = "grep -rlE '$PATTERN' . | xargs sed -i 's|/api/v1/|/api/v2/|g; s|api.riseup-asia.com/v1|api.riseup-asia.com/v2|g'"
+exclude_dirs = ["release-artifacts"]
+exclude_files = ["forbidden-strings.toml", "check-forbidden-strings.py"]
+allowlist = [
+  "spec/13-api-migration/",
+  "docs/legacy-api-notes.md",
+]
