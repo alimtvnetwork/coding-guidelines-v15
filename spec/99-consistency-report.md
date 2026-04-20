@@ -28,15 +28,21 @@
 | `01-spec-authoring-guide/` | ✅ | ✅ |
 | `02-coding-guidelines/` | ✅ | ✅ |
 | `03-error-manage/` | ✅ (nested) | ✅ (nested) |
-| `04-split-db-architecture/` | ✅ | ✅ |
-| `05-seedable-config-architecture/` | ✅ | ✅ |
-| `06-design-system/` | ✅ | ✅ |
-| `07-docs-viewer-ui/` | ✅ | ✅ |
-| `08-code-block-system/` | ✅ | ✅ |
-| `09-powershell-integration/` | ✅ | ✅ |
+| `04-database-conventions/` | ✅ | ✅ |
+| `05-split-db-architecture/` | ✅ | ✅ |
+| `06-seedable-config-architecture/` | ✅ | ✅ |
+| `07-design-system/` | ✅ | ✅ |
+| `08-docs-viewer-ui/` | ✅ | ✅ |
+| `09-code-block-system/` | ✅ | ✅ |
 | `10-research/` | ✅ | — (placeholder) |
-| `11-consolidated-guidelines/` | ✅ | ✅ |
+| `11-powershell-integration/` | ✅ | ✅ |
 | `12-cicd-pipeline-workflows/` | ✅ | ✅ |
+| `13-generic-cli/` | ✅ | ✅ |
+| `14-update/` | ✅ | ✅ |
+| `15-distribution-and-runner/` | ✅ | ✅ |
+| `16-generic-release/` | ✅ | ✅ |
+| `17-consolidated-guidelines/` | ✅ | ✅ |
+| `18-wp-plugin-how-to/` | ✅ | ✅ |
 
 ### App-Specific (21+)
 
@@ -44,6 +50,8 @@
 |--------|----------|--------------------|
 | `21-app/` | ✅ | — (placeholder) |
 | `22-app-issues/` | ✅ | — (placeholder) |
+| `23-app-database/` | ✅ | — (placeholder) |
+| `24-app-design-system-and-ui/` | ✅ | — (placeholder) |
 
 ---
 
