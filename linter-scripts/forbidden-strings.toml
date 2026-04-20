@@ -33,3 +33,14 @@ allowlist = [
   ".lovable/memory/index.md",
   ".lovable/strictly-avoid.md",
 ]
+# --- Rule: stale module path (movie-cli v1 references) ---
+[[rule]]
+id = "STALE-MODULE-PATH"
+description = "Stale module path reference (movie-cli-v1). Current canonical namespace is movie-cli-v2."
+pattern = 'movie-cli-v1\\b'
+fix_hint = "grep -rlE '$PATTERN' . | xargs sed -i 's|movie-cli-v1|movie-cli-v2|g'"
+exclude_dirs = ["release-artifacts"]
+exclude_files = ["forbidden-strings.toml", "check-forbidden-strings.py"]
+allowlist = [
+  "spec/14-update/23-install-script-version-probe.md",
+]
