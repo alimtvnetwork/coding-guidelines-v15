@@ -23,7 +23,9 @@
     "spec:links:suggest": "python3 linter-scripts/suggest-spec-cross-link-fixes.py --root spec --repo-root .",
     "spec:links:fix": "python3 linter-scripts/suggest-spec-cross-link-fixes.py --root spec --repo-root . --apply",
     "spec:verify:inject": "node scripts/spec-verification/inject-verification-sections.mjs",
-    "spec:verify:inject:dry": "node scripts/spec-verification/inject-verification-sections.mjs --dry-run"
+    "spec:verify:inject:dry": "node scripts/spec-verification/inject-verification-sections.mjs --dry-run",
+    "spec:verify:report": "node scripts/spec-verification/generate-coverage-report.mjs --out reports/spec-verification/coverage.md && node scripts/spec-verification/generate-coverage-report.mjs --json --out reports/spec-verification/coverage.json",
+    "spec:verify:docs": "node scripts/spec-verification/generate-templates-doc.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
