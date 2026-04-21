@@ -3,87 +3,41 @@
 // generate-bundle-installers.mjs
 //
 // Emits per-bundle one-liner installers (.sh / .ps1) at the repo root.
-// Each generated installer is a thin wrapper that delegates to the
-// canonical install.sh / install.ps1 with a hardcoded --folders list.
+// Each generated installer reads its definition from bundles.json
+// (single source of truth) and supports two install paths:
 //
-// Why thin wrappers: keeps a single source of truth for download +
-// merge logic in install.{sh,ps1}; fixes propagate to all bundles
-// automatically; bundle scripts stay ~40 lines and easy to audit.
+//   1. Versioned install (--version vX.Y.Z) → fetch the stable-named
+//      release archive (`<stableName>.tar.gz` / `.zip`) and extract
+//      with src→dest folder remapping. No git checkout required.
+//
+//   2. Branch install (default) → delegate to install.sh / install.ps1
+//      with the bundle's source folder list (legacy behavior).
+//
+// All scripts also accept `--target <dir>` (alias `-Target`) to override
+// the install destination root.
+//
+// Source of truth: bundles.json. Edit the manifest, run this script,
+// commit the regenerated <bundle>-install.{sh,ps1} files.
 //
 // Usage:
 //   node scripts/generate-bundle-installers.mjs
 // =====================================================================
 
-import { writeFileSync, chmodSync, mkdirSync } from "node:fs";
+import { writeFileSync, chmodSync, mkdirSync, readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const REPO_SLUG = "alimtvnetwork/coding-guidelines-v15";
-const RAW_BASE = `https://raw.githubusercontent.com/${REPO_SLUG}/main`;
-
-const BUNDLES = [
-  {
-    name: "error-manage",
-    title: "Error Management Spec",
-    description: "Installs the error-management guidance plus the spec-authoring guide.",
-    folders: ["spec/01-spec-authoring-guide", "spec/03-error-manage"],
-  },
-  {
-    name: "splitdb",
-    title: "Split-DB Architecture Spec",
-    description: "Installs the database conventions, split-DB architecture, and seedable config specs.",
-    folders: [
-      "spec/04-database-conventions",
-      "spec/05-split-db-architecture",
-      "spec/06-seedable-config-architecture",
-    ],
-  },
-  {
-    name: "slides",
-    title: "Slides App + Decks",
-    description: "Installs the slides Vite app and the source decks (spec-slides/).",
-    folders: ["spec-slides", "slides-app"],
-  },
-  {
-    name: "linters",
-    title: "Linters + CI/CD Linter Pack",
-    description: "Installs the project linters and the CI/CD linter runner pack.",
-    folders: ["linters", "linters-cicd"],
-  },
-  {
-    name: "cli",
-    title: "CLI Toolchain Spec",
-    description: "Installs the CLI-related spec folders (PowerShell, CI/CD, generic CLI, update, distribution, generic release).",
-    folders: [
-      "spec/11-powershell-integration",
-      "spec/12-cicd-pipeline-workflows",
-      "spec/13-generic-cli",
-      "spec/14-update",
-      "spec/15-distribution-and-runner",
-      "spec/16-generic-release",
-    ],
-  },
-  {
-    name: "wp",
-    title: "WordPress Plugin How-To Spec",
-    description: "Installs the WordPress plugin authoring spec into spec/18-wp-plugin-how-to.",
-    folders: ["spec/18-wp-plugin-how-to"],
-  },
-  {
-    name: "consolidated",
-    title: "Consolidated Guidelines",
-    description: "Installs the spec-authoring guide, error-manage spec, and consolidated guidelines bundle.",
-    folders: [
-      "spec/01-spec-authoring-guide",
-      "spec/03-error-manage",
-      "spec/17-consolidated-guidelines",
-    ],
-  },
-];
+const MANIFEST_PATH = resolve(REPO_ROOT, "bundles.json");
+const MANIFEST = JSON.parse(readFileSync(MANIFEST_PATH, "utf8"));
+const { rawBase: RAW_BASE, releaseBase: RELEASE_BASE, bundles: BUNDLES } = MANIFEST;
+const PKG = JSON.parse(readFileSync(resolve(REPO_ROOT, "package.json"), "utf8"));
+const EXAMPLE_VERSION = `v${PKG.version}`;
 
 function bashScript(bundle) {
-  const folderList = bundle.folders.join(",");
+  const srcList = bundle.folders.map((f) => f.src).join(",");
+  const mappingPairs = bundle.folders.map((f) => `${f.src}|${f.dest}`).join(" ");
+  const mappingComment = bundle.folders.map((f) => `${f.src} → ${f.dest}`).join("\n#   ");
   return `#!/usr/bin/env bash
 # =====================================================================
 # ${bundle.name}-install.sh — ${bundle.title}
@@ -92,45 +46,113 @@ function bashScript(bundle) {
 #
 # Quick start:
 #   curl -fsSL ${RAW_BASE}/${bundle.name}-install.sh | bash
-#   curl -fsSL ${RAW_BASE}/${bundle.name}-install.sh | bash -s -- --version v3.39.0
+#   curl -fsSL ${RAW_BASE}/${bundle.name}-install.sh | bash -s -- --version ${EXAMPLE_VERSION}
+#   curl -fsSL ${RAW_BASE}/${bundle.name}-install.sh | bash -s -- --target ./vendor
 #
-# This is a thin wrapper around install.sh that hardcodes the bundle's
-# folder list. All install.sh flags are forwarded (e.g. --version,
-# --dest, --dry-run, --prompt, --force).
+# Install paths:
+#   • --version vX.Y.Z → fetch ${bundle.archive.stableName}.tar.gz from
+#     the GitHub Release and extract with src→dest folder remapping.
+#   • default          → delegate to install.sh (branch checkout).
 #
-# Folders installed:
-#   ${bundle.folders.join("\n#   ")}
+# Folder mapping (src in repo → dest under target):
+#   ${mappingComment}
+#
+# Generated by scripts/generate-bundle-installers.mjs from bundles.json.
+# Do not edit by hand — re-run \`npm run bundles:generate\` after
+# editing the manifest.
 # =====================================================================
 
 set -euo pipefail
 
 BUNDLE_NAME="${bundle.name}"
-BUNDLE_FOLDERS="${folderList}"
+BUNDLE_FOLDERS_SRC="${srcList}"
+BUNDLE_MAPPING="${mappingPairs}"
+ARCHIVE_STABLE_NAME="${bundle.archive.stableName}"
+RELEASE_BASE="${RELEASE_BASE}"
 INSTALLER_URL="${RAW_BASE}/install.sh"
+
+VERSION=""
+TARGET="$(pwd)"
+FORWARD_ARGS=()
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --version)        VERSION="$2"; FORWARD_ARGS+=("--version" "$2"); shift 2 ;;
+    --target|--dest)  TARGET="$2"; FORWARD_ARGS+=("--dest" "$2");    shift 2 ;;
+    *)                FORWARD_ARGS+=("$1");                          shift   ;;
+  esac
+done
 
 echo ""
 echo "════════════════════════════════════════════════════════"
 echo "  ${bundle.title} (bundle: \${BUNDLE_NAME})"
-echo "  Delegating to install.sh with --folders \${BUNDLE_FOLDERS}"
+echo "  Target: \${TARGET}"
+if [[ -n "\${VERSION}" ]]; then
+  echo "  Mode:   versioned archive (\${ARCHIVE_STABLE_NAME}.tar.gz @ \${VERSION})"
+else
+  echo "  Mode:   branch checkout via install.sh"
+fi
 echo "════════════════════════════════════════════════════════"
 echo ""
 
 # Skip the latest-installer probe — bundle scripts pin to install.sh as-is.
 export INSTALL_NO_PROBE=1
 
-if command -v curl >/dev/null 2>&1; then
-  curl -fsSL "$INSTALLER_URL" | bash -s -- --folders "$BUNDLE_FOLDERS" "$@"
-elif command -v wget >/dev/null 2>&1; then
-  wget -qO- "$INSTALLER_URL" | bash -s -- --folders "$BUNDLE_FOLDERS" "$@"
+install_via_archive() {
+  local archive_url="\${RELEASE_BASE}/download/\${VERSION}/\${ARCHIVE_STABLE_NAME}.tar.gz"
+  local tmp; tmp="$(mktemp -d)"
+  trap "rm -rf \\"\${tmp}\\"" EXIT
+
+  echo "  ▸ downloading \${archive_url}"
+  if ! curl -fsSL -o "\${tmp}/bundle.tar.gz" "\${archive_url}"; then
+    echo "  ⚠️  archive fetch failed — falling back to install.sh" >&2
+    install_via_installer
+    return
+  fi
+
+  mkdir -p "\${tmp}/extract"
+  tar -xzf "\${tmp}/bundle.tar.gz" -C "\${tmp}/extract"
+
+  mkdir -p "\${TARGET}"
+  for pair in \${BUNDLE_MAPPING}; do
+    local src="\${pair%|*}"
+    local dest="\${pair#*|}"
+    if [[ ! -d "\${tmp}/extract/\${src}" ]]; then
+      echo "  ⚠️  archive missing \${src} — skipping" >&2
+      continue
+    fi
+    mkdir -p "\${TARGET}/\${dest}"
+    cp -R "\${tmp}/extract/\${src}/." "\${TARGET}/\${dest}/"
+    echo "  ✓ \${src} → \${TARGET}/\${dest}"
+  done
+}
+
+install_via_installer() {
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL "\${INSTALLER_URL}" | bash -s -- --folders "\${BUNDLE_FOLDERS_SRC}" "\${FORWARD_ARGS[@]}"
+  elif command -v wget >/dev/null 2>&1; then
+    wget -qO- "\${INSTALLER_URL}" | bash -s -- --folders "\${BUNDLE_FOLDERS_SRC}" "\${FORWARD_ARGS[@]}"
+  else
+    echo "❌ Neither curl nor wget found. Install one and retry." >&2
+    exit 1
+  fi
+}
+
+if [[ -n "\${VERSION}" ]]; then
+  install_via_archive
 else
-  echo "❌ Neither curl nor wget found. Install one and retry." >&2
-  exit 1
+  install_via_installer
 fi
+
+echo ""
+echo "✅ \${BUNDLE_NAME} installed."
 `;
 }
 
 function powershellScript(bundle) {
-  const folderList = bundle.folders.join(",");
+  const srcList = bundle.folders.map((f) => f.src).join(",");
+  const mappingPairs = bundle.folders.map((f) => `${f.src}|${f.dest}`).join(",");
+  const mappingComment = bundle.folders.map((f) => `${f.src} → ${f.dest}`).join("\n      ");
   return `<#
 .SYNOPSIS
     ${bundle.title} — bundle installer (${bundle.name}).
@@ -138,21 +160,28 @@ function powershellScript(bundle) {
 .DESCRIPTION
     ${bundle.description}
 
-    This is a thin wrapper around install.ps1 that hardcodes the bundle's
-    folder list. All install.ps1 parameters are forwarded (e.g. -Version,
-    -Dest, -DryRun, -Prompt, -Force).
+    Install paths:
+      • -Version vX.Y.Z → fetch ${bundle.archive.stableName}.zip from the
+        GitHub Release and extract with src→dest folder remapping.
+      • default         → delegate to install.ps1 (branch checkout).
 
-    Folders installed:
-      ${bundle.folders.join("\n      ")}
+    Folder mapping (src in repo → dest under target):
+      ${mappingComment}
+
+    Generated by scripts/generate-bundle-installers.mjs from bundles.json.
+    Do not edit by hand — re-run \`npm run bundles:generate\` after
+    editing the manifest.
 
 .EXAMPLE
     irm ${RAW_BASE}/${bundle.name}-install.ps1 | iex
 
 .EXAMPLE
-    & ([scriptblock]::Create((irm ${RAW_BASE}/${bundle.name}-install.ps1))) -Version v3.39.0
+    & ([scriptblock]::Create((irm ${RAW_BASE}/${bundle.name}-install.ps1))) -Version ${EXAMPLE_VERSION} -Target .\\vendor
 #>
 
 param(
+    [string]$Version = "",
+    [string]$Target = "",
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$ForwardedArgs = @()
 )
@@ -161,26 +190,83 @@ $ErrorActionPreference = "Stop"
 $ProgressPreference = "SilentlyContinue"
 
 $BundleName = "${bundle.name}"
-$BundleFolders = "${folderList}"
+$BundleFoldersSrc = "${srcList}"
+$BundleMapping = "${mappingPairs}"
+$ArchiveStableName = "${bundle.archive.stableName}"
+$ReleaseBase = "${RELEASE_BASE}"
 $InstallerUrl = "${RAW_BASE}/install.ps1"
+
+if ([string]::IsNullOrEmpty($Target)) { $Target = (Get-Location).Path }
 
 Write-Host ""
 Write-Host "════════════════════════════════════════════════════════" -ForegroundColor Cyan
 Write-Host "  ${bundle.title} (bundle: $BundleName)" -ForegroundColor Cyan
-Write-Host "  Delegating to install.ps1 with -Folders $BundleFolders" -ForegroundColor Cyan
+Write-Host "  Target: $Target" -ForegroundColor Cyan
+if ($Version) {
+    Write-Host "  Mode:   versioned archive ($ArchiveStableName.zip @ $Version)" -ForegroundColor Cyan
+} else {
+    Write-Host "  Mode:   branch checkout via install.ps1" -ForegroundColor Cyan
+}
 Write-Host "════════════════════════════════════════════════════════" -ForegroundColor Cyan
 Write-Host ""
 
-# Skip the latest-installer probe — bundle scripts pin to install.ps1 as-is.
 $env:INSTALL_NO_PROBE = "1"
 
-$installerSource = Invoke-RestMethod -Uri $InstallerUrl -UseBasicParsing
-$installerBlock = [scriptblock]::Create($installerSource)
+function Install-ViaArchive {
+    $archiveUrl = "$ReleaseBase/download/$Version/$ArchiveStableName.zip"
+    $tmp = Join-Path ([System.IO.Path]::GetTempPath()) ("bundle-" + [guid]::NewGuid().ToString("N").Substring(0,8))
+    New-Item -ItemType Directory -Path $tmp -Force | Out-Null
+    try {
+        $zipPath = Join-Path $tmp "bundle.zip"
+        Write-Host "  ▸ downloading $archiveUrl"
+        try {
+            Invoke-WebRequest -Uri $archiveUrl -OutFile $zipPath -UseBasicParsing
+        } catch {
+            Write-Warning "  archive fetch failed — falling back to install.ps1: $($_.Exception.Message)"
+            Install-ViaInstaller
+            return
+        }
 
-# Folders is [string[]] in install.ps1, so split the comma list.
-$folderArray = $BundleFolders.Split(",")
+        $extractDir = Join-Path $tmp "extract"
+        Expand-Archive -Path $zipPath -DestinationPath $extractDir -Force
 
-& $installerBlock -Folders $folderArray @ForwardedArgs
+        New-Item -ItemType Directory -Path $Target -Force | Out-Null
+        foreach ($pair in $BundleMapping.Split(",")) {
+            $parts = $pair.Split("|")
+            $src = $parts[0]; $dest = $parts[1]
+            $srcPath = Join-Path $extractDir $src
+            if (-not (Test-Path $srcPath)) {
+                Write-Warning "  archive missing $src — skipping"
+                continue
+            }
+            $destPath = Join-Path $Target $dest
+            New-Item -ItemType Directory -Path $destPath -Force | Out-Null
+            Copy-Item -Path (Join-Path $srcPath '*') -Destination $destPath -Recurse -Force
+            Write-Host "  ✓ $src → $destPath" -ForegroundColor Green
+        }
+    } finally {
+        Remove-Item -Path $tmp -Recurse -Force -ErrorAction SilentlyContinue
+    }
+}
+
+function Install-ViaInstaller {
+    $installerSource = Invoke-RestMethod -Uri $InstallerUrl -UseBasicParsing
+    $installerBlock = [scriptblock]::Create($installerSource)
+    $folderArray = $BundleFoldersSrc.Split(",")
+    $extra = @()
+    if ($Version) { $extra += @("-Version", $Version) }
+    if ($Target)  { $extra += @("-Dest", $Target) }
+    & $installerBlock -Folders $folderArray @extra @ForwardedArgs
+}
+
+if ($Version) {
+    Install-ViaArchive
+} else {
+    Install-ViaInstaller
+}
+
+Write-Host ""
+Write-Host "✅ $BundleName installed." -ForegroundColor Green
 `;
 }
 
@@ -192,11 +278,11 @@ function writeFile(relPath, contents, executable = false) {
   console.log(`  ✓ wrote ${relPath}`);
 }
 
-console.log("Generating bundle installers...");
+console.log(`Generating bundle installers from ${MANIFEST_PATH}...`);
 for (const bundle of BUNDLES) {
   writeFile(`${bundle.name}-install.sh`, bashScript(bundle), true);
   writeFile(`${bundle.name}-install.ps1`, powershellScript(bundle), false);
 }
 console.log(`\nDone. Generated ${BUNDLES.length * 2} files for ${BUNDLES.length} bundles.`);
 
-export { BUNDLES };
+export { BUNDLES, MANIFEST };
