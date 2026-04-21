@@ -503,25 +503,3 @@ grep -rn 'ctx\.Value\|context\.Value' spec/ --include="*.md" \
 ---
 
 *Updated 2026-02-28 — v2.0.0. Added centralized `CastOrFail[T]` utility pattern (§9), "never swallow cast errors" rule (§10), stack skip requirement (§9.4), and test casting patterns (§9.3).*
-
----
-
-## Verification
-
-_Auto-generated section — see `spec/02-coding-guidelines/97-acceptance-criteria.md` for the full criteria index._
-
-### AC-CG-003a: Coding guideline conformance: Casting Elimination Patterns
-
-**Given** Run the cross-language coding-guidelines validator against `src/` and language-specific source roots.  
-**When** Run the verification command shown below.  
-**Then** Zero CODE-RED violations are reported (functions ≤ 15 lines, files ≤ 300 lines, no nested ifs, max 2 boolean operands).
-
-**Verification command:**
-
-```bash
-go run linter-scripts/validate-guidelines.go --path spec --max-lines 15 && python3 linter-scripts/validate-guidelines.py spec
-```
-
-**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
-
-_Verification section last updated: 2026-04-21_

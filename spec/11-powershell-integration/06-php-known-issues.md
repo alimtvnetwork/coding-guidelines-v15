@@ -82,25 +82,3 @@ $isBackupError = gettype($backupId) === 'array';
 // CORRECT — typed constant
 $isBackupError = gettype($backupId) === PhpNativeType::PhpArray->value;
 ```
-
----
-
-## Verification
-
-_Auto-generated section — see `spec/11-powershell-integration/97-acceptance-criteria.md` for the full criteria index._
-
-### AC-PS-006: PowerShell integration conformance: Php Known Issues
-
-**Given** Lint PowerShell scripts and modules in `scripts/` for naming, parameter binding, and error propagation.  
-**When** Run the verification command shown below.  
-**Then** Filenames are lowercase-kebab-case; functions are `Verb-Noun` PascalCase; `$ErrorActionPreference = 'Stop'` is set; no `Write-Host` for control flow.
-
-**Verification command:**
-
-```bash
-pwsh -NoProfile -Command "Invoke-ScriptAnalyzer -Path scripts -Recurse -Severity Warning"
-```
-
-**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
-
-_Verification section last updated: 2026-04-21_

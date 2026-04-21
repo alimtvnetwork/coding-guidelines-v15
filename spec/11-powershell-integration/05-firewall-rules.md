@@ -79,25 +79,3 @@ New-NetFirewallRule `
 5. Select **Allow the connection** → **Next**
 6. Check **Domain** and **Private** (uncheck Public) → **Next**
 7. Name: `LLM Runner (Go Backend) TCP 8080` → **Finish**
-
----
-
-## Verification
-
-_Auto-generated section — see `spec/11-powershell-integration/97-acceptance-criteria.md` for the full criteria index._
-
-### AC-PS-005: PowerShell integration conformance: Firewall Rules
-
-**Given** Lint PowerShell scripts and modules in `scripts/` for naming, parameter binding, and error propagation.  
-**When** Run the verification command shown below.  
-**Then** Filenames are lowercase-kebab-case; functions are `Verb-Noun` PascalCase; `$ErrorActionPreference = 'Stop'` is set; no `Write-Host` for control flow.
-
-**Verification command:**
-
-```bash
-pwsh -NoProfile -Command "Invoke-ScriptAnalyzer -Path scripts -Recurse -Severity Warning"
-```
-
-**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
-
-_Verification section last updated: 2026-04-21_

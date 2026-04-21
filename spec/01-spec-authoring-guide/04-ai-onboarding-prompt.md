@@ -247,25 +247,3 @@ Then **stop and wait** for instructions. Do not suggest next steps. Do not ask e
 ---
 
 *AI onboarding prompt — v3.2.0 — 2026-04-16*
-
----
-
-## Verification
-
-_Auto-generated section — see `spec/01-spec-authoring-guide/97-acceptance-criteria.md` for the full criteria index._
-
-### AC-SAG-004: Conformance check for spec authoring rule: Ai Onboarding Prompt
-
-**Given** Run the spec-structure linter against `spec/`.  
-**When** Run the verification command shown below.  
-**Then** Every folder MUST contain a valid `00-overview.md`, follow kebab-case numeric prefixes, and resolve all internal links.
-
-**Verification command:**
-
-```bash
-python3 linter-scripts/check-spec-folder-refs.py && python3 linter-scripts/check-spec-cross-links.py --root spec
-```
-
-**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
-
-_Verification section last updated: 2026-04-21_

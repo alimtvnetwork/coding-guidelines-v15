@@ -407,25 +407,3 @@ When a new CI/CD failure occurs:
 4. Update the **Pre-flight Checklist** if a new check is warranted.
 5. Bump the version of this document in the front-matter.
 6. Cross-reference the issue from the affected spec (e.g., `02-release-pipeline.md`).
-
----
-
-## Verification
-
-_Auto-generated section — see `spec/12-cicd-pipeline-workflows/97-acceptance-criteria.md` for the full criteria index._
-
-### AC-CI-010: CI/CD pipeline conformance: Release Pipeline Issues Rca
-
-**Given** Validate `.github/workflows/*.yml` against the documented job matrix.  
-**When** Run the verification command shown below.  
-**Then** Required jobs (`lint`, `cross-links`, `sync-drift`) are present; concurrency groups follow the `<workflow>-<ref>` pattern; `permissions:` is least-privilege.
-
-**Verification command:**
-
-```bash
-python3 linter-scripts/check-spec-cross-links.py --root spec
-```
-
-**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
-
-_Verification section last updated: 2026-04-21_

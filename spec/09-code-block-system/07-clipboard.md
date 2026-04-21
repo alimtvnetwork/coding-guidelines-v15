@@ -72,25 +72,3 @@ Key properties:
 ---
 
 *Clipboard Utility — updated: 2026-04-08*
-
----
-
-## Verification
-
-_Auto-generated section — see `spec/09-code-block-system/97-acceptance-criteria.md` for the full criteria index._
-
-### AC-CB-007: Code-block system conformance: Clipboard
-
-**Given** Render fenced code blocks (incl. nested 4-backtick fences) and checklist blocks from the spec tree.  
-**When** Run the verification command shown below.  
-**Then** Nested fences preserve backtick counts; clipboard copy returns exact source; tree rendering matches the constants map.
-
-**Verification command:**
-
-```bash
-npm run test
-```
-
-**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
-
-_Verification section last updated: 2026-04-21_

@@ -124,25 +124,3 @@ No silent failures. No bare stack traces.
 ---
 
 *Install contract — v1.0.0 — 2026-04-19*
-
----
-
-## Verification
-
-_Auto-generated section — see `spec/15-distribution-and-runner/97-acceptance-criteria.md` for the full criteria index._
-
-### AC-DIST-001: Distribution & runner conformance: Install Contract
-
-**Given** Validate the install contract and runner contract against a clean machine fixture.  
-**When** Run the verification command shown below.  
-**Then** Install script is idempotent; runner detects missing deps and exits with a stable error code; PATH entries are deduped.
-
-**Verification command:**
-
-```bash
-python3 linter-scripts/check-spec-cross-links.py --root spec
-```
-
-**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
-
-_Verification section last updated: 2026-04-21_

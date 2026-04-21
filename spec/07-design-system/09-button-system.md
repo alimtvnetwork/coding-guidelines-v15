@@ -221,25 +221,3 @@ Smaller, low-emphasis buttons used in code block headers:
 | Motion Transitions | [06-motion-transitions.md](./06-motion-transitions.md) |
 | Header Navigation | [08-header-navigation.md](./08-header-navigation.md) |
 | Theme Variables | [02-theme-variable-architecture.md](./02-theme-variable-architecture.md) |
-
----
-
-## Verification
-
-_Auto-generated section — see `spec/07-design-system/97-acceptance-criteria.md` for the full criteria index._
-
-### AC-DS-009: Design-system conformance: Button System
-
-**Given** Scan `src/` for raw color literals, hard-coded spacing, and untokenized typography.  
-**When** Run the verification command shown below.  
-**Then** All visual properties resolve to semantic tokens declared in `index.css` / `tailwind.config.ts`; no `text-white`, `bg-#fff`, or hex literals appear in components.
-
-**Verification command:**
-
-```bash
-npm run lint
-```
-
-**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
-
-_Verification section last updated: 2026-04-21_

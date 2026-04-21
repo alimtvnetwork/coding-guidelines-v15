@@ -155,25 +155,3 @@ Binaries and extension bundles are compiled **exactly once**. Compression, check
 ---
 
 *Browser extension release pipeline — updated: 2026-04-09*
-
----
-
-## Verification
-
-_Auto-generated section — see `spec/12-cicd-pipeline-workflows/97-acceptance-criteria.md` for the full criteria index._
-
-### AC-CI-002a: CI/CD pipeline conformance: Release Pipeline
-
-**Given** Validate `.github/workflows/*.yml` against the documented job matrix.  
-**When** Run the verification command shown below.  
-**Then** Required jobs (`lint`, `cross-links`, `sync-drift`) are present; concurrency groups follow the `<workflow>-<ref>` pattern; `permissions:` is least-privilege.
-
-**Verification command:**
-
-```bash
-python3 linter-scripts/check-spec-cross-links.py --root spec
-```
-
-**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
-
-_Verification section last updated: 2026-04-21_

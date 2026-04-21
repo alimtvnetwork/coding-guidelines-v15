@@ -120,25 +120,3 @@ dist/
 
 The `dist/` directory is the **single source of truth** for all
 downstream packaging, checksumming, and publishing steps.
-
----
-
-## Verification
-
-_Auto-generated section — see `spec/16-generic-release/97-acceptance-criteria.md` for the full criteria index._
-
-### AC-REL-001: Generic-release conformance: Cross Compilation
-
-**Given** Inspect a release artifact bundle for required assets and checksums.  
-**When** Run the verification command shown below.  
-**Then** SHA-256 checksums verify; `release-metadata.json` matches the package version; install scripts pin the exact release tag.
-
-**Verification command:**
-
-```bash
-python3 linter-scripts/check-spec-cross-links.py --root spec
-```
-
-**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
-
-_Verification section last updated: 2026-04-21_

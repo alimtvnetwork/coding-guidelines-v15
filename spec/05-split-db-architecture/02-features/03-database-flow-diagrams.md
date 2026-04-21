@@ -355,25 +355,3 @@ This document provides visual architecture diagrams showing the complete databas
 | GSearch DB | `../20-gsearch-cli/01-backend/22-database-architecture.md` |
 | BRun DB | `../21-brun-cli/01-backend/16-database-architecture.md` |
 | Nexus Flow DB | `../24-nexus-flow-cli/01-backend/05-database-architecture.md` |
-
----
-
-## Verification
-
-_Auto-generated section — see `spec/05-split-db-architecture/97-acceptance-criteria.md` for the full criteria index._
-
-### AC-SDB-003a: Split-DB architecture conformance: Database Flow Diagrams
-
-**Given** Inspect Root/App/Session DB lifecycle wiring and Casbin RBAC enforcement points.  
-**When** Run the verification command shown below.  
-**Then** Each tier opens its own SQLite handle (WAL mode), policy reload happens on Casbin policy change, and user-scope isolation is enforced by row filters.
-
-**Verification command:**
-
-```bash
-python3 linter-scripts/check-spec-cross-links.py --root spec
-```
-
-**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
-
-_Verification section last updated: 2026-04-21_

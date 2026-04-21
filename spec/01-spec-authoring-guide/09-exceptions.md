@@ -206,25 +206,3 @@ spec/
 2. **Include reason** — Why the standard cannot be followed
 3. **Mark as permanent or temporary** — Temporary exceptions should have a remediation plan
 4. **Update the consistency report** — Note the exception so it doesn't flag as an error
-
----
-
-## Verification
-
-_Auto-generated section — see `spec/01-spec-authoring-guide/97-acceptance-criteria.md` for the full criteria index._
-
-### AC-SAG-009: Conformance check for spec authoring rule: Exceptions
-
-**Given** Run the spec-structure linter against `spec/`.  
-**When** Run the verification command shown below.  
-**Then** Every folder MUST contain a valid `00-overview.md`, follow kebab-case numeric prefixes, and resolve all internal links.
-
-**Verification command:**
-
-```bash
-python3 linter-scripts/check-spec-folder-refs.py && python3 linter-scripts/check-spec-cross-links.py --root spec
-```
-
-**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
-
-_Verification section last updated: 2026-04-21_

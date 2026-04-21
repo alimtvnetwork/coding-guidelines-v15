@@ -595,25 +595,3 @@ func TestOverlapPercentageValidation(t *testing.T) {
 | Error Code Registry | `../03-error-manage/03-error-code-registry/00-overview.md` |
 | AI Bridge Error Codes | `../03-error-manage/03-error-code-registry/00-overview.md` |
 | Seedable Config Overview | `../00-overview.md` |
-
----
-
-## Verification
-
-_Auto-generated section — see `spec/06-seedable-config-architecture/97-acceptance-criteria.md` for the full criteria index._
-
-### AC-CFG-002a: Seedable-config conformance: Rag Validation Helpers
-
-**Given** Diff the running config tree against `config.seed.json` after a SemVer-aware GORM merge.  
-**When** Run the verification command shown below.  
-**Then** Merged keys preserve user overrides; new seed keys are added; removed seed keys are pruned; merge is idempotent on a second pass.
-
-**Verification command:**
-
-```bash
-python3 linter-scripts/check-spec-cross-links.py --root spec
-```
-
-**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
-
-_Verification section last updated: 2026-04-21_

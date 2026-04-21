@@ -115,25 +115,3 @@ Project-wide major version increment (+1.0.0) applied to all specification files
 ---
 
 _This changelog is maintained alongside the specification in `spec/response-envelope/`._
-
----
-
-## Verification
-
-_Auto-generated section — see `spec/03-error-manage/97-acceptance-criteria.md` for the full criteria index._
-
-### AC-ERR-002b: Error-management conformance: Changelog
-
-**Given** Audit error-handling sites for use of the `apperror` package, error codes, and explicit file/path logging.  
-**When** Run the verification command shown below.  
-**Then** Every error site uses `apperror.Wrap`/`apperror.New` with a registered code; no bare `errors.New` or swallowed errors remain.
-
-**Verification command:**
-
-```bash
-python3 linter-scripts/check-forbidden-strings.py && go run linter-scripts/validate-guidelines.go --path spec --max-lines 15
-```
-
-**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
-
-_Verification section last updated: 2026-04-21_
