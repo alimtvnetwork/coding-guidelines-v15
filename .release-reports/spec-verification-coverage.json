@@ -1,0 +1,14 @@
+{
+  "generated": "2026-04-21",
+  "mode": "overview-only",
+  "coverage_percent": 100,
+  "counts": {
+    "expected": 22,
+    "present": 22,
+    "missing": 0,
+    "skipped": 569,
+    "stray": 0
+  },
+  "missing": [],
+  "stray": []
+}
