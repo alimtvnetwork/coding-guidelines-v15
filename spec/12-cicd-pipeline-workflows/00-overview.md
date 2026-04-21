@@ -78,6 +78,19 @@ AI INSTRUCTION:
 | 01 | [01-ci-pipeline.md](./02-go-binary-deploy/01-ci-pipeline.md) | CI: SHA dedup, lint, vulncheck, test matrix, cross-compile | ✅ Active |
 | 02 | [02-release-pipeline.md](./02-go-binary-deploy/02-release-pipeline.md) | Release: binary build, icon embedding, code signing, install scripts, GitHub Release | ✅ Active |
 
+### Subfolder: Reusable CI Guards (Language-Agnostic)
+
+| # | File | Description | Status |
+|---|------|-------------|--------|
+| 00 | [00-overview.md](./03-reusable-ci-guards/00-overview.md) | Pattern inventory + design principles for AI-portable CI guards | ✅ Active |
+| 01 | [01-forbidden-name-guard.md](./03-reusable-ci-guards/01-forbidden-name-guard.md) | Block collision-prone helper names in flat-namespace packages | ✅ Active |
+| 02 | [02-grandfather-baseline-naming.md](./03-reusable-ci-guards/02-grandfather-baseline-naming.md) | Enforce naming convention only on new identifiers | ✅ Active |
+| 03 | [03-cross-file-collision-audit.md](./03-reusable-ci-guards/03-cross-file-collision-audit.md) | Detect duplicate / case-insensitive identifier collisions | ✅ Active |
+| 04 | [04-baseline-diff-lint-gate.md](./03-reusable-ci-guards/04-baseline-diff-lint-gate.md) | Fail build only on NEW lint findings vs cached baseline | ✅ Active |
+| 05 | [05-actionable-lint-suggestions.md](./03-reusable-ci-guards/05-actionable-lint-suggestions.md) | PR comment mapping each new finding to a fix template | ✅ Active |
+| 06 | [06-matrix-test-aggregator.md](./03-reusable-ci-guards/06-matrix-test-aggregator.md) | Combine matrix-job test outputs into one copy-paste report | ✅ Active |
+| 99 | [99-ai-implementation-guide.md](./03-reusable-ci-guards/99-ai-implementation-guide.md) | How an AI should select, configure, and ship these guards | ✅ Active |
+
 ---
 
 ## Migration History
