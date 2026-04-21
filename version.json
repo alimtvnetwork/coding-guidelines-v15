@@ -4,14 +4,14 @@
   "name": "coding-guidelines",
   "description": "Cross-language coding standards, error handling, CI/CD, and self-update specifications. Synced from package.json by scripts/sync-version.mjs.",
   "git": {
-    "sha": "c0e82bef6556b142499816900f620b9802b9f06c",
-    "shortSha": "c0e82be",
+    "sha": "c102ff5f51647b44bed0f3a49ab8db43e9680b9d",
+    "shortSha": "c102ff5",
     "branch": "edit/edt-9afd4d8f-c4a1-445e-8a75-eab855fb54f1"
   },
   "stats": {
     "totalFiles": 589,
     "totalLines": 125548,
-    "totalFolders": 23,
+    "totalFolders": 22,
     "totalBytes": 4198672,
     "rootFiles": 5
   },
@@ -249,19 +249,6 @@
       "fileCount": 31,
       "lineCount": 17265,
       "byteCount": 571755
-    },
-    {
-      "path": "19-ai-reliability",
-      "name": "Ai Reliability",
-      "title": null,
-      "version": null,
-      "updated": null,
-      "status": null,
-      "aiConfidence": null,
-      "ambiguity": null,
-      "fileCount": 0,
-      "lineCount": 0,
-      "byteCount": 0
     },
     {
       "path": "21-app",
