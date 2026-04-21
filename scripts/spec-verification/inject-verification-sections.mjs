@@ -40,7 +40,6 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(HERE, "..", "..");
 
 const SKIP_BASENAMES = new Set([
-  "00-overview.md",
   "97-acceptance-criteria.md",
   "99-consistency-report.md",
   "readme.md",
@@ -51,15 +50,21 @@ const VERIFICATION_HEADING = "## Verification";
 const TODAY = new Date().toISOString().slice(0, 10);
 
 function parseArgs(argv) {
-  const args = { root: "spec", dryRun: false, only: null, json: false };
+  const args = { root: "spec", dryRun: false, only: null, json: false, mode: "overview-only", strip: false };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--dry-run") args.dryRun = true;
     else if (a === "--json") args.json = true;
     else if (a === "--root") args.root = argv[++i];
     else if (a === "--only") args.only = argv[++i];
+    else if (a === "--mode") args.mode = argv[++i];
+    else if (a === "--strip") args.strip = true;
     else if (a === "-h" || a === "--help") { printHelp(); process.exit(0); }
     else { console.error(`Unknown flag: ${a}`); process.exit(2); }
+  }
+  if (!["overview-only", "all-files"].includes(args.mode)) {
+    console.error(`--mode must be 'overview-only' or 'all-files', got '${args.mode}'`);
+    process.exit(2);
   }
   return args;
 }
@@ -68,6 +73,10 @@ function printHelp() {
   console.log(`Usage: node scripts/spec-verification/inject-verification-sections.mjs [flags]
   --root <dir>   Spec root (default 'spec')
   --only <substr> Restrict to folders whose path includes this substring
+  --mode <m>      'overview-only' (default) — inject only into each folder's
+                  00-overview.md. 'all-files' — inject into every prose file.
+  --strip         Remove existing ## Verification blocks instead of writing
+                  new ones. Useful when downsizing scope.
   --dry-run       Show plan without writing
   --json          Emit JSON summary`);
 }
@@ -154,13 +163,24 @@ function replaceOrAppend(content, newSection) {
   return head + "\n" + newSection;
 }
 
-function shouldSkip(fullPath, relPath) {
+function shouldSkip(fullPath, relPath, mode) {
   const base = basename(fullPath).toLowerCase();
   if (SKIP_BASENAMES.has(base)) return true;
-  // Skip the spec root files (e.g. spec/00-overview.md) — those have their
-  // own bespoke verification logic.
+  // Spec-root files (e.g. spec/00-overview.md) own their own bespoke
+  // verification logic — never touch them.
   if (relPath.split(sep).length === 1) return true;
+  // overview-only mode: only touch each folder's 00-overview.md.
+  if (mode === "overview-only" && base !== "00-overview.md") return true;
   return false;
+}
+
+function stripVerificationBlock(content) {
+  const idx = content.indexOf(`\n${VERIFICATION_HEADING}`);
+  if (idx === -1) return content;
+  let cutStart = idx;
+  const beforeIdx = content.lastIndexOf("\n---\n", idx);
+  if (beforeIdx !== -1 && beforeIdx > idx - 20) cutStart = beforeIdx;
+  return content.slice(0, cutStart).replace(/\s+$/, "") + "\n";
 }
 
 function main() {
@@ -183,14 +203,31 @@ function main() {
     summary.scanned++;
     const rel = relative(rootAbs, full);
     if (args.only && !rel.includes(args.only)) { summary.skipped++; continue; }
-    if (shouldSkip(full, rel)) { summary.skipped++; continue; }
+    // For --strip, we visit every prose file regardless of mode so we can
+    // remove blocks that earlier runs may have planted.
+    if (!args.strip && shouldSkip(full, rel, args.mode)) { summary.skipped++; continue; }
+    if (args.strip) {
+      const base = basename(full).toLowerCase();
+      if (SKIP_BASENAMES.has(base) || rel.split(sep).length === 1) {
+        summary.skipped++; continue;
+      }
+      // In overview-only strip mode, do NOT strip the overview itself.
+      if (args.mode === "overview-only" && base === "00-overview.md") {
+        summary.skipped++; continue;
+      }
+    }
     const profile = pickProfile(rel);
     summary.perProfile[profile.tag] = (summary.perProfile[profile.tag] || 0) + 1;
     let original;
     try { original = readFileSync(full, "utf8"); }
     catch (e) { summary.errors.push({ file: rel, error: e.message }); continue; }
-    const section = buildSection(profile, full, rel);
-    const next = replaceOrAppend(original, section);
+    let next;
+    if (args.strip) {
+      next = stripVerificationBlock(original);
+    } else {
+      const section = buildSection(profile, full, rel);
+      next = replaceOrAppend(original, section);
+    }
     if (next === original) { summary.unchanged++; continue; }
     if (!args.dryRun) {
       try { writeFileSync(full, next, "utf8"); }
