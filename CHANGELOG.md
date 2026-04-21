@@ -7,6 +7,32 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.22.0] - 2026-04-21
+
+### Changed
+- **Release pipeline bakes and uploads versioned `release-install.*`
+  scripts.** New `.github/workflows/release.yml` step
+  *"Bake version into release-install scripts"* (runs after the
+  `linters-cicd` verify, before `softprops/action-gh-release`).
+  - Copies `release-install.sh` and `release-install.ps1` into
+    `release-artifacts/` and `sed`-substitutes the literal
+    `__VERSION_PLACEHOLDER__` token with the resolved tag
+    (`${{ steps.version.outputs.version }}`). Originals in the repo
+    keep the placeholder verbatim so subsequent releases re-bake
+    cleanly from a known-good source.
+  - Fail-fast guards: missing source file → `::error::… missing`;
+    any leftover `__VERSION_PLACEHOLDER__` after substitution →
+    `::error::… still present`; explicit `grep` assertions confirm
+    `BAKED_VERSION="vX.Y.Z"` (bash) and `$BakedVersion = "vX.Y.Z"`
+    (PowerShell) are present in the staged copies.
+  - `chmod +x` applied to the bash variant; SHA-256 sums for both
+    files appended to `release-artifacts/checksums.txt`.
+  - Both files added to the `softprops/action-gh-release` `files:`
+    list, so each GitHub Release page now ships
+    `release-install.sh` and `release-install.ps1` as first-class
+    assets pinned to that exact tag. Implements the deferred wiring
+    step from `spec/14-update/25-release-pinned-installer.md` §6.
+
 ## [3.21.0] - 2026-04-21
 
 ### Added
