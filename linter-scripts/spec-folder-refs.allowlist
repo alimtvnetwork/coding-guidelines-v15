@@ -1,13 +1,26 @@
 # Allowlist for check-spec-folder-refs.py
 #
-# Folders listed here MAY be referenced by markdown even though they
-# do NOT exist on disk in this repository. They live in sibling
-# repositories (notably `gitmap-v3`) that are intentionally NOT
-# imported here per the avoid-app-sync rule
-# (see .lovable/memory/constraints/avoid-app-sync).
+# Two categories, each under a [section] header:
 #
-# Format: one folder name per line. Lines starting with `#` and blank
-# lines are ignored.
+#   [external]  — Folders that physically exist in a sibling repository
+#                 (notably `gitmap-v3`) and are intentionally NOT imported
+#                 into this repo per the avoid-app-sync rule
+#                 (see .lovable/memory/constraints/avoid-app-sync).
+#                 References are real and resolvable in the other repo.
+#
+#   [doc-only]  — Illustrative or historical folder names that do NOT exist
+#                 anywhere. They appear in narrative documentation
+#                 (changelogs, migration write-ups, examples) purely as
+#                 prose. They MUST NOT be used as live navigation links.
+#
+# Format:
+#   - Section headers: `[external]` or `[doc-only]` on their own line.
+#   - One folder name per line within a section.
+#   - Lines starting with `#` and blank lines are ignored.
+#   - Entries before the first section header default to [external] for
+#     backward compatibility with the pre-section format.
+
+[external]
 
 # --- gitmap-v3 sibling repo (app, app-issues, general layout) ---
 01-app
@@ -38,5 +51,7 @@
 31-generic-enforce
 33-ai-bridge-non-vector-rag
 
-# --- documentation-only references (not real spec folders) ---
-15-domain-migration
+[doc-only]
+
+# Add illustrative / historical folder names here. They must never appear
+# as live links — only inside prose, code fences, or example tables.
