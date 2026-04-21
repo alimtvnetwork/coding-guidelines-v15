@@ -213,7 +213,12 @@ function main() {
     if (!args.strip && shouldSkip(full, rel, args.mode)) { summary.skipped++; continue; }
     if (args.strip) {
       const base = basename(full).toLowerCase();
-      if (SKIP_BASENAMES.has(base) || rel.split(sep).length === 1) {
+      // For --strip we always visit readme.md / changelog.md too, so we
+      // can clean up blocks planted by earlier "all-files" runs. Only
+      // 97-acceptance-criteria.md and 99-consistency-report.md are
+      // sacred — those own their own verification narratives.
+      const stripSacred = new Set(["97-acceptance-criteria.md", "99-consistency-report.md"]);
+      if (stripSacred.has(base) || rel.split(sep).length === 1) {
         summary.skipped++; continue;
       }
       // In overview-only strip mode, do NOT strip the overview itself.
