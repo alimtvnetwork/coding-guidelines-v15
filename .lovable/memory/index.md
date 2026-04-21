@@ -1,6 +1,6 @@
 # Memory Index
 
-**Updated:** 2026-04-19
+**Updated:** 2026-04-21
 
 # Project Memory
 
@@ -8,6 +8,7 @@
 - 🔴 CODE RED: Never swallow errors. Zero-nesting (no nested if). Max 2 operands. Positively named guard functions.
 - 🔴 CODE RED: Strict metrics: functions 8-15 lines, files < 300 lines, React components < 100 lines.
 - 🔴 NEVER sync 01-app, 02-app-issues, 03-general, 03-tasks, or 12-consolidated-guidelines from upstream sibling repos. All maintained locally.
+- 🔴 SKIP from spec audits: `21-app`, `22-app-issues`, `23-app-database`, `24-app-design-system-and-ui` are intentional stubs. Never write 97/99 files for them, never demote to `_drafts/`, exclude from corpus averages.
 - Naming: PascalCase for all internal IDs, DB, JSON, Types. Exceptions: Rust uses snake_case identifiers.
 - DB Schema: PascalCase naming. PKs are `{TableName}Id` (INTEGER PRIMARY KEY AUTOINCREMENT). No UUIDs.
 - DB Booleans: forbidden `Not`/`No` prefixes; Approved Inverses (`IsDisabled`, `IsInvalid`, `IsIncomplete`, `IsUnavailable`, `IsUnread`, `IsHidden`, `IsBroken`, `IsLocked`, `IsUnpublished`, `IsUnverified`) allowed. Inverses derived in code via Rule 9 codegen.
@@ -68,3 +69,4 @@
 - [Doc Standards](mem://project/documentation-standards) — Mandatory numeric folders (01-20 Core, 21+ App), JSON tree syncing.
 - [Author Attribution](mem://project/author-attribution) — Md. Alim Ul Karim, Riseup Asia LLC, SEO/footer requirements.
 - [Avoid Upstream Sync](mem://constraints/avoid-app-sync) — NEVER sync app/app-issues/general/tasks/consolidated-guidelines from upstream sibling repos.
+- [Skip Stub Spec Folders](mem://constraints/skip-stub-spec-folders) — 21-app, 22-app-issues, 23-app-database, 24-app-design-system-and-ui excluded from audit/remediation.
