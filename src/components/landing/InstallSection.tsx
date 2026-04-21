@@ -41,19 +41,32 @@ type BundleCommand = {
   folders: string[];
   bash: string;
   ps: string;
-  archive: string;
+  archiveZip: string;
+  archiveTar: string;
+  downloadBash: string;
+  downloadPwsh: string;
 };
 
 const RAW_BASE = bundlesManifest.rawBase;
+const RELEASE_BASE = bundlesManifest.releaseBase;
+const LATEST_TAG = `v${versionData.version}`;
 
-const bundleCommands: BundleCommand[] = bundlesManifest.bundles.map((b) => ({
-  bundle: b.name,
-  description: b.description,
-  folders: b.folders.map((f) => f.dest),
-  bash: `curl -fsSL ${RAW_BASE}/${b.name}-install.sh | bash`,
-  ps: `irm ${RAW_BASE}/${b.name}-install.ps1 | iex`,
-  archive: `${b.archive.stableName}.zip`,
-}));
+const bundleCommands: BundleCommand[] = bundlesManifest.bundles.map((b) => {
+  const stable = b.archive.stableName;
+  const tarUrl = `${RELEASE_BASE}/download/${LATEST_TAG}/${stable}.tar.gz`;
+  const zipUrl = `${RELEASE_BASE}/download/${LATEST_TAG}/${stable}.zip`;
+  return {
+    bundle: b.name,
+    description: b.description,
+    folders: b.folders.map((f) => f.dest),
+    bash: `curl -fsSL ${RAW_BASE}/${b.name}-install.sh | bash`,
+    ps: `irm ${RAW_BASE}/${b.name}-install.ps1 | iex`,
+    archiveZip: zipUrl,
+    archiveTar: tarUrl,
+    downloadBash: `curl -fsSLO ${tarUrl}`,
+    downloadPwsh: `Invoke-WebRequest -Uri ${zipUrl} -OutFile ${stable}.zip`,
+  };
+});
 
 function CopyButton({ command }: { command: string }) {
   const [hasCopied, setHasCopied] = useState(false);
@@ -181,6 +194,7 @@ export function InstallSection() {
 }
 
 function BundleCard({ bundle }: { bundle: BundleCommand }) {
+  const [tab, setTab] = useState<"install" | "download">("install");
   return (
     <Card className="overflow-hidden border-border/60 bg-card/50 transition-colors hover:border-primary/40">
       <CardHeader className="pb-3">
@@ -194,8 +208,61 @@ function BundleCard({ bundle }: { bundle: BundleCommand }) {
         <p className="mt-1 text-xs text-muted-foreground">{bundle.description}</p>
       </CardHeader>
       <CardContent className="space-y-2">
-        <BundleCommandRow label="bash" command={bundle.bash} />
-        <BundleCommandRow label="pwsh" command={bundle.ps} />
+        <div
+          role="tablist"
+          aria-label={`${bundle.bundle} command mode`}
+          className="inline-flex rounded-md border border-border bg-secondary/40 p-0.5 text-[11px] font-medium"
+        >
+          <button
+            role="tab"
+            aria-selected={tab === "install"}
+            onClick={() => setTab("install")}
+            className={`rounded px-2.5 py-1 transition-colors ${
+              tab === "install"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            One-liner install
+          </button>
+          <button
+            role="tab"
+            aria-selected={tab === "download"}
+            onClick={() => setTab("download")}
+            className={`rounded px-2.5 py-1 transition-colors ${
+              tab === "download"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Download archive
+          </button>
+        </div>
+        {tab === "install" ? (
+          <>
+            <BundleCommandRow label="bash" command={bundle.bash} />
+            <BundleCommandRow label="pwsh" command={bundle.ps} />
+          </>
+        ) : (
+          <>
+            <BundleCommandRow label="bash" command={bundle.downloadBash} />
+            <BundleCommandRow label="pwsh" command={bundle.downloadPwsh} />
+            <div className="flex flex-wrap gap-2 pt-1">
+              <a
+                href={bundle.archiveTar}
+                className="rounded-md border border-border/60 bg-secondary/40 px-2 py-1 font-mono text-[10px] text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
+              >
+                .tar.gz
+              </a>
+              <a
+                href={bundle.archiveZip}
+                className="rounded-md border border-border/60 bg-secondary/40 px-2 py-1 font-mono text-[10px] text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
+              >
+                .zip
+              </a>
+            </div>
+          </>
+        )}
         <ul className="mt-2 flex flex-wrap gap-1.5">
           {bundle.folders.map((folder) => (
             <li
