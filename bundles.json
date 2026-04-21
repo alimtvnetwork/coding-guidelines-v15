@@ -36,8 +36,8 @@
       "title": "Slides App + Decks",
       "description": "Installs the slides Vite app and the source decks (spec-slides/).",
       "folders": [
-        { "src": "spec-slides", "dest": "spec-slides" },
-        { "src": "slides-app", "dest": "slides-app" }
+        { "src": "spec-slides", "dest": "spec/spec-slides" },
+        { "src": "slides-app", "dest": "spec/slides-app" }
       ],
       "archive": {
         "stableName": "slides",
