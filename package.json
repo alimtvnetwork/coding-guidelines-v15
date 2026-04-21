@@ -18,7 +18,10 @@
     "release:ps1": "powershell -ExecutionPolicy Bypass -File ./release.ps1",
     "test": "vitest run",
     "test:watch": "vitest",
-    "spec:audit": "node scripts/spec-audit/run-audit.mjs"
+    "spec:audit": "node scripts/spec-audit/run-audit.mjs",
+    "spec:links:check": "python3 linter-scripts/check-spec-cross-links.py --root spec --repo-root .",
+    "spec:links:suggest": "python3 linter-scripts/suggest-spec-cross-link-fixes.py --root spec --repo-root .",
+    "spec:links:fix": "python3 linter-scripts/suggest-spec-cross-link-fixes.py --root spec --repo-root . --apply"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
