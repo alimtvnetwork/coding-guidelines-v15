@@ -717,25 +717,3 @@ POST /api/v1/reset/confirm
 ---
 
 *Concrete examples for every CLI.*
-
----
-
-## Verification
-
-_Auto-generated section — see `spec/05-split-db-architecture/97-acceptance-criteria.md` for the full criteria index._
-
-### AC-SDB-001a: Split-DB architecture conformance: Cli Examples
-
-**Given** Inspect Root/App/Session DB lifecycle wiring and Casbin RBAC enforcement points.  
-**When** Run the verification command shown below.  
-**Then** Each tier opens its own SQLite handle (WAL mode), policy reload happens on Casbin policy change, and user-scope isolation is enforced by row filters.
-
-**Verification command:**
-
-```bash
-python3 linter-scripts/check-spec-cross-links.py --root spec
-```
-
-**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
-
-_Verification section last updated: 2026-04-21_

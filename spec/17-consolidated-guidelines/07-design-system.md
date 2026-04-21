@@ -707,25 +707,3 @@ Change HSL values in `:root {}` and `.dark {}` — every component updates autom
 ---
 
 *Consolidated design system — v3.2.0 — 2026-04-16*
-
----
-
-## Verification
-
-_Auto-generated section — see `spec/17-consolidated-guidelines/97-acceptance-criteria.md` for the full criteria index._
-
-### AC-CON-007: Consolidated guideline conformance: Design System
-
-**Given** Cross-check this consolidated digest against its source spec folder.  
-**When** Run the verification command shown below.  
-**Then** Every rule cited here resolves to a section in the source folder via the cross-link checker; no orphan rules.
-
-**Verification command:**
-
-```bash
-python3 linter-scripts/check-spec-cross-links.py --root spec
-```
-
-**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
-
-_Verification section last updated: 2026-04-21_

@@ -28,25 +28,3 @@
 | [templates/powershell.json](./templates/powershell.json) | Template `powershell.json` |
 | [templates/run.ps1](./templates/run.ps1) | Template `run.ps1` entry point |
 | [examples/server-client-project.json](./examples/server-client-project.json) | Example server-client project configuration |
-
----
-
-## Verification
-
-_Auto-generated section — see `spec/11-powershell-integration/97-acceptance-criteria.md` for the full criteria index._
-
-### AC-PS-523: Conformance check for this PowerShell integration rule
-
-**Given** Invoke the Pester suite.  
-**When** Run the verification command shown below.  
-**Then** Pester exits 0 with FailedCount=0; `Invoke-ScriptAnalyzer -Severity Error` returns zero diagnostics on every shipped `.ps1`.
-
-**Verification command:**
-
-```bash
-pwsh -Command 'Invoke-Pester tests/powershell/ -CI'
-```
-
-**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
-
-_Verification section last updated: 2026-04-21_

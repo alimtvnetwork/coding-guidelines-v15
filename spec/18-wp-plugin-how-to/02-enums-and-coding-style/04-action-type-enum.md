@@ -233,25 +233,3 @@ $action->label();
 ---
 
 *Second reference implementation — large enum (40+ cases) with match-based metadata.*
-
----
-
-## Verification
-
-_Auto-generated section — see `spec/18-wp-plugin-how-to/97-acceptance-criteria.md` for the full criteria index._
-
-### AC-WP-004a: WordPress plugin conformance: Action Type Enum
-
-**Given** Static-analyze the plugin source against the documented enum, trait, and REST conventions.  
-**When** Run the verification command shown below.  
-**Then** Enums are `enum X: string` with metadata methods; REST routes use the `/wp-json/<plugin>/v1/` namespace; nonces are verified on every mutating request.
-
-**Verification command:**
-
-```bash
-python3 linter-scripts/check-spec-cross-links.py --root spec
-```
-
-**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
-
-_Verification section last updated: 2026-04-21_

@@ -49,16 +49,16 @@ _No research documents added yet. Add research files as numbered entries (e.g., 
 
 _Auto-generated section — see `spec/10-research/97-acceptance-criteria.md` for the full criteria index._
 
-### AC-RES-000: Conformance check for this research-document rule
+### AC-RES-000: Research-folder conformance: Overview
 
-**Given** Run the research-structure linter.  
+**Given** Validate research note structure (front-matter, dated filenames, source links).  
 **When** Run the verification command shown below.  
-**Then** Every research file contains H2 sections `Objective`, `Methodology`, `Findings`, `Conclusion` and links to at least one consolidated guideline.
+**Then** Every research note has a date prefix, a `Source:` line, and a `Decision:` or `Outcome:` section.
 
 **Verification command:**
 
 ```bash
-python3 linters-cicd/scripts/check-research-structure.py spec/10-research/
+python3 linter-scripts/check-spec-folder-refs.py
 ```
 
 **Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.

@@ -146,25 +146,3 @@ func FailMapNew[K comparable, V any](code, message string) ResultMap[K, V]
 > All result wrappers — `Result[T]`, `ResultSlice[T]`, and `ResultMap[K, V]` — expose the underlying error via `.AppError()` (returning `*AppError`), **not** `.Error()`. This avoids collision with Go's native `error` interface method `.Error() string` and ensures callers always receive the structured `*AppError` type for direct propagation via `Fail[T]()`, `FailSlice[T]()`, etc. without interface casts. The same convention applies to `dbutil` result types (`dbutil.Result[T]`, `dbutil.ResultSet[T]`, `dbutil.ExecResult`), which also store and return `*apperror.AppError` from their `.AppError()` method to enable bridge methods like `ToAppResult()` and `ToAppResultSlice()`.
 
 ---
-
----
-
-## Verification
-
-_Auto-generated section — see `spec/03-error-manage/97-acceptance-criteria.md` for the full criteria index._
-
-### AC-ERR-003c: Error-management conformance: Result Types
-
-**Given** Audit error-handling sites for use of the `apperror` package, error codes, and explicit file/path logging.  
-**When** Run the verification command shown below.  
-**Then** Every error site uses `apperror.Wrap`/`apperror.New` with a registered code; no bare `errors.New` or swallowed errors remain.
-
-**Verification command:**
-
-```bash
-python3 linter-scripts/check-forbidden-strings.py && go run linter-scripts/validate-guidelines.go --path spec --max-lines 15
-```
-
-**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
-
-_Verification section last updated: 2026-04-21_

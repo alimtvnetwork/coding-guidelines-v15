@@ -81,25 +81,3 @@ When handing this project to any AI or engineer, they should read these specs in
 6. **01** — CI pipeline (how code is validated)
 7. **02** — Release pipeline (how releases are built and published)
 8. **03** — Vulnerability scanning (security baseline)
-
----
-
-## Verification
-
-_Auto-generated section — see `spec/12-cicd-pipeline-workflows/97-acceptance-criteria.md` for the full criteria index._
-
-### AC-CI-273: Conformance check for this CI/CD pipeline rule
-
-**Given** Validate every workflow YAML and inspect release artifacts.  
-**When** Run the verification command shown below.  
-**Then** Every `.github/workflows/*.yml` validates against `schemas/github-workflow.json`; every git tag matches `^v\d+\.\d+\.\d+(-(alpha|beta|rc)\.\d+)?$`.
-
-**Verification command:**
-
-```bash
-bash linters-cicd/run-all.sh --workflows-only
-```
-
-**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
-
-_Verification section last updated: 2026-04-21_

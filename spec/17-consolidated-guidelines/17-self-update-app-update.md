@@ -439,25 +439,3 @@ Update configuration stored in a config file:
 ---
 
 *Consolidated self-update & app update — v3.2.0 — 2026-04-16*
-
----
-
-## Verification
-
-_Auto-generated section — see `spec/17-consolidated-guidelines/97-acceptance-criteria.md` for the full criteria index._
-
-### AC-CON-017: Consolidated guideline conformance: Self Update App Update
-
-**Given** Cross-check this consolidated digest against its source spec folder.  
-**When** Run the verification command shown below.  
-**Then** Every rule cited here resolves to a section in the source folder via the cross-link checker; no orphan rules.
-
-**Verification command:**
-
-```bash
-python3 linter-scripts/check-spec-cross-links.py --root spec
-```
-
-**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
-
-_Verification section last updated: 2026-04-21_

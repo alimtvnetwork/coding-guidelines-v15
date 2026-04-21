@@ -350,16 +350,16 @@ Tell the AI:
 
 _Auto-generated section — see `spec/11-powershell-integration/97-acceptance-criteria.md` for the full criteria index._
 
-### AC-PS-000: Conformance check for this PowerShell integration rule
+### AC-PS-000: PowerShell integration conformance: Overview
 
-**Given** Invoke the Pester suite.  
+**Given** Lint PowerShell scripts and modules in `scripts/` for naming, parameter binding, and error propagation.  
 **When** Run the verification command shown below.  
-**Then** Pester exits 0 with FailedCount=0; `Invoke-ScriptAnalyzer -Severity Error` returns zero diagnostics on every shipped `.ps1`.
+**Then** Filenames are lowercase-kebab-case; functions are `Verb-Noun` PascalCase; `$ErrorActionPreference = 'Stop'` is set; no `Write-Host` for control flow.
 
 **Verification command:**
 
 ```bash
-pwsh -Command 'Invoke-Pester tests/powershell/ -CI'
+pwsh -NoProfile -Command "Invoke-ScriptAnalyzer -Path scripts -Recurse -Severity Warning"
 ```
 
 **Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.

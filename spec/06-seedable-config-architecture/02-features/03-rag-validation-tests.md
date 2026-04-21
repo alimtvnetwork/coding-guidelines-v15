@@ -892,25 +892,3 @@ func BenchmarkValidateChunkSize(b *testing.B) {
 | RAG Chunk Settings | `./02-rag-chunk-settings.md` |
 | Error Code Registry | `../03-error-code-registry/01-registry.md` |
 | AI Bridge Error Codes | `../22-ai-bridge-cli/01-backend/05-error-codes.md` |
-
----
-
-## Verification
-
-_Auto-generated section — see `spec/06-seedable-config-architecture/97-acceptance-criteria.md` for the full criteria index._
-
-### AC-CFG-003a: Seedable-config conformance: Rag Validation Tests
-
-**Given** Diff the running config tree against `config.seed.json` after a SemVer-aware GORM merge.  
-**When** Run the verification command shown below.  
-**Then** Merged keys preserve user overrides; new seed keys are added; removed seed keys are pruned; merge is idempotent on a second pass.
-
-**Verification command:**
-
-```bash
-python3 linter-scripts/check-spec-cross-links.py --root spec
-```
-
-**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
-
-_Verification section last updated: 2026-04-21_

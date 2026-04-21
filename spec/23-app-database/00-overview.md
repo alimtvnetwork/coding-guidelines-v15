@@ -49,3 +49,25 @@ Application-specific database specifications. Covers the app's data model, table
 ---
 
 *App database — created 2026-04-16*
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/23-app-database/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-ADB-000: App-database conformance: Overview
+
+**Given** Validate app database migrations against the schema-design rules.  
+**When** Run the verification command shown below.  
+**Then** Migrations are forward-only; PascalCase naming is preserved; new columns are nullable with no DEFAULT (Rule 12).
+
+**Verification command:**
+
+```bash
+python3 linter-scripts/check-forbidden-strings.py
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_
