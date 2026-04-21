@@ -114,6 +114,52 @@ jobs:
             sha256sum "release-artifacts/${bundle}-install.ps1" >> release-artifacts/checksums.txt
           done
 
+      # ── Dedicated error-manage release artifacts ─────────────────────
+      # Publishes two extra assets with stable, version-agnostic names so
+      # downstream tooling can fetch the latest error-manage bundle without
+      # knowing the tag:
+      #   • error-manage.zip      (Windows-native, PowerShell Expand-Archive)
+      #   • error-manage.tar.gz   (Linux/macOS-native, preserves perms)
+      # Both archives contain the same two folders:
+      #   spec/01-spec-authoring-guide
+      #   spec/03-error-manage
+      - name: Package error-manage (Windows .zip + Unix .tar.gz)
+        run: |
+          set -euo pipefail
+          SOURCES=("spec/01-spec-authoring-guide" "spec/03-error-manage")
+
+          for src in "${SOURCES[@]}"; do
+            test -d "$src" || { echo "::error::missing source folder $src"; exit 1; }
+          done
+
+          # Windows-native archive (PowerShell Expand-Archive)
+          zip -rq error-manage.zip "${SOURCES[@]}"
+
+          # Unix-native archive (preserves executable bits)
+          tar czf error-manage.tar.gz "${SOURCES[@]}"
+
+          for f in error-manage.zip error-manage.tar.gz; do
+            ls -lh "$f"
+            sha256sum "$f" >> release-artifacts/checksums.txt
+            mv "$f" release-artifacts/
+          done
+
+      - name: Verify error-manage artifacts
+        run: |
+          set -euo pipefail
+          test -f release-artifacts/error-manage.zip    || { echo "::error::error-manage.zip missing";    exit 1; }
+          test -f release-artifacts/error-manage.tar.gz || { echo "::error::error-manage.tar.gz missing"; exit 1; }
+          # Sanity: both archives must contain both source folders.
+          unzip -l release-artifacts/error-manage.zip | grep -q "spec/01-spec-authoring-guide/" \
+            || { echo "::error::error-manage.zip missing 01-spec-authoring-guide"; exit 1; }
+          unzip -l release-artifacts/error-manage.zip | grep -q "spec/03-error-manage/" \
+            || { echo "::error::error-manage.zip missing 03-error-manage"; exit 1; }
+          tar tzf release-artifacts/error-manage.tar.gz | grep -q "spec/01-spec-authoring-guide/" \
+            || { echo "::error::error-manage.tar.gz missing 01-spec-authoring-guide"; exit 1; }
+          tar tzf release-artifacts/error-manage.tar.gz | grep -q "spec/03-error-manage/" \
+            || { echo "::error::error-manage.tar.gz missing 03-error-manage"; exit 1; }
+          echo "  ✓ both error-manage archives validated"
+
       # ── Pinned-version installers (release-install.{sh,ps1}) ────────
       # Substitute `__VERSION_PLACEHOLDER__` with the concrete tag and
       # stage the baked copies as release assets. The originals in the
