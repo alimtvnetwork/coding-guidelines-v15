@@ -112,7 +112,7 @@ _Auto-generated section — see `spec/15-distribution-and-runner/97-acceptance-c
 **Verification command:**
 
 ```bash
-python3 linter-scripts/check-spec-cross-links.py --root spec
+python3 linter-scripts/check-spec-cross-links.py --root spec --repo-root .
 ```
 
 **Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.

@@ -454,7 +454,7 @@ _Auto-generated section — see `spec/01-spec-authoring-guide/97-acceptance-crit
 **Verification command:**
 
 ```bash
-python3 linter-scripts/check-spec-folder-refs.py && python3 linter-scripts/check-spec-cross-links.py --root spec
+python3 linter-scripts/check-spec-folder-refs.py && python3 linter-scripts/check-spec-cross-links.py --root spec --repo-root .
 ```
 
 **Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
