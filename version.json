@@ -4,15 +4,15 @@
   "name": "coding-guidelines",
   "description": "Cross-language coding standards, error handling, CI/CD, and self-update specifications. Synced from package.json by scripts/sync-version.mjs.",
   "git": {
-    "sha": "9911a9482147273f8c9ec746118831b45729be4b",
-    "shortSha": "9911a94",
+    "sha": "c0e82bef6556b142499816900f620b9802b9f06c",
+    "shortSha": "c0e82be",
     "branch": "edit/edt-9afd4d8f-c4a1-445e-8a75-eab855fb54f1"
   },
   "stats": {
-    "totalFiles": 599,
-    "totalLines": 126351,
+    "totalFiles": 589,
+    "totalLines": 125548,
     "totalFolders": 23,
-    "totalBytes": 4228705,
+    "totalBytes": 4198672,
     "rootFiles": 5
   },
   "folders": [
@@ -253,15 +253,15 @@
     {
       "path": "19-ai-reliability",
       "name": "Ai Reliability",
-      "title": "AI Reliability — Generic 'AI Doing Work' Success Rate",
-      "version": "1.0.0",
-      "updated": "2026-04-21",
+      "title": null,
+      "version": null,
+      "updated": null,
       "status": null,
-      "aiConfidence": "Production-Ready",
-      "ambiguity": "None",
-      "fileCount": 10,
-      "lineCount": 803,
-      "byteCount": 30033
+      "aiConfidence": null,
+      "ambiguity": null,
+      "fileCount": 0,
+      "lineCount": 0,
+      "byteCount": 0
     },
     {
       "path": "21-app",
