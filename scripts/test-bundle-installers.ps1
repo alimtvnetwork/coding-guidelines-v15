@@ -15,7 +15,11 @@ $ProgressPreference    = "SilentlyContinue"
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $Work     = New-Item -ItemType Directory -Path (Join-Path ([System.IO.Path]::GetTempPath()) ("bundle-test-" + [guid]::NewGuid().ToString("N").Substring(0,8))) | ForEach-Object { $_.FullName }
 $Archives = Join-Path $Work "archives"
-$Port     = 18476
+# Pick a free port automatically (caller can override with TEST_PORT).
+$Port     = if ($env:TEST_PORT) { [int]$env:TEST_PORT } else {
+    $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Loopback, 0)
+    $listener.Start(); $p = $listener.LocalEndpoint.Port; $listener.Stop(); $p
+}
 $FakeVer  = "vtest"
 $AssetDir = Join-Path $Archives "download/$FakeVer"
 New-Item -ItemType Directory -Path $AssetDir -Force | Out-Null
@@ -41,12 +45,20 @@ foreach ($bundle in $bundleNames) {
 }
 
 Write-Host "▸ starting local HTTP server on port $Port"
-$serverProc = Start-Process -FilePath "python3" -ArgumentList "-m","http.server",$Port -WorkingDirectory $Archives -PassThru -WindowStyle Hidden -RedirectStandardOutput (Join-Path $Work "server.log") -RedirectStandardError (Join-Path $Work "server.err")
+$serverProc = Start-Process -FilePath "python3" -ArgumentList "-m","http.server",$Port,"--bind","127.0.0.1" -WorkingDirectory $Archives -PassThru -WindowStyle Hidden -RedirectStandardOutput (Join-Path $Work "server.log") -RedirectStandardError (Join-Path $Work "server.err")
 
-# Wait for the server to come up.
+# Wait for OUR archives endpoint to respond (not just any squatter on
+# this port).
 $ready = $false
 for ($i = 0; $i -lt 50; $i++) {
-    try { Invoke-WebRequest -Uri "http://127.0.0.1:$Port/" -UseBasicParsing -TimeoutSec 1 | Out-Null; $ready = $true; break } catch { Start-Sleep -Milliseconds 200 }
+    if ($serverProc.HasExited) {
+        Write-Host (Get-Content (Join-Path $Work 'server.log') -Raw -ErrorAction SilentlyContinue)
+        Stop-Server; throw "HTTP server died (exit $($serverProc.ExitCode))"
+    }
+    try {
+        Invoke-WebRequest -Uri "http://127.0.0.1:$Port/download/$FakeVer/" -UseBasicParsing -TimeoutSec 1 | Out-Null
+        $ready = $true; break
+    } catch { Start-Sleep -Milliseconds 200 }
 }
 if (-not $ready) { Stop-Server; throw "local HTTP server failed to start" }
 

@@ -47,12 +47,17 @@ function bashScript(bundle) {
 # Quick start:
 #   curl -fsSL ${RAW_BASE}/${bundle.name}-install.sh | bash
 #   curl -fsSL ${RAW_BASE}/${bundle.name}-install.sh | bash -s -- --version ${EXAMPLE_VERSION}
-#   curl -fsSL ${RAW_BASE}/${bundle.name}-install.sh | bash -s -- --target ./vendor
+#   curl -fsSL ${RAW_BASE}/${bundle.name}-install.sh | bash -s -- --target-dir ./vendor
 #
 # Install paths:
 #   • --version vX.Y.Z → fetch ${bundle.archive.stableName}.tar.gz from
 #     the GitHub Release and extract with src→dest folder remapping.
 #   • default          → delegate to install.sh (branch checkout).
+#
+# Flags:
+#   --version vX.Y.Z         install a specific tagged release
+#   --target-dir <dir>       install into <dir> (aliases: --target, --dest)
+#                            default: current working directory
 #
 # Folder mapping (src in repo → dest under target):
 #   ${mappingComment}
@@ -77,9 +82,12 @@ FORWARD_ARGS=()
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --version)        VERSION="$2"; FORWARD_ARGS+=("--version" "$2"); shift 2 ;;
-    --target|--dest)  TARGET="$2"; FORWARD_ARGS+=("--dest" "$2");    shift 2 ;;
-    *)                FORWARD_ARGS+=("$1");                          shift   ;;
+    --version)
+      VERSION="$2"; FORWARD_ARGS+=("--version" "$2"); shift 2 ;;
+    --target-dir|--target|--dest)
+      TARGET="$2"; FORWARD_ARGS+=("--dest" "$2");    shift 2 ;;
+    *)
+      FORWARD_ARGS+=("$1");                          shift   ;;
   esac
 done
 
@@ -176,12 +184,13 @@ function powershellScript(bundle) {
     irm ${RAW_BASE}/${bundle.name}-install.ps1 | iex
 
 .EXAMPLE
-    & ([scriptblock]::Create((irm ${RAW_BASE}/${bundle.name}-install.ps1))) -Version ${EXAMPLE_VERSION} -Target .\\vendor
+    & ([scriptblock]::Create((irm ${RAW_BASE}/${bundle.name}-install.ps1))) -Version ${EXAMPLE_VERSION} -TargetDir .\\vendor
 #>
 
 param(
     [string]$Version = "",
-    [string]$Target = "",
+    [Alias("Target", "Dest")]
+    [string]$TargetDir = "",
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$ForwardedArgs = @()
 )
@@ -196,12 +205,12 @@ $ArchiveStableName = "${bundle.archive.stableName}"
 $ReleaseBase = "${RELEASE_BASE}"
 $InstallerUrl = "${RAW_BASE}/install.ps1"
 
-if ([string]::IsNullOrEmpty($Target)) { $Target = (Get-Location).Path }
+if ([string]::IsNullOrEmpty($TargetDir)) { $TargetDir = (Get-Location).Path }
 
 Write-Host ""
 Write-Host "════════════════════════════════════════════════════════" -ForegroundColor Cyan
 Write-Host "  ${bundle.title} (bundle: $BundleName)" -ForegroundColor Cyan
-Write-Host "  Target: $Target" -ForegroundColor Cyan
+Write-Host "  Target: $TargetDir" -ForegroundColor Cyan
 if ($Version) {
     Write-Host "  Mode:   versioned archive ($ArchiveStableName.zip @ $Version)" -ForegroundColor Cyan
 } else {
@@ -230,7 +239,7 @@ function Install-ViaArchive {
         $extractDir = Join-Path $tmp "extract"
         Expand-Archive -Path $zipPath -DestinationPath $extractDir -Force
 
-        New-Item -ItemType Directory -Path $Target -Force | Out-Null
+        New-Item -ItemType Directory -Path $TargetDir -Force | Out-Null
         foreach ($pair in $BundleMapping.Split(",")) {
             $parts = $pair.Split("|")
             $src = $parts[0]; $dest = $parts[1]
@@ -239,7 +248,7 @@ function Install-ViaArchive {
                 Write-Warning "  archive missing $src — skipping"
                 continue
             }
-            $destPath = Join-Path $Target $dest
+            $destPath = Join-Path $TargetDir $dest
             New-Item -ItemType Directory -Path $destPath -Force | Out-Null
             Copy-Item -Path (Join-Path $srcPath '*') -Destination $destPath -Recurse -Force
             Write-Host "  ✓ $src → $destPath" -ForegroundColor Green
@@ -255,7 +264,7 @@ function Install-ViaInstaller {
     $folderArray = $BundleFoldersSrc.Split(",")
     $extra = @()
     if ($Version) { $extra += @("-Version", $Version) }
-    if ($Target)  { $extra += @("-Dest", $Target) }
+    if ($TargetDir) { $extra += @("-Dest", $TargetDir) }
     & $installerBlock -Folders $folderArray @extra @ForwardedArgs
 }
 
