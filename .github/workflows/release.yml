@@ -78,6 +78,43 @@ jobs:
           test -f "release-artifacts/coding-guidelines-linters-${{ steps.version.outputs.version }}.zip" \
             || { echo "::error::linters-cicd zip missing"; exit 1; }
 
+      # ── Pinned-version installers (release-install.{sh,ps1}) ────────
+      # Substitute `__VERSION_PLACEHOLDER__` with the concrete tag and
+      # stage the baked copies as release assets. The originals in the
+      # repo keep the placeholder verbatim so future releases re-bake
+      # cleanly. Spec: spec/14-update/25-release-pinned-installer.md
+      - name: Bake version into release-install scripts
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          test -f release-install.sh  || { echo "::error::release-install.sh missing";  exit 1; }
+          test -f release-install.ps1 || { echo "::error::release-install.ps1 missing"; exit 1; }
+
+          mkdir -p release-artifacts
+          cp release-install.sh  release-artifacts/release-install.sh
+          cp release-install.ps1 release-artifacts/release-install.ps1
+
+          # Use a delimiter that cannot appear in a semver tag.
+          sed -i "s|__VERSION_PLACEHOLDER__|${VERSION}|g" release-artifacts/release-install.sh
+          sed -i "s|__VERSION_PLACEHOLDER__|${VERSION}|g" release-artifacts/release-install.ps1
+
+          chmod +x release-artifacts/release-install.sh
+
+          # Fail fast if any placeholder slipped through.
+          if grep -q "__VERSION_PLACEHOLDER__" release-artifacts/release-install.sh release-artifacts/release-install.ps1; then
+            echo "::error::__VERSION_PLACEHOLDER__ still present after substitution"
+            exit 1
+          fi
+
+          # Confirm the concrete tag is actually baked in.
+          grep -q "BAKED_VERSION=\"${VERSION}\""  release-artifacts/release-install.sh  \
+            || { echo "::error::bash baked version mismatch";       exit 1; }
+          grep -q "\$BakedVersion = \"${VERSION}\"" release-artifacts/release-install.ps1 \
+            || { echo "::error::powershell baked version mismatch"; exit 1; }
+
+          sha256sum release-artifacts/release-install.sh  >> release-artifacts/checksums.txt
+          sha256sum release-artifacts/release-install.ps1 >> release-artifacts/checksums.txt
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -90,6 +127,8 @@ jobs:
             install-config.json
             slides-app/coding-guidelines-slides-*.zip
             release-artifacts/linters-install.sh
+            release-artifacts/release-install.sh
+            release-artifacts/release-install.ps1
           body: |
             ## Installation
 
