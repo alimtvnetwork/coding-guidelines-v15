@@ -162,7 +162,20 @@ jobs:
             install.ps1
             install-config.json
             slides-app/coding-guidelines-slides-*.zip
+            release-artifacts/error-manage-install.sh
+            release-artifacts/error-manage-install.ps1
+            release-artifacts/splitdb-install.sh
+            release-artifacts/splitdb-install.ps1
+            release-artifacts/slides-install.sh
+            release-artifacts/slides-install.ps1
             release-artifacts/linters-install.sh
+            release-artifacts/linters-install.ps1
+            release-artifacts/cli-install.sh
+            release-artifacts/cli-install.ps1
+            release-artifacts/wp-install.sh
+            release-artifacts/wp-install.ps1
+            release-artifacts/consolidated-install.sh
+            release-artifacts/consolidated-install.ps1
             release-artifacts/release-install.sh
             release-artifacts/release-install.ps1
           body: |
