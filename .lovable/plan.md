@@ -1,6 +1,6 @@
 # Current Plan
 
-**Version:** 3.8.0
+**Version:** 3.12.0
 **Updated:** 2026-04-21
 
 ---
@@ -24,10 +24,6 @@
 | 13 | Wire release-install.* into `release.sh` / `release.ps1` (sed VERSION/REPO, ship as release assets) | ⏳ Pending | High |
 | 14 | Add release-pinned one-liner block to GitHub Release body template | ⏳ Pending | Medium |
 | 15 | Test harness asserting NO call to `api.github.com/.../releases/latest` from release-install.* | ⏳ Pending | Medium |
-| 16 | Create `tests/replay/anti-flicker.spec.ts` covering A1–A7 (per spec 19) | ⏳ Pending | High |
-| 17 | Create `scripts/replay-repro.sh` for G-REP gate (per spec 19) | ⏳ Pending | Medium |
-| 18 | Wire G-CTX static check into `run-all.sh` (per spec 19) | ⏳ Pending | Medium |
-| 19 | Promote ⚠ NEEDS REAL EXAMPLE rows in `19-ai-reliability/02-failure-taxonomy.md` | ⏳ Pending | Low |
 
 ---
 
