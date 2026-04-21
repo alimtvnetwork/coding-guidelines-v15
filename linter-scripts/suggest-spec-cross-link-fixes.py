@@ -95,6 +95,20 @@ def iter_markdown_files(root: Path) -> Iterable[Path]:
         yield path
 
 
+def load_allowlist(repo_root: Path) -> set[str]:
+    """Reuse the same waiver file used by check-spec-cross-links.py so the
+    suggester operates on the same set of genuine failures."""
+    path = repo_root / "linter-scripts" / "spec-cross-links.allowlist"
+    if not path.exists():
+        return set()
+    out: set[str] = set()
+    for raw in path.read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if line and not line.startswith("#"):
+            out.add(line)
+    return out
+
+
 def resolve_target_path(source: Path, target: str, repo_root: Path) -> Path:
     raw = target.split("#", 1)[0]
     if not raw:
