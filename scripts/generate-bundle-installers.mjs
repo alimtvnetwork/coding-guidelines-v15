@@ -34,6 +34,71 @@ const { rawBase: RAW_BASE, releaseBase: RELEASE_BASE, bundles: BUNDLES } = MANIF
 const PKG = JSON.parse(readFileSync(resolve(REPO_ROOT, "package.json"), "utf8"));
 const EXAMPLE_VERSION = `v${PKG.version}`;
 
+// ---------------------------------------------------------------------
+// Manifest validation
+//
+// Hard-coded expectations for bundles whose folder layout is contractual
+// (documented in readme.md and consumed by downstream installers). Any
+// drift here means generated one-liners would silently install the wrong
+// folders — fail loudly before writing any file.
+// ---------------------------------------------------------------------
+const EXPECTED_BUNDLES = {
+  slides: {
+    count: 2,
+    folders: [
+      { src: "spec-slides", dest: "spec/spec-slides" },
+      { src: "slides-app", dest: "spec/slides-app" },
+    ],
+  },
+  consolidated: {
+    count: 3,
+    folders: [
+      { src: "spec/01-spec-authoring-guide", dest: "spec/01-spec-authoring-guide" },
+      { src: "spec/03-error-manage", dest: "spec/03-error-manage" },
+      { src: "spec/17-consolidated-guidelines", dest: "spec/17-consolidated-guidelines" },
+    ],
+  },
+};
+
+function hasMatchingFolder(folders, expected) {
+  return folders.some((f) => f.src === expected.src && f.dest === expected.dest);
+}
+
+function validateBundle(bundle, expected) {
+  const errors = [];
+  const actualCount = bundle.folders.length;
+  if (actualCount !== expected.count) {
+    errors.push(`expected ${expected.count} folders, got ${actualCount}`);
+  }
+  for (const folder of expected.folders) {
+    if (hasMatchingFolder(bundle.folders, folder)) continue;
+    errors.push(`missing mapping ${folder.src} → ${folder.dest}`);
+  }
+  return errors;
+}
+
+function validateManifest(bundles) {
+  const failures = [];
+  for (const [name, expected] of Object.entries(EXPECTED_BUNDLES)) {
+    const bundle = bundles.find((b) => b.name === name);
+    if (!bundle) {
+      failures.push(`  ✗ ${name}: bundle not found in manifest`);
+      continue;
+    }
+    const errors = validateBundle(bundle, expected);
+    if (errors.length === 0) {
+      console.log(`  ✓ ${name}: ${expected.count} folders match`);
+      continue;
+    }
+    for (const err of errors) failures.push(`  ✗ ${name}: ${err}`);
+  }
+  if (failures.length === 0) return;
+  console.error("\n❌ Manifest validation failed:");
+  for (const line of failures) console.error(line);
+  console.error("\nFix bundles.json before regenerating installers.");
+  process.exit(1);
+}
+
 function bashScript(bundle) {
   const srcList = bundle.folders.map((f) => f.src).join(",");
   const mappingPairs = bundle.folders.map((f) => `${f.src}|${f.dest}`).join(" ");
@@ -288,6 +353,9 @@ function writeFile(relPath, contents, executable = false) {
 }
 
 console.log(`Generating bundle installers from ${MANIFEST_PATH}...`);
+console.log("\nValidating manifest against expected bundle layouts...");
+validateManifest(BUNDLES);
+console.log("");
 for (const bundle of BUNDLES) {
   writeFile(`${bundle.name}-install.sh`, bashScript(bundle), true);
   writeFile(`${bundle.name}-install.ps1`, powershellScript(bundle), false);
