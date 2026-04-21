@@ -46,7 +46,7 @@ function bashScript(bundle) {
 #
 # Quick start:
 #   curl -fsSL ${RAW_BASE}/${bundle.name}-install.sh | bash
-#   curl -fsSL ${RAW_BASE}/${bundle.name}-install.sh | bash -s -- --version v3.40.0
+#   curl -fsSL ${RAW_BASE}/${bundle.name}-install.sh | bash -s -- --version ${EXAMPLE_VERSION}
 #   curl -fsSL ${RAW_BASE}/${bundle.name}-install.sh | bash -s -- --target ./vendor
 #
 # Install paths:
@@ -176,7 +176,7 @@ function powershellScript(bundle) {
     irm ${RAW_BASE}/${bundle.name}-install.ps1 | iex
 
 .EXAMPLE
-    & ([scriptblock]::Create((irm ${RAW_BASE}/${bundle.name}-install.ps1))) -Version v3.40.0 -Target .\\vendor
+    & ([scriptblock]::Create((irm ${RAW_BASE}/${bundle.name}-install.ps1))) -Version ${EXAMPLE_VERSION} -Target .\\vendor
 #>
 
 param(
