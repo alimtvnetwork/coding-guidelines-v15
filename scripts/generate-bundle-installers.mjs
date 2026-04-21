@@ -31,6 +31,8 @@ const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const MANIFEST_PATH = resolve(REPO_ROOT, "bundles.json");
 const MANIFEST = JSON.parse(readFileSync(MANIFEST_PATH, "utf8"));
 const { rawBase: RAW_BASE, releaseBase: RELEASE_BASE, bundles: BUNDLES } = MANIFEST;
+const PKG = JSON.parse(readFileSync(resolve(REPO_ROOT, "package.json"), "utf8"));
+const EXAMPLE_VERSION = `v${PKG.version}`;
 
 function bashScript(bundle) {
   const srcList = bundle.folders.map((f) => f.src).join(",");
