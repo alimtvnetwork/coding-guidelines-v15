@@ -1,18 +1,18 @@
 {
-  "version": "3.28.0",
+  "version": "3.29.0",
   "updated": "2026-04-21",
   "name": "coding-guidelines",
   "description": "Cross-language coding standards, error handling, CI/CD, and self-update specifications. Synced from package.json by scripts/sync-version.mjs.",
   "git": {
-    "sha": "47d66ecfd6a919c26b859c6a80245e566430c4b7",
-    "shortSha": "47d66ec",
-    "branch": "edit/edt-0a876f18-9bc9-40f7-a935-f12f2e1a7111"
+    "sha": "68f4f5fe858cbc6e47cc28cd3db834301533a83a",
+    "shortSha": "68f4f5f",
+    "branch": "edit/edt-eae9c138-9b51-4850-b374-9c2af38d85bc"
   },
   "stats": {
-    "totalFiles": 589,
-    "totalLines": 125548,
+    "totalFiles": 591,
+    "totalLines": 125664,
     "totalFolders": 22,
-    "totalBytes": 4198672,
+    "totalBytes": 4201849,
     "rootFiles": 5
   },
   "folders": [
@@ -142,9 +142,9 @@
       "status": null,
       "aiConfidence": "Production-Ready",
       "ambiguity": "None",
-      "fileCount": 1,
-      "lineCount": 45,
-      "byteCount": 1551
+      "fileCount": 2,
+      "lineCount": 98,
+      "byteCount": 2804
     },
     {
       "path": "11-powershell-integration",
@@ -207,9 +207,9 @@
       "status": "Authoritative — implementation must match this spec.",
       "aiConfidence": null,
       "ambiguity": null,
-      "fileCount": 5,
-      "lineCount": 565,
-      "byteCount": 20330
+      "fileCount": 6,
+      "lineCount": 628,
+      "byteCount": 22254
     },
     {
       "path": "16-generic-release",
