@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import versionData from "@/../version.json";
+import bundlesManifest from "@/../bundles.json";
 
 type InstallCommand = {
   platform: string;
@@ -40,76 +41,19 @@ type BundleCommand = {
   folders: string[];
   bash: string;
   ps: string;
+  archive: string;
 };
 
-const RAW_BASE = "https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main";
+const RAW_BASE = bundlesManifest.rawBase;
 
-const bundleCommands: BundleCommand[] = [
-  {
-    bundle: "error-manage",
-    description: "Error-management spec + spec-authoring guide",
-    folders: ["spec/01-spec-authoring-guide", "spec/03-error-manage"],
-    bash: `curl -fsSL ${RAW_BASE}/error-manage-install.sh | bash`,
-    ps: `irm ${RAW_BASE}/error-manage-install.ps1 | iex`,
-  },
-  {
-    bundle: "splitdb",
-    description: "DB conventions + split-DB + seedable config",
-    folders: [
-      "spec/04-database-conventions",
-      "spec/05-split-db-architecture",
-      "spec/06-seedable-config-architecture",
-    ],
-    bash: `curl -fsSL ${RAW_BASE}/splitdb-install.sh | bash`,
-    ps: `irm ${RAW_BASE}/splitdb-install.ps1 | iex`,
-  },
-  {
-    bundle: "slides",
-    description: "Slides Vite app + source decks",
-    folders: ["spec-slides", "slides-app"],
-    bash: `curl -fsSL ${RAW_BASE}/slides-install.sh | bash`,
-    ps: `irm ${RAW_BASE}/slides-install.ps1 | iex`,
-  },
-  {
-    bundle: "linters",
-    description: "Project linters + CI/CD linter pack",
-    folders: ["linters", "linters-cicd"],
-    bash: `curl -fsSL ${RAW_BASE}/linters-install.sh | bash`,
-    ps: `irm ${RAW_BASE}/linters-install.ps1 | iex`,
-  },
-  {
-    bundle: "cli",
-    description: "PowerShell, CI/CD, generic CLI, update, distribution, generic release",
-    folders: [
-      "spec/11-powershell-integration",
-      "spec/12-cicd-pipeline-workflows",
-      "spec/13-generic-cli",
-      "spec/14-update",
-      "spec/15-distribution-and-runner",
-      "spec/16-generic-release",
-    ],
-    bash: `curl -fsSL ${RAW_BASE}/cli-install.sh | bash`,
-    ps: `irm ${RAW_BASE}/cli-install.ps1 | iex`,
-  },
-  {
-    bundle: "wp",
-    description: "WordPress plugin how-to spec",
-    folders: ["spec/18-wp-plugin-how-to"],
-    bash: `curl -fsSL ${RAW_BASE}/wp-install.sh | bash`,
-    ps: `irm ${RAW_BASE}/wp-install.ps1 | iex`,
-  },
-  {
-    bundle: "consolidated",
-    description: "Spec-authoring + error-manage + consolidated guidelines",
-    folders: [
-      "spec/01-spec-authoring-guide",
-      "spec/03-error-manage",
-      "spec/17-consolidated-guidelines",
-    ],
-    bash: `curl -fsSL ${RAW_BASE}/consolidated-install.sh | bash`,
-    ps: `irm ${RAW_BASE}/consolidated-install.ps1 | iex`,
-  },
-];
+const bundleCommands: BundleCommand[] = bundlesManifest.bundles.map((b) => ({
+  bundle: b.name,
+  description: b.description,
+  folders: b.folders.map((f) => f.dest),
+  bash: `curl -fsSL ${RAW_BASE}/${b.name}-install.sh | bash`,
+  ps: `irm ${RAW_BASE}/${b.name}-install.ps1 | iex`,
+  archive: `${b.archive.stableName}.zip`,
+}));
 
 function CopyButton({ command }: { command: string }) {
   const [hasCopied, setHasCopied] = useState(false);

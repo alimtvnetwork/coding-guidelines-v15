@@ -77,36 +77,58 @@ jobs:
           test -f "release-artifacts/coding-guidelines-linters-${{ steps.version.outputs.version }}.zip" \
             || { echo "::error::linters-cicd zip missing"; exit 1; }
 
-      # ── Bundle zips (one per named install bundle) ──────────────────
-      # Each bundle below mirrors the folder list baked into its
-      # <bundle>-install.{sh,ps1} wrapper at the repo root. The zip is
-      # an offline alternative to the curl|bash one-liner.
-      - name: Package named bundles
+      # ── Manifest-driven bundle packaging (bundles.json) ──────────────
+      # For every bundle in bundles.json we publish FOUR archive assets:
+      #   • <stableName>.zip                       (Windows, version-agnostic)
+      #   • <stableName>.tar.gz                    (Unix, version-agnostic)
+      #   • <versionedPrefix>-<version>.zip        (Windows, pinned)
+      #   • <versionedPrefix>-<version>.tar.gz     (Unix, pinned)
+      # plus the matching <name>-install.{sh,ps1} bundle scripts.
+      #
+      # The stable-named archives let bundle install scripts download a
+      # specific version directly without git-cloning the whole repo.
+      - name: Setup Node (for manifest reader)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Package bundles from manifest
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           set -euo pipefail
-          declare -A BUNDLES=(
-            [error-manage]="spec/01-spec-authoring-guide spec/03-error-manage"
-            [splitdb]="spec/04-database-conventions spec/05-split-db-architecture spec/06-seedable-config-architecture"
-            [cli]="spec/11-powershell-integration spec/12-cicd-pipeline-workflows spec/13-generic-cli spec/14-update spec/15-distribution-and-runner spec/16-generic-release"
-            [wp]="spec/18-wp-plugin-how-to"
-            [consolidated]="spec/01-spec-authoring-guide spec/03-error-manage spec/17-consolidated-guidelines"
-          )
-          for bundle in "${!BUNDLES[@]}"; do
-            ZIP_NAME="coding-guidelines-${bundle}-${VERSION}.zip"
-            # shellcheck disable=SC2086
-            zip -rq "$ZIP_NAME" ${BUNDLES[$bundle]}
-            sha256sum "$ZIP_NAME" >> release-artifacts/checksums.txt
-            mv "$ZIP_NAME" release-artifacts/
-            echo "  ✓ packaged $ZIP_NAME"
-          done
-
-      - name: Stage bundle install scripts
-        run: |
-          set -euo pipefail
           mkdir -p release-artifacts
-          for bundle in error-manage splitdb slides linters cli wp consolidated; do
+
+          BUNDLE_NAMES=$(node scripts/read-bundles.mjs names)
+          for bundle in $BUNDLE_NAMES; do
+            FOLDERS=$(node scripts/read-bundles.mjs folders "$bundle")
+            STABLE=$(node scripts/read-bundles.mjs stable-name "$bundle")
+            VERSIONED=$(node scripts/read-bundles.mjs versioned-prefix "$bundle")
+
+            echo "▸ packaging bundle: $bundle  [folders: $FOLDERS]"
+
+            for src in $FOLDERS; do
+              test -d "$src" || { echo "::error::missing source folder $src for bundle $bundle"; exit 1; }
+            done
+
+            STABLE_ZIP="${STABLE}.zip"
+            STABLE_TGZ="${STABLE}.tar.gz"
+            VERSIONED_ZIP="${VERSIONED}-${VERSION}.zip"
+            VERSIONED_TGZ="${VERSIONED}-${VERSION}.tar.gz"
+
+            # shellcheck disable=SC2086
+            zip -rq "$STABLE_ZIP" $FOLDERS
+            # shellcheck disable=SC2086
+            tar czf "$STABLE_TGZ" $FOLDERS
+            cp "$STABLE_ZIP" "$VERSIONED_ZIP"
+            cp "$STABLE_TGZ" "$VERSIONED_TGZ"
+
+            for f in "$STABLE_ZIP" "$STABLE_TGZ" "$VERSIONED_ZIP" "$VERSIONED_TGZ"; do
+              sha256sum "$f" >> release-artifacts/checksums.txt
+              mv "$f" release-artifacts/
+              echo "  ✓ $f"
+            done
+
             cp "${bundle}-install.sh"  "release-artifacts/${bundle}-install.sh"
             cp "${bundle}-install.ps1" "release-artifacts/${bundle}-install.ps1"
             chmod +x "release-artifacts/${bundle}-install.sh"
@@ -114,51 +136,23 @@ jobs:
             sha256sum "release-artifacts/${bundle}-install.ps1" >> release-artifacts/checksums.txt
           done
 
-      # ── Dedicated error-manage release artifacts ─────────────────────
-      # Publishes two extra assets with stable, version-agnostic names so
-      # downstream tooling can fetch the latest error-manage bundle without
-      # knowing the tag:
-      #   • error-manage.zip      (Windows-native, PowerShell Expand-Archive)
-      #   • error-manage.tar.gz   (Linux/macOS-native, preserves perms)
-      # Both archives contain the same two folders:
-      #   spec/01-spec-authoring-guide
-      #   spec/03-error-manage
-      - name: Package error-manage (Windows .zip + Unix .tar.gz)
+      - name: Verify bundle archives
         run: |
           set -euo pipefail
-          SOURCES=("spec/01-spec-authoring-guide" "spec/03-error-manage")
-
-          for src in "${SOURCES[@]}"; do
-            test -d "$src" || { echo "::error::missing source folder $src"; exit 1; }
+          BUNDLE_NAMES=$(node scripts/read-bundles.mjs names)
+          for bundle in $BUNDLE_NAMES; do
+            STABLE=$(node scripts/read-bundles.mjs stable-name "$bundle")
+            FOLDERS=$(node scripts/read-bundles.mjs folders "$bundle")
+            ZIP="release-artifacts/${STABLE}.zip"
+            TGZ="release-artifacts/${STABLE}.tar.gz"
+            test -f "$ZIP" || { echo "::error::$ZIP missing"; exit 1; }
+            test -f "$TGZ" || { echo "::error::$TGZ missing"; exit 1; }
+            for src in $FOLDERS; do
+              unzip -l "$ZIP" | grep -q "${src}/" || { echo "::error::$ZIP missing $src"; exit 1; }
+              tar tzf "$TGZ" | grep -q "${src}/" || { echo "::error::$TGZ missing $src"; exit 1; }
+            done
+            echo "  ✓ $bundle archives validated"
           done
-
-          # Windows-native archive (PowerShell Expand-Archive)
-          zip -rq error-manage.zip "${SOURCES[@]}"
-
-          # Unix-native archive (preserves executable bits)
-          tar czf error-manage.tar.gz "${SOURCES[@]}"
-
-          for f in error-manage.zip error-manage.tar.gz; do
-            ls -lh "$f"
-            sha256sum "$f" >> release-artifacts/checksums.txt
-            mv "$f" release-artifacts/
-          done
-
-      - name: Verify error-manage artifacts
-        run: |
-          set -euo pipefail
-          test -f release-artifacts/error-manage.zip    || { echo "::error::error-manage.zip missing";    exit 1; }
-          test -f release-artifacts/error-manage.tar.gz || { echo "::error::error-manage.tar.gz missing"; exit 1; }
-          # Sanity: both archives must contain both source folders.
-          unzip -l release-artifacts/error-manage.zip | grep -q "spec/01-spec-authoring-guide/" \
-            || { echo "::error::error-manage.zip missing 01-spec-authoring-guide"; exit 1; }
-          unzip -l release-artifacts/error-manage.zip | grep -q "spec/03-error-manage/" \
-            || { echo "::error::error-manage.zip missing 03-error-manage"; exit 1; }
-          tar tzf release-artifacts/error-manage.tar.gz | grep -q "spec/01-spec-authoring-guide/" \
-            || { echo "::error::error-manage.tar.gz missing 01-spec-authoring-guide"; exit 1; }
-          tar tzf release-artifacts/error-manage.tar.gz | grep -q "spec/03-error-manage/" \
-            || { echo "::error::error-manage.tar.gz missing 03-error-manage"; exit 1; }
-          echo "  ✓ both error-manage archives validated"
 
       # ── Pinned-version installers (release-install.{sh,ps1}) ────────
       # Substitute `__VERSION_PLACEHOLDER__` with the concrete tag and
@@ -281,21 +275,6 @@ jobs:
             ```
             Offline zips are also published per bundle:
             `coding-guidelines-<bundle>-${{ steps.version.outputs.version }}.zip`.
-
-            ## Error-Manage Standalone Archives (NEW)
-
-            Stable, version-agnostic asset names that always point at the
-            latest `spec/01-spec-authoring-guide` + `spec/03-error-manage`:
-
-            **Windows (PowerShell):**
-            ```powershell
-            irm https://github.com/alimtvnetwork/coding-guidelines-v15/releases/latest/download/error-manage.zip -OutFile error-manage.zip
-            Expand-Archive error-manage.zip -DestinationPath .
-            ```
-            **Linux / macOS:**
-            ```bash
-            curl -fsSL https://github.com/alimtvnetwork/coding-guidelines-v15/releases/latest/download/error-manage.tar.gz | tar xz
-            ```
 
             ## Checksums
             See `checksums.txt` for SHA-256 verification hashes.
