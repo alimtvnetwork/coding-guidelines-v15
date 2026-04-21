@@ -7,6 +7,16 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.21.0] - 2026-04-21
+
+### Removed
+- **Stale `LEGACY-CDN-DOMAIN` allowlist entries.** Removed
+  `spec/15-domain-migration/` and `docs/legacy-domains.md` from the rule's
+  allowlist in `linter-scripts/forbidden-strings.toml` — neither path
+  exists in the repository, so they could only mask future legitimate
+  findings. Allowlist is now empty for this rule.
+- Updated the 3.19.0 changelog entry to reflect the empty allowlist.
+
 ## [3.20.0] - 2026-04-21
 
 ### Changed
@@ -31,7 +41,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   references (`cdn.riseup-asia.com`) that should be `cdn.riseup.asia` per the
   current infrastructure standard.
   - Pattern: `cdn\.riseup-asia\.com`
-  - Allowlist: `docs/legacy-domains.md` (legitimate historical migration documentation).
+  - Allowlist: empty — no legitimate occurrences exist in the repo.
   - Added to `linter-scripts/forbidden-strings.toml` as the third `[[rule]]`
     demonstrating the TOML-driven scanner's extensibility.
 
