@@ -3,84 +3,38 @@
 // generate-bundle-installers.mjs
 //
 // Emits per-bundle one-liner installers (.sh / .ps1) at the repo root.
-// Each generated installer is a thin wrapper that delegates to the
-// canonical install.sh / install.ps1 with a hardcoded --folders list.
+// Each generated installer reads its definition from bundles.json
+// (single source of truth) and supports two install paths:
 //
-// Why thin wrappers: keeps a single source of truth for download +
-// merge logic in install.{sh,ps1}; fixes propagate to all bundles
-// automatically; bundle scripts stay ~40 lines and easy to audit.
+//   1. Versioned install (--version vX.Y.Z) → fetch the stable-named
+//      release archive (`<stableName>.tar.gz` / `.zip`) and extract
+//      with src→dest folder remapping. No git checkout needed.
+//
+//   2. Branch install (default) → delegate to install.sh / install.ps1
+//      with the bundle's source folder list. Same legacy behavior.
+//
+// All scripts also accept `--target <dir>` (alias `-Target`) to override
+// the install destination.
+//
+// Source of truth: bundles.json. Edit the manifest, run this script,
+// commit the regenerated <bundle>-install.{sh,ps1} files.
 //
 // Usage:
 //   node scripts/generate-bundle-installers.mjs
 // =====================================================================
 
-import { writeFileSync, chmodSync, mkdirSync } from "node:fs";
+import { writeFileSync, chmodSync, mkdirSync, readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const REPO_SLUG = "alimtvnetwork/coding-guidelines-v15";
-const RAW_BASE = `https://raw.githubusercontent.com/${REPO_SLUG}/main`;
+const MANIFEST_PATH = resolve(REPO_ROOT, "bundles.json");
+const MANIFEST = JSON.parse(readFileSync(MANIFEST_PATH, "utf8"));
+const { rawBase: RAW_BASE, releaseBase: RELEASE_BASE, bundles: BUNDLES } = MANIFEST;
 
-const BUNDLES = [
-  {
-    name: "error-manage",
-    title: "Error Management Spec",
-    description: "Installs the error-management guidance plus the spec-authoring guide.",
-    folders: ["spec/01-spec-authoring-guide", "spec/03-error-manage"],
-  },
-  {
-    name: "splitdb",
-    title: "Split-DB Architecture Spec",
-    description: "Installs the database conventions, split-DB architecture, and seedable config specs.",
-    folders: [
-      "spec/04-database-conventions",
-      "spec/05-split-db-architecture",
-      "spec/06-seedable-config-architecture",
-    ],
-  },
-  {
-    name: "slides",
-    title: "Slides App + Decks",
-    description: "Installs the slides Vite app and the source decks (spec-slides/).",
-    folders: ["spec-slides", "slides-app"],
-  },
-  {
-    name: "linters",
-    title: "Linters + CI/CD Linter Pack",
-    description: "Installs the project linters and the CI/CD linter runner pack.",
-    folders: ["linters", "linters-cicd"],
-  },
-  {
-    name: "cli",
-    title: "CLI Toolchain Spec",
-    description: "Installs the CLI-related spec folders (PowerShell, CI/CD, generic CLI, update, distribution, generic release).",
-    folders: [
-      "spec/11-powershell-integration",
-      "spec/12-cicd-pipeline-workflows",
-      "spec/13-generic-cli",
-      "spec/14-update",
-      "spec/15-distribution-and-runner",
-      "spec/16-generic-release",
-    ],
-  },
-  {
-    name: "wp",
-    title: "WordPress Plugin How-To Spec",
-    description: "Installs the WordPress plugin authoring spec into spec/18-wp-plugin-how-to.",
-    folders: ["spec/18-wp-plugin-how-to"],
-  },
-  {
-    name: "consolidated",
-    title: "Consolidated Guidelines",
-    description: "Installs the spec-authoring guide, error-manage spec, and consolidated guidelines bundle.",
-    folders: [
-      "spec/01-spec-authoring-guide",
-      "spec/03-error-manage",
-      "spec/17-consolidated-guidelines",
-    ],
-  },
-];
+function isIdentityMapping(folders) {
+  return folders.every((f) => f.src === f.dest);
+}
 
 function bashScript(bundle) {
   const folderList = bundle.folders.join(",");
