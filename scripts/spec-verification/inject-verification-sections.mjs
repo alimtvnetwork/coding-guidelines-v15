@@ -217,7 +217,10 @@ function main() {
         summary.skipped++; continue;
       }
       // In overview-only strip mode, do NOT strip the overview itself.
-      if (args.mode === "overview-only" && base === "00-overview.md") {
+      // (Only the top-level overview — depth 2 — is preserved; nested
+      // 00-overview.md files lost their per-file block earlier and are
+      // now treated like any other prose file.)
+      if (args.mode === "overview-only" && base === "00-overview.md" && rel.split(sep).length === 2) {
         summary.skipped++; continue;
       }
     }
