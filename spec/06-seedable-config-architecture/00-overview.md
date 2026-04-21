@@ -109,7 +109,7 @@ _Auto-generated section — see `spec/06-seedable-config-architecture/97-accepta
 **Verification command:**
 
 ```bash
-python3 linter-scripts/check-spec-cross-links.py --root spec
+python3 linter-scripts/check-spec-cross-links.py --root spec --repo-root .
 ```
 
 **Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.

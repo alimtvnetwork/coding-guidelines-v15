@@ -117,7 +117,7 @@ _Auto-generated section — see `spec/12-cicd-pipeline-workflows/97-acceptance-c
 **Verification command:**
 
 ```bash
-python3 linter-scripts/check-spec-cross-links.py --root spec
+npm run sync && npm run lint && npm run test
 ```
 
 **Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.

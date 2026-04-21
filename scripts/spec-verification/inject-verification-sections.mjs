@@ -34,7 +34,7 @@
 import { readFileSync, writeFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative, basename, dirname, sep } from "node:path";
 import { fileURLToPath } from "node:url";
-import { FOLDER_PROFILES, DEFAULT_PROFILE } from "./profiles.mjs";
+import { FOLDER_PROFILES, DEFAULT_PROFILE, resolveCommand } from "./profiles.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(HERE, "..", "..");
@@ -121,7 +121,7 @@ function buildSection(profile, fullPath, relPath) {
   const given = profile.given(fileSlug);
   const when = profile.when;
   const then = profile.then(fileSlug);
-  const cmd = profile.command;
+  const cmd = resolveCommand(profile);
   return [
     "",
     "---",

@@ -1,18 +1,18 @@
 {
-  "version": "3.35.0",
+  "version": "3.34.0",
   "updated": "2026-04-22",
   "name": "coding-guidelines",
   "description": "Cross-language coding standards, error handling, CI/CD, and self-update specifications. Synced from package.json by scripts/sync-version.mjs.",
   "git": {
-    "sha": "425130e14c85c4b7bd7404be50f15dc41fae7452",
-    "shortSha": "425130e",
-    "branch": "edit/edt-71c7f1f7-2f73-47ef-ba18-8045a5cde83c"
+    "sha": "32530715542c1682e82c216b7d97d7c688fba11e",
+    "shortSha": "3253071",
+    "branch": "edit/edt-25d13a52-70dd-4ad0-9dd9-5881ff653c04"
   },
   "stats": {
     "totalFiles": 591,
     "totalLines": 125599,
     "totalFolders": 22,
-    "totalBytes": 4200706,
+    "totalBytes": 4200816,
     "rootFiles": 5
   },
   "folders": [
@@ -27,7 +27,7 @@
       "ambiguity": "None",
       "fileCount": 15,
       "lineCount": 2826,
-      "byteCount": 106100
+      "byteCount": 106114
     },
     {
       "path": "02-coding-guidelines",
@@ -79,7 +79,7 @@
       "ambiguity": "Low",
       "fileCount": 14,
       "lineCount": 4101,
-      "byteCount": 169924
+      "byteCount": 169938
     },
     {
       "path": "06-seedable-config-architecture",
@@ -92,7 +92,7 @@
       "ambiguity": "Low",
       "fileCount": 15,
       "lineCount": 3977,
-      "byteCount": 122731
+      "byteCount": 122745
     },
     {
       "path": "07-design-system",
@@ -170,7 +170,7 @@
       "ambiguity": "None",
       "fileCount": 28,
       "lineCount": 6250,
-      "byteCount": 199750
+      "byteCount": 199734
     },
     {
       "path": "13-generic-cli",
@@ -196,7 +196,7 @@
       "ambiguity": "None",
       "fileCount": 41,
       "lineCount": 8158,
-      "byteCount": 259291
+      "byteCount": 259305
     },
     {
       "path": "15-distribution-and-runner",
@@ -209,7 +209,7 @@
       "ambiguity": null,
       "fileCount": 6,
       "lineCount": 650,
-      "byteCount": 22963
+      "byteCount": 22977
     },
     {
       "path": "16-generic-release",
@@ -222,7 +222,7 @@
       "ambiguity": null,
       "fileCount": 10,
       "lineCount": 2101,
-      "byteCount": 66660
+      "byteCount": 66674
     },
     {
       "path": "17-consolidated-guidelines",
@@ -235,7 +235,7 @@
       "ambiguity": "None",
       "fileCount": 25,
       "lineCount": 11287,
-      "byteCount": 373863
+      "byteCount": 373877
     },
     {
       "path": "18-wp-plugin-how-to",
@@ -248,7 +248,7 @@
       "ambiguity": "None",
       "fileCount": 31,
       "lineCount": 17288,
-      "byteCount": 572491
+      "byteCount": 572505
     },
     {
       "path": "21-app",
@@ -274,7 +274,7 @@
       "ambiguity": "None",
       "fileCount": 1,
       "lineCount": 56,
-      "byteCount": 1639
+      "byteCount": 1653
     },
     {
       "path": "23-app-database",
