@@ -113,6 +113,32 @@ jobs:
           path: /tmp/spec-cross-links-report.json
           if-no-files-found: ignore
 
+      - name: Suggest auto-fixes for broken links (advisory)
+        # Companion step that runs the fuzzy-match suggester. Always exits 0
+        # (advisory only — never blocks merge). Surfaces suggestions as
+        # GitHub annotations so reviewers see proposed fixes inline on the
+        # PR diff. Use `python3 linter-scripts/suggest-spec-cross-link-fixes.py
+        # --apply` locally to rewrite files when confidence >= 0.82.
+        if: always()
+        run: |
+          python3 linter-scripts/suggest-spec-cross-link-fixes.py \
+            --root spec \
+            --repo-root . \
+            --github \
+            --json > /tmp/spec-cross-links-suggestions.json || true
+          echo "--- Human-readable summary ---"
+          python3 linter-scripts/suggest-spec-cross-link-fixes.py \
+            --root spec \
+            --repo-root . || true
+
+      - name: Upload suggestions JSON
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: spec-cross-links-suggestions
+          path: /tmp/spec-cross-links-suggestions.json
+          if-no-files-found: ignore
+
   sync-drift:
     name: Sync Drift Check (version.json + specTree.json)
     runs-on: ubuntu-latest

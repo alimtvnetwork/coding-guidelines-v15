@@ -48,3 +48,46 @@ Remove a waiver as soon as the underlying link is fixed.
 
 Runs as the `cross-links` job in `.github/workflows/ci.yml` on every push
 and pull request to `main`.
+
+---
+
+## Auto-Fix Suggester (companion)
+
+`suggest-spec-cross-link-fixes.py` consumes the same allowlist and the
+same broken-link set as the checker, then proposes the closest match for
+each failure using `difflib.SequenceMatcher`:
+
+- `missing-file` → fuzzy-match against every `*.md` under `spec/` (basename
+  match wins ties).
+- `missing-section` → fuzzy-match the requested anchor against the slug of
+  every heading in the resolved target file.
+
+### Modes
+
+| Flag | Behavior |
+|------|----------|
+| _(default)_ | Report-only. Always exits 0. Used by CI as advisory annotations. |
+| `--apply` | Rewrite files in place when `confidence >= --min-confidence` (default `0.82`). Exits 1 if any low-confidence breakage remains. |
+| `--github` | Emit GitHub Actions annotations (`::warning` for auto-fixable, `::notice` for manual-review). |
+| `--json`   | Machine-readable report on stdout. |
+
+### Local usage
+
+```bash
+# Preview what would change
+python3 linter-scripts/suggest-spec-cross-link-fixes.py --root spec
+
+# Apply high-confidence fixes only
+python3 linter-scripts/suggest-spec-cross-link-fixes.py --root spec --apply
+
+# Stricter threshold
+python3 linter-scripts/suggest-spec-cross-link-fixes.py --root spec --apply --min-confidence 0.9
+```
+
+### CI integration
+
+The `cross-links` job runs the suggester unconditionally after the
+blocking checker. Suggestions are uploaded as the
+`spec-cross-links-suggestions` artifact and surfaced as PR annotations.
+The suggester never fails the build — it is purely advisory so reviewers
+can opt in to applying fixes locally.
