@@ -1,7 +1,7 @@
 {
   "name": "vite_react_shadcn_ts",
   "private": true,
-  "version": "3.26.0",
+  "version": "3.27.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -17,7 +17,8 @@
     "release": "bash ./release.sh",
     "release:ps1": "powershell -ExecutionPolicy Bypass -File ./release.ps1",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "spec:audit": "node scripts/spec-audit/run-audit.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
