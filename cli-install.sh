@@ -7,12 +7,17 @@
 # Quick start:
 #   curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/cli-install.sh | bash
 #   curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/cli-install.sh | bash -s -- --version v3.41.0
-#   curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/cli-install.sh | bash -s -- --target ./vendor
+#   curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/cli-install.sh | bash -s -- --target-dir ./vendor
 #
 # Install paths:
 #   • --version vX.Y.Z → fetch cli.tar.gz from
 #     the GitHub Release and extract with src→dest folder remapping.
 #   • default          → delegate to install.sh (branch checkout).
+#
+# Flags:
+#   --version vX.Y.Z         install a specific tagged release
+#   --target-dir <dir>       install into <dir> (aliases: --target, --dest)
+#                            default: current working directory
 #
 # Folder mapping (src in repo → dest under target):
 #   spec/11-powershell-integration → spec/11-powershell-integration
@@ -42,9 +47,12 @@ FORWARD_ARGS=()
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --version)        VERSION="$2"; FORWARD_ARGS+=("--version" "$2"); shift 2 ;;
-    --target|--dest)  TARGET="$2"; FORWARD_ARGS+=("--dest" "$2");    shift 2 ;;
-    *)                FORWARD_ARGS+=("$1");                          shift   ;;
+    --version)
+      VERSION="$2"; FORWARD_ARGS+=("--version" "$2"); shift 2 ;;
+    --target-dir|--target|--dest)
+      TARGET="$2"; FORWARD_ARGS+=("--dest" "$2");    shift 2 ;;
+    *)
+      FORWARD_ARGS+=("$1");                          shift   ;;
   esac
 done
 

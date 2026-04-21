@@ -21,12 +21,13 @@
     irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/wp-install.ps1 | iex
 
 .EXAMPLE
-    & ([scriptblock]::Create((irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/wp-install.ps1))) -Version v3.41.0 -Target .\vendor
+    & ([scriptblock]::Create((irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/wp-install.ps1))) -Version v3.41.0 -TargetDir .\vendor
 #>
 
 param(
     [string]$Version = "",
-    [string]$Target = "",
+    [Alias("Target", "Dest")]
+    [string]$TargetDir = "",
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$ForwardedArgs = @()
 )
@@ -41,12 +42,12 @@ $ArchiveStableName = "wp"
 $ReleaseBase = "https://github.com/alimtvnetwork/coding-guidelines-v15/releases"
 $InstallerUrl = "https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.ps1"
 
-if ([string]::IsNullOrEmpty($Target)) { $Target = (Get-Location).Path }
+if ([string]::IsNullOrEmpty($TargetDir)) { $TargetDir = (Get-Location).Path }
 
 Write-Host ""
 Write-Host "════════════════════════════════════════════════════════" -ForegroundColor Cyan
 Write-Host "  WordPress Plugin How-To Spec (bundle: $BundleName)" -ForegroundColor Cyan
-Write-Host "  Target: $Target" -ForegroundColor Cyan
+Write-Host "  Target: $TargetDir" -ForegroundColor Cyan
 if ($Version) {
     Write-Host "  Mode:   versioned archive ($ArchiveStableName.zip @ $Version)" -ForegroundColor Cyan
 } else {
@@ -75,7 +76,7 @@ function Install-ViaArchive {
         $extractDir = Join-Path $tmp "extract"
         Expand-Archive -Path $zipPath -DestinationPath $extractDir -Force
 
-        New-Item -ItemType Directory -Path $Target -Force | Out-Null
+        New-Item -ItemType Directory -Path $TargetDir -Force | Out-Null
         foreach ($pair in $BundleMapping.Split(",")) {
             $parts = $pair.Split("|")
             $src = $parts[0]; $dest = $parts[1]
@@ -84,7 +85,7 @@ function Install-ViaArchive {
                 Write-Warning "  archive missing $src — skipping"
                 continue
             }
-            $destPath = Join-Path $Target $dest
+            $destPath = Join-Path $TargetDir $dest
             New-Item -ItemType Directory -Path $destPath -Force | Out-Null
             Copy-Item -Path (Join-Path $srcPath '*') -Destination $destPath -Recurse -Force
             Write-Host "  ✓ $src → $destPath" -ForegroundColor Green
@@ -100,7 +101,7 @@ function Install-ViaInstaller {
     $folderArray = $BundleFoldersSrc.Split(",")
     $extra = @()
     if ($Version) { $extra += @("-Version", $Version) }
-    if ($Target)  { $extra += @("-Dest", $Target) }
+    if ($TargetDir) { $extra += @("-Dest", $TargetDir) }
     & $installerBlock -Folders $folderArray @extra @ForwardedArgs
 }
 
