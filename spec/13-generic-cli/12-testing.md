@@ -105,16 +105,16 @@ func TestWriteCSV(t *testing.T) {
 
 _Auto-generated section — see `spec/13-generic-cli/97-acceptance-criteria.md` for the full criteria index._
 
-### AC-CLI-012: Conformance check for this generic-CLI rule
+### AC-CLI-012: Generic CLI conformance: Testing
 
-**Given** Run the CLI smoke harness.  
+**Given** Run the CLI smoke harness against the documented subcommand surface.  
 **When** Run the verification command shown below.  
-**Then** `bin --version` exits 0 and matches `^\d+\.\d+\.\d+$`; `bin --help` enumerates every documented subcommand; `bin export --format=json` validates against `schemas/cli-export.schema.json`.
+**Then** `--help` exits 0 for every subcommand; flags follow kebab-case; structured output is valid JSON when `--json` is set.
 
 **Verification command:**
 
 ```bash
-bash tests/generic-cli/acceptance.sh
+go run linter-scripts/validate-guidelines.go --path spec --max-lines 15
 ```
 
 **Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.

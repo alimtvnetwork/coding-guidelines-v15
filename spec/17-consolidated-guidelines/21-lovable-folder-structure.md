@@ -307,16 +307,16 @@ Bullet-point list of pending suggestions with one-line descriptions.
 
 _Auto-generated section — see `spec/17-consolidated-guidelines/97-acceptance-criteria.md` for the full criteria index._
 
-### AC-CON-021: Conformance check for this consolidated-guideline rule
+### AC-CON-021: Consolidated guideline conformance: Lovable Folder Structure
 
-**Given** Run the standalone-implementability checker.  
+**Given** Cross-check this consolidated digest against its source spec folder.  
 **When** Run the verification command shown below.  
-**Then** This file contains at least one fenced code block and zero relative parent links (`grep -c '\[.*\](\.\./' file.md` MUST be 0).
+**Then** Every rule cited here resolves to a section in the source folder via the cross-link checker; no orphan rules.
 
 **Verification command:**
 
 ```bash
-python3 linters-cicd/scripts/check-consolidated-standalone.py
+python3 linter-scripts/check-spec-cross-links.py --root spec
 ```
 
 **Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.

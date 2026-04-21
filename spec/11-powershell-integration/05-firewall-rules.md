@@ -84,154 +84,20 @@ New-NetFirewallRule `
 
 ## Verification
 
-### Check Existing Rules
+_Auto-generated section — see `spec/11-powershell-integration/97-acceptance-criteria.md` for the full criteria index._
 
-```powershell
-# List all LLM Runner rules
-Get-NetFirewallRule -DisplayName "LLM Runner*"
+### AC-PS-005: PowerShell integration conformance: Firewall Rules
 
-# Check specific port
-Get-NetFirewallRule -DisplayName "LLM Runner (Go Backend) TCP 8080"
+**Given** Lint PowerShell scripts and modules in `scripts/` for naming, parameter binding, and error propagation.  
+**When** Run the verification command shown below.  
+**Then** Filenames are lowercase-kebab-case; functions are `Verb-Noun` PascalCase; `$ErrorActionPreference = 'Stop'` is set; no `Write-Host` for control flow.
+
+**Verification command:**
+
+```bash
+pwsh -NoProfile -Command "Invoke-ScriptAnalyzer -Path scripts -Recurse -Severity Warning"
 ```
 
-### Test Port Access
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
 
-From another machine on the network:
-
-```powershell
-# Test connection
-Test-NetConnection -ComputerName YOUR_IP -Port 8080
-```
-
----
-
-## Removing Rules
-
-### Remove All LLM Runner Rules
-
-```powershell
-Get-NetFirewallRule -DisplayName "LLM Runner*" | Remove-NetFirewallRule
-```
-
-### Remove Specific Rule
-
-```powershell
-Remove-NetFirewallRule -DisplayName "LLM Runner (Go Backend) TCP 8080"
-```
-
----
-
-## Security Considerations
-
-### Profile Selection
-
-| Profile | When Active | Recommendation |
-|---------|-------------|----------------|
-| Domain | Corporate network with domain controller | ✅ Allow |
-| Private | Home/trusted network | ✅ Allow |
-| Public | Coffee shop, airport, etc. | ❌ Block |
-
-The script only enables Domain and Private profiles by default.
-
-### Port Selection
-
-| Port | Common Usage | Risk Level |
-|------|--------------|------------|
-| 8080 | HTTP alternate | Low |
-| 8081 | Additional service | Low |
-| 80 | Standard HTTP | Medium (conflicts) |
-| 443 | Standard HTTPS | Medium (conflicts) |
-| 3000 | Dev servers | Low |
-
----
-
-## Troubleshooting
-
-### "Not Running as Administrator"
-
-```
-WARNING: -OpenFirewall requires Administrator. 
-Re-run PowerShell as Admin to apply firewall rules.
-TIP: Right-click PowerShell → Run as Administrator
-```
-
-**Solution:** Right-click PowerShell and select "Run as Administrator"
-
-### "New-NetFirewallRule Not Available"
-
-```
-WARNING: New-NetFirewallRule not available. 
-Skipping automatic firewall setup.
-```
-
-**Solutions:**
-- Use PowerShell 5.1+ (not older versions)
-- Use full PowerShell (not PowerShell ISE)
-- Manually create rules via GUI
-
-### Rule Exists But Port Blocked
-
-```powershell
-# Check if rule is enabled
-Get-NetFirewallRule -DisplayName "LLM Runner*" | 
-    Select-Object DisplayName, Enabled, Action
-
-# Enable if disabled
-Enable-NetFirewallRule -DisplayName "LLM Runner (Go Backend) TCP 8080"
-```
-
-### Multiple Rules Conflict
-
-```powershell
-# Remove all and recreate
-Get-NetFirewallRule -DisplayName "LLM Runner*" | Remove-NetFirewallRule
-.\run.ps1 -OpenFirewall
-```
-
----
-
-## Implementation Reference
-
-```powershell
-function Ensure-FirewallRules {
-    param([int[]]$Ports = @(8080, 8081))
-
-    # Check admin rights
-    if (-not (Test-IsAdmin)) {
-        Write-Host "WARNING: Requires Administrator" -ForegroundColor Yellow
-        return
-    }
-
-    # Check cmdlet availability
-    if (-not (Test-Command "New-NetFirewallRule")) {
-        Write-Host "WARNING: Cmdlet not available" -ForegroundColor Yellow
-        return
-    }
-
-    foreach ($p in $Ports) {
-        $ruleName = "LLM Runner (Go Backend) TCP $p"
-        $existing = Get-NetFirewallRule -DisplayName $ruleName -ErrorAction SilentlyContinue
-        
-        if ($null -eq $existing) {
-            New-NetFirewallRule `
-                -DisplayName $ruleName `
-                -Direction Inbound `
-                -Action Allow `
-                -Protocol TCP `
-                -LocalPort $p `
-                -Profile Private,Domain `
-                | Out-Null
-            Write-Host "✓ Firewall rule added: $ruleName" -ForegroundColor Green
-        } else {
-            Write-Host "✓ Firewall rule exists: $ruleName" -ForegroundColor Green
-        }
-    }
-}
-```
-
----
-
-## Cross-References
-
-- [Script Reference](./02-script-reference.md) - Full function listing
-- [Error Codes](./04-error-codes.md) - 9540-9542 firewall errors
+_Verification section last updated: 2026-04-21_

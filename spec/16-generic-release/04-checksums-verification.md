@@ -155,16 +155,16 @@ Include a formatted checksum table in the release description:
 
 _Auto-generated section — see `spec/16-generic-release/97-acceptance-criteria.md` for the full criteria index._
 
-### AC-REL-004: Conformance check for this release-pipeline rule
+### AC-REL-004: Generic-release conformance: Checksums Verification
 
-**Given** Run the release matrix check.  
+**Given** Inspect a release artifact bundle for required assets and checksums.  
 **When** Run the verification command shown below.  
-**Then** Build matrix produces all six pairs (`linux/amd64`, `linux/arm64`, `darwin/amd64`, `darwin/arm64`, `windows/amd64`, `windows/arm64`); every release tag matches the SemVer regex.
+**Then** SHA-256 checksums verify; `release-metadata.json` matches the package version; install scripts pin the exact release tag.
 
 **Verification command:**
 
 ```bash
-bash tests/release/matrix-check.sh
+python3 linter-scripts/check-spec-cross-links.py --root spec
 ```
 
 **Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.

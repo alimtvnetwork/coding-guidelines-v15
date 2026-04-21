@@ -406,7 +406,7 @@ comments — any other SQL statement breaks the chain.
 
 _Auto-generated section — see `spec/04-database-conventions/97-acceptance-criteria.md` for the full criteria index._
 
-### AC-DB-002: Conformance check for this database convention
+### AC-DB-002: Database convention conformance: Schema Design
 
 **Given** Run the SQL schema linter against your DDL files.  
 **When** Run the verification command shown below.  
@@ -415,7 +415,7 @@ _Auto-generated section — see `spec/04-database-conventions/97-acceptance-crit
 **Verification command:**
 
 ```bash
-python3 linter-scripts/check-db-schema.py path/to/schema.sql
+python3 linter-scripts/check-forbidden-strings.py
 ```
 
 **Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.

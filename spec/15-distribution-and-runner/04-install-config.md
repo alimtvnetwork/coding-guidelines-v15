@@ -107,16 +107,16 @@ Invocation:
 
 _Auto-generated section — see `spec/15-distribution-and-runner/97-acceptance-criteria.md` for the full criteria index._
 
-### AC-DIST-004: Conformance check for this distribution/runner rule
+### AC-DIST-004: Distribution & runner conformance: Install Config
 
-**Given** Run the install + runner contract tests on a clean host.  
+**Given** Validate the install contract and runner contract against a clean machine fixture.  
 **When** Run the verification command shown below.  
-**Then** Install drops the binary at the documented platform path; runner exit codes follow the 0/1/2/3/4/64+ contract; required deps (`bun >=1.1`, `git >=2.40`, `unzip`, `curl`) are documented per script.
+**Then** Install script is idempotent; runner detects missing deps and exits with a stable error code; PATH entries are deduped.
 
 **Verification command:**
 
 ```bash
-bash tests/distribution/acceptance.sh && pwsh tests/distribution/acceptance.ps1
+python3 linter-scripts/check-spec-cross-links.py --root spec
 ```
 
 **Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.

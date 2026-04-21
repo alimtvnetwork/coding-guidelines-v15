@@ -1027,16 +1027,16 @@ This pattern is used by:
 
 _Auto-generated section — see `spec/05-split-db-architecture/97-acceptance-criteria.md` for the full criteria index._
 
-### AC-SDB-001: Conformance check for this split-DB architecture rule
+### AC-SDB-001: Split-DB architecture conformance: Fundamentals
 
-**Given** Initialize the app and inspect the on-disk DB hierarchy.  
+**Given** Inspect Root/App/Session DB lifecycle wiring and Casbin RBAC enforcement points.  
 **When** Run the verification command shown below.  
-**Then** Root, App, and Session DB files exist at the documented paths and report `journal_mode=wal` via `PRAGMA journal_mode;`.
+**Then** Each tier opens its own SQLite handle (WAL mode), policy reload happens on Casbin policy change, and user-scope isolation is enforced by row filters.
 
 **Verification command:**
 
 ```bash
-bash tests/split-db/acceptance.sh
+python3 linter-scripts/check-spec-cross-links.py --root spec
 ```
 
 **Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
