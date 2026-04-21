@@ -60,6 +60,7 @@ pattern file is structured as:
 | 05 | [05-actionable-lint-suggestions.md](./05-actionable-lint-suggestions.md) | Actionable lint suggestions | PR comment mapping each new finding to a fix template |
 | 06 | [06-matrix-test-aggregator.md](./06-matrix-test-aggregator.md) | Matrix test aggregator | Combine matrix-job test outputs into one copy-paste report |
 | 07 | [07-shared-cli-wrapper.md](./07-shared-cli-wrapper.md) | Shared CLI wrapper | Unified `--phase check\|lint\|test\|all` entry point dispatching to all six guards |
+| 08 | [08-config-schema.md](./08-config-schema.md) | Unified config schema | Single `ci-guards.yaml` parameterizes every guard; loader emits env vars consumed by Pattern 07 |
 | 99 | [99-ai-implementation-guide.md](./99-ai-implementation-guide.md) | AI handoff | How an AI should select, configure, and ship these guards |
 
 ---

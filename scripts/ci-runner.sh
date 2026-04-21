@@ -41,6 +41,7 @@ RESULTS_DIR=""
 VERBOSE=0
 FIX_MODE=0
 SCRIPTS_DIR="${CI_RUNNER_SCRIPTS_DIR:-.github/scripts}"
+CONFIG_FILE=""
 
 # ---------------------------------------------------------------------------
 # Logging helpers (single-purpose, < 8 lines each)
@@ -77,6 +78,7 @@ Phases group related guards from spec/12-cicd-pipeline-workflows/03-reusable-ci-
 Options:
   --phase <name>          Required. One of: check, lint, test, all.
   --guard <name>          Optional. Run a single guard by name.
+  --config <path>         Optional. Load ci-guards.yaml/.json (Pattern 08).
   --source-dir <path>     Source directory for check-phase guards.
   --baseline <path>       Baseline file (naming-baseline, lint-diff).
   --results-dir <path>    Matrix results directory (test-summary).
@@ -110,6 +112,7 @@ parse_flags() {
     case "$1" in
       --phase)        PHASE="${2:-}";        shift 2 ;;
       --guard)        GUARD="${2:-}";        shift 2 ;;
+      --config)       CONFIG_FILE="${2:-}";  shift 2 ;;
       --json)         JSON_OUT="${2:-}";     shift 2 ;;
       --baseline)     BASELINE_FILE="${2:-}"; shift 2 ;;
       --source-dir)   SOURCE_DIR="${2:-}";   shift 2 ;;
@@ -121,6 +124,30 @@ parse_flags() {
       *)              log_error "unknown flag: $1"; print_usage; exit "$EXIT_USAGE_ERROR" ;;
     esac
   done
+}
+
+# Load config file (if provided) and apply its values as defaults.
+# Explicit CLI flags take precedence over config-file values.
+apply_config_file() {
+  if [ -z "$CONFIG_FILE" ]; then
+    return "$EXIT_OK"
+  fi
+  if [ ! -f "$CONFIG_FILE" ]; then
+    log_error "config file not found: $CONFIG_FILE"
+    return "$EXIT_TOOL_ERROR"
+  fi
+  log_info "loading config from $CONFIG_FILE"
+  local env_lines
+  if ! env_lines=$(node "$(dirname "$0")/ci-config.mjs" --config "$CONFIG_FILE" --emit env); then
+    log_error "config loader failed for $CONFIG_FILE"
+    return "$EXIT_TOOL_ERROR"
+  fi
+  # shellcheck disable=SC2086
+  eval "$env_lines"
+  # Apply config defaults only when CLI flag is empty.
+  [ -z "$SCRIPTS_DIR" ] || [ "$SCRIPTS_DIR" = ".github/scripts" ] && \
+    SCRIPTS_DIR="${CI_GUARDS_SCRIPTS_DIR:-$SCRIPTS_DIR}"
+  return "$EXIT_OK"
 }
 
 validate_flags() {
@@ -281,6 +308,9 @@ main() {
   parse_flags "$@"
   if ! validate_flags; then
     exit "$EXIT_USAGE_ERROR"
+  fi
+  if ! apply_config_file; then
+    exit "$EXIT_TOOL_ERROR"
   fi
   if [ -n "$GUARD" ]; then
     log_section "single-guard mode: $GUARD"
