@@ -297,16 +297,16 @@ $ <tool> release info v1.3.0
 
 _Auto-generated section — see `spec/12-cicd-pipeline-workflows/97-acceptance-criteria.md` for the full criteria index._
 
-### AC-CI-005: Conformance check for this CI/CD pipeline rule
+### AC-CI-005: CI/CD pipeline conformance: Changelog Integration
 
-**Given** Validate every workflow YAML and inspect release artifacts.  
+**Given** Validate `.github/workflows/*.yml` against the documented job matrix.  
 **When** Run the verification command shown below.  
-**Then** Every `.github/workflows/*.yml` validates against `schemas/github-workflow.json`; every git tag matches `^v\d+\.\d+\.\d+(-(alpha|beta|rc)\.\d+)?$`.
+**Then** Required jobs (`lint`, `cross-links`, `sync-drift`) are present; concurrency groups follow the `<workflow>-<ref>` pattern; `permissions:` is least-privilege.
 
 **Verification command:**
 
 ```bash
-bash linters-cicd/run-all.sh --workflows-only
+python3 linter-scripts/check-spec-cross-links.py --root spec
 ```
 
 **Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.

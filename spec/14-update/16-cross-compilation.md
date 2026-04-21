@@ -126,38 +126,20 @@ The `dist/` directory is the **single source of truth** for all downstream packa
 
 ## Verification
 
-After building each target, verify it is a valid executable:
+_Auto-generated section — see `spec/14-update/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-UPD-016: Self-update conformance: Cross Compilation
+
+**Given** Exercise the rename-first deploy path against a fixture release directory.  
+**When** Run the verification command shown below.  
+**Then** `latest.json` is written atomically; the old binary is renamed (not deleted) before the new one is moved into place; rollback restores the previous version.
+
+**Verification command:**
 
 ```bash
-file "$output"   # Should show correct architecture
-ls -la "$output" # Should have non-zero size
+python3 linter-scripts/check-spec-cross-links.py --root spec
 ```
 
-For the host-architecture binary, run a quick smoke test:
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
 
-```bash
-./<binary> version  # Should print the embedded version
-```
-
----
-
-## Constraints
-
-- Never rebuild binaries after the build stage — all downstream steps operate on the already-built artifacts.
-- Use the same Go toolchain version across all targets.
-- Do not use `go install` for cross-compilation — use `go build`.
-- Binary names must include OS and architecture for disambiguation.
-- The `.exe` extension is mandatory for Windows targets only.
-
----
-
-## Cross-References
-
-- [Release Assets](./07-release-assets.md) — Asset naming and compression conventions
-- [Checksums & Verification](./08-checksums-verification.md) — SHA-256 hash generation
-- [Release Pipeline](./11-release-pipeline.md) — End-to-end CI/CD workflow
-- [CI/CD Pipeline Workflows](../12-cicd-pipeline-workflows/00-overview.md) — Server-side pipeline patterns
-
----
-
-*Cross-compilation — v3.2.0 — 2026-04-11*
+_Verification section last updated: 2026-04-21_

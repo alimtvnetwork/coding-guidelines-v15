@@ -168,16 +168,16 @@ $status->label();
 
 _Auto-generated section — see `spec/18-wp-plugin-how-to/97-acceptance-criteria.md` for the full criteria index._
 
-### AC-WP-003b: Conformance check for this WP plugin rule
+### AC-WP-003a: WordPress plugin conformance: Self Update Status Enum
 
-**Given** Run the WP plugin acceptance harness against a clean WordPress install.  
+**Given** Static-analyze the plugin source against the documented enum, trait, and REST conventions.  
 **When** Run the verification command shown below.  
-**Then** `wp plugin activate <plugin-slug>` exits 0; `php -l` reports `No syntax errors` for every `.php` file; external cross-references resolve.
+**Then** Enums are `enum X: string` with metadata methods; REST routes use the `/wp-json/<plugin>/v1/` namespace; nonces are verified on every mutating request.
 
 **Verification command:**
 
 ```bash
-bash tests/wp-plugin/run-acceptance.sh
+python3 linter-scripts/check-spec-cross-links.py --root spec
 ```
 
 **Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.

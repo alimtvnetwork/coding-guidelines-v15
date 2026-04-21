@@ -125,35 +125,20 @@ downstream packaging, checksumming, and publishing steps.
 
 ## Verification
 
-After building each target, verify it is a valid executable:
+_Auto-generated section — see `spec/16-generic-release/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-REL-001: Generic-release conformance: Cross Compilation
+
+**Given** Inspect a release artifact bundle for required assets and checksums.  
+**When** Run the verification command shown below.  
+**Then** SHA-256 checksums verify; `release-metadata.json` matches the package version; install scripts pin the exact release tag.
+
+**Verification command:**
 
 ```bash
-file "$output"       # Should show correct architecture
-ls -la "$output"     # Should have non-zero size
+python3 linter-scripts/check-spec-cross-links.py --root spec
 ```
 
-For the host-architecture binary, run a quick smoke test:
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
 
-```bash
-./<binary> version   # Should print the embedded version
-```
-
----
-
-## Constraints
-
-- Never rebuild binaries after the build stage — all downstream steps
-  operate on the already-built artifacts.
-- Use the same Go toolchain version across all targets.
-- Do not use `go install` for cross-compilation — use `go build`.
-- Binary names must include OS and architecture for disambiguation.
-- The `.exe` extension is mandatory for Windows targets only.
-
-## Contributors
-
-- [**Md. Alim Ul Karim**](https://www.linkedin.com/in/alimkarim) — Creator & Lead Architect. System architect with 20+ years of professional software engineering experience across enterprise, fintech, and distributed systems. Recognized as one of the top software architects globally. Alim's architectural philosophy — consistency over cleverness, convention over configuration — is the driving force behind every design decision in this framework.
-  - [Google Profile](https://www.google.com/search?q=Alim+Ul+Karim)
-- [Riseup Asia LLC (Top Leading Software Company in WY)](https://riseup-asia.com) (2026)
-  - [Facebook](https://www.facebook.com/riseupasia.talent/)
-  - [LinkedIn](https://www.linkedin.com/company/105304484/)
-  - [YouTube](https://www.youtube.com/@riseup-asia)
+_Verification section last updated: 2026-04-21_

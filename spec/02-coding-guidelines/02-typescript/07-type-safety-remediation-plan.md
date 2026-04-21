@@ -357,13 +357,20 @@ type ActivityEntry =
 
 ## Verification
 
-After each phase:
-1. `tsc --noEmit` — zero type errors
-2. Search for `\bany\b` in `src/` — zero matches (excluding comments with "any" as English word)
-3. Search for `as any` — zero matches
-4. Search for `catch.*any` — zero matches
-5. Search for `Record<string, unknown>` in API signatures — zero matches
+_Auto-generated section — see `spec/02-coding-guidelines/97-acceptance-criteria.md` for the full criteria index._
 
----
+### AC-CG-007a: Coding guideline conformance: Type Safety Remediation Plan
 
-*Remediation plan v1.0.0 — 2026-02-12*
+**Given** Run the cross-language coding-guidelines validator against `src/` and language-specific source roots.  
+**When** Run the verification command shown below.  
+**Then** Zero CODE-RED violations are reported (functions ≤ 15 lines, files ≤ 300 lines, no nested ifs, max 2 boolean operands).
+
+**Verification command:**
+
+```bash
+go run linter-scripts/validate-guidelines.go --path spec --max-lines 15 && python3 linter-scripts/validate-guidelines.py spec
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

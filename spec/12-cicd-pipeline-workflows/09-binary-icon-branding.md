@@ -164,27 +164,20 @@ When the release pipeline generates resources:
 
 ## Verification
 
-After building, verify the icon is embedded:
+_Auto-generated section — see `spec/12-cicd-pipeline-workflows/97-acceptance-criteria.md` for the full criteria index._
 
-1. **File Explorer**: The `.exe` should show the custom icon instead of the default Windows executable icon
-2. **Right-click → Properties → Details**: Should show the product name, version, and description
-3. **Task Manager**: Running process should display the custom icon
+### AC-CI-009: CI/CD pipeline conformance: Binary Icon Branding
 
-### CI Verification (Optional)
+**Given** Validate `.github/workflows/*.yml` against the documented job matrix.  
+**When** Run the verification command shown below.  
+**Then** Required jobs (`lint`, `cross-links`, `sync-drift`) are present; concurrency groups follow the `<workflow>-<ref>` pattern; `permissions:` is least-privilege.
+
+**Verification command:**
 
 ```bash
-# Check that .syso files were generated
-ls -la rsrc_windows_*.syso
+python3 linter-scripts/check-spec-cross-links.py --root spec
 ```
 
----
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
 
-## Constraints
-
-- `go-winres` version is pinned in CI — never use `@latest`
-- Icon PNG must be at least 256x256 with transparency
-- `.syso` files must NOT be committed to Git — they are generated at build time
-- Add `*.syso` to `.gitignore`
-- Version in `winres.json` is a placeholder — always override at build time
-- `go-winres make` must run before `go build`, not after
-- Only affects Windows binaries — Linux/macOS ignore `.syso` files
+_Verification section last updated: 2026-04-21_

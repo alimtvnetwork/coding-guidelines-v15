@@ -246,16 +246,16 @@ Checklists are wrapped in a `.checklist-block` container with:
 
 _Auto-generated section — see `spec/08-docs-viewer-ui/97-acceptance-criteria.md` for the full criteria index._
 
-### AC-UI-006b: Conformance check for this docs-viewer UI rule
+### AC-UI-006a: Docs viewer UI conformance: Ui Theme Animations
 
-**Given** Run the Playwright suite for the docs viewer.  
+**Given** Render the docs viewer against the spec tree fixture.  
 **When** Run the verification command shown below.  
-**Then** Keyboard navigation works (`j`/`k` move selection); document tree validates against `schemas/doc-tree.schema.json`; zero hardcoded colors in viewer components.
+**Then** Keyboard navigation, syntax highlighting, fullscreen toggle, and copy-markdown all function without console errors.
 
 **Verification command:**
 
 ```bash
-bunx playwright test tests/docs-viewer/
+npm run test
 ```
 
 **Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.

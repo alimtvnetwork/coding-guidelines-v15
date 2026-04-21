@@ -144,16 +144,16 @@ The gradient flows from `--heading-gradient-from` (primary hue) to `--heading-gr
 
 _Auto-generated section — see `spec/07-design-system/97-acceptance-criteria.md` for the full criteria index._
 
-### AC-DS-003: Conformance check for this design-system rule
+### AC-DS-003: Design-system conformance: Typography
 
-**Given** Scan source for hardcoded colors and verify token contract.  
+**Given** Scan `src/` for raw color literals, hard-coded spacing, and untokenized typography.  
 **When** Run the verification command shown below.  
-**Then** Every semantic token is defined in HSL in `src/index.css` for both `:root` and `.dark`; zero hardcoded color classes in components.
+**Then** All visual properties resolve to semantic tokens declared in `index.css` / `tailwind.config.ts`; no `text-white`, `bg-#fff`, or hex literals appear in components.
 
 **Verification command:**
 
 ```bash
-grep -rnE '(text|bg|border)-(white|black|gray-[0-9])' src/components/ ; test $? -eq 1
+npm run lint
 ```
 
 **Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.

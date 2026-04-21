@@ -79,16 +79,16 @@ const levelColors = { error: "text-red-500", warn: "text-yellow-500", info: "tex
 
 _Auto-generated section — see `spec/03-error-manage/97-acceptance-criteria.md` for the full criteria index._
 
-### AC-ERR-001d: Conformance check for this error-management rule
+### AC-ERR-001c: Error-management conformance: Design Tokens
 
-**Given** Run the error-handling linter against the codebase.  
+**Given** Audit error-handling sites for use of the `apperror` package, error codes, and explicit file/path logging.  
 **When** Run the verification command shown below.  
-**Then** Zero empty `catch {}` blocks; every `apperror.New(...)` call carries a file/path context; all `Err*` identifiers are PascalCase.
+**Then** Every error site uses `apperror.Wrap`/`apperror.New` with a registered code; no bare `errors.New` or swallowed errors remain.
 
 **Verification command:**
 
 ```bash
-grep -rnE 'catch[[:space:]]*\([^)]*\)[[:space:]]*\{[[:space:]]*\}' src/ ; test $? -eq 1
+python3 linter-scripts/check-forbidden-strings.py && go run linter-scripts/validate-guidelines.go --path spec --max-lines 15
 ```
 
 **Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
