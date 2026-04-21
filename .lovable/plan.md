@@ -72,8 +72,7 @@
 | 39 | Created `spec/15-distribution-and-runner/` (00–04, v1.0.0) — install/runner/release/config contracts | 2026-04-19 |
 | 40 | Added `linters-cicd` to `install-config.json` default folders | 2026-04-19 |
 | 41 | Extended root `run.ps1` / `run.sh` with `slides`/`lint`/`help` sub-commands | 2026-04-19 |
-| 42 | Created `spec/19-ai-reliability/` (00, 01–07, 97, 99) targeting ASR ≥ 98% | 2026-04-21 |
-| 43 | CHANGELOG `[3.23.0]` + plan v3.8.0 | 2026-04-21 |
+| 42 | Removed `spec/19-ai-reliability/` and all dependent artifacts (per user request); CHANGELOG `[3.23.0]` rewritten | 2026-04-21 |
 
 ---
 
@@ -95,4 +94,4 @@
 
 ---
 
-*Plan — v3.8.0 — 2026-04-21*
+*Plan — v3.12.0 — 2026-04-21*
