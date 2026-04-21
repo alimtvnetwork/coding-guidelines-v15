@@ -52,8 +52,5 @@ description = "Legacy CDN domain (cdn.riseup-asia.com). Current canonical domain
 pattern = 'cdn\.riseup-asia\.com'
 fix_hint = "grep -rlE '$PATTERN' . | xargs sed -i 's|cdn.riseup-asia.com|cdn.riseup.asia|g'"
 exclude_dirs = ["release-artifacts"]
-exclude_files = ["forbidden-strings.toml", "check-forbidden-strings.py"]
-allowlist = [
-  "spec/15-domain-migration/",
-  "docs/legacy-domains.md",
-]
+exclude_files = ["forbidden-strings.toml", "check-forbidden-strings.py", "CHANGELOG.md"]
+allowlist = []
