@@ -50,6 +50,10 @@ def is_redundant_view(call: dict, in_context: set[str]) -> bool:
     return bool(file_path) and file_path in in_context
 
 
+class MalformedLogError(Exception):
+    """Raised when the JSONL log cannot be parsed."""
+
+
 def iter_records(source: Iterable[str]) -> Iterable[dict]:
     for line_no, raw in enumerate(source, start=1):
         stripped = raw.strip()
@@ -58,9 +62,7 @@ def iter_records(source: Iterable[str]) -> Iterable[dict]:
         try:
             yield json.loads(stripped)
         except json.JSONDecodeError as exc:
-            raise SystemExit(
-                _error(f"malformed JSON on line {line_no}: {exc}")
-            )
+            raise MalformedLogError(f"malformed JSON on line {line_no}: {exc}") from exc
 
 
 def scan(records: Iterable[dict]) -> list[dict]:
@@ -123,17 +125,21 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--version", action="version", version=f"check-context-hygiene {VERSION}")
     args = parser.parse_args(argv)
 
-    if args.log == "-":
-        records = list(iter_records(sys.stdin))
-        log_label = "<stdin>"
-    else:
-        log_path = Path(args.log)
-        if not log_path.is_file():
-            sys.stderr.write(_error(f"log file not found: {args.log}"))
-            return 2
-        with log_path.open("r", encoding="utf-8") as fh:
-            records = list(iter_records(fh))
-        log_label = str(log_path)
+    try:
+        if args.log == "-":
+            records = list(iter_records(sys.stdin))
+            log_label = "<stdin>"
+        else:
+            log_path = Path(args.log)
+            if not log_path.is_file():
+                sys.stderr.write(_error(f"log file not found: {args.log}"))
+                return 2
+            with log_path.open("r", encoding="utf-8") as fh:
+                records = list(iter_records(fh))
+            log_label = str(log_path)
+    except MalformedLogError as exc:
+        sys.stderr.write(_error(str(exc)))
+        return 2
 
     violations = scan(records)
     sys.stdout.write(render_report(violations, log_label))
