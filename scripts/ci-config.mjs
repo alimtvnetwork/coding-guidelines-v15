@@ -88,8 +88,11 @@ function parseFlags(argv) {
 function parseYamlSubset(text) {
   const lines = text.split(/\r?\n/);
   const root = {};
-  // Stack of [indent, container, isList]; container can be object or array.
-  const stack = [{ indent: -1, container: root, key: null }];
+  // Stack frames: { indent, container, parent, parentKey }
+  //   container       = the map currently being filled
+  //   parent + parentKey = where to swap container to an array if a list
+  //                        item is encountered as the first child
+  const stack = [{ indent: -1, container: root, parent: null, parentKey: null }];
 
   for (let lineNo = 0; lineNo < lines.length; lineNo++) {
     const raw = lines[lineNo];
@@ -133,16 +136,17 @@ function countIndent(line) {
   return i;
 }
 
-function handleListItem(stack, body, lineNo, indent) {
+function handleListItem(stack, body, lineNo, _indent) {
   const top = stack[stack.length - 1];
-  if (!top.pendingListKey) {
+  if (!top.parent || top.parentKey === null) {
     throw new Error(`line ${lineNo + 1}: list item without parent key`);
   }
-  if (!Array.isArray(top.container[top.pendingListKey])) {
-    top.container[top.pendingListKey] = [];
+  // Promote container to array on first list item.
+  if (!Array.isArray(top.parent[top.parentKey])) {
+    top.parent[top.parentKey] = [];
+    top.container = top.parent[top.parentKey];
   }
-  const value = parseScalar(body.slice(2).trim());
-  top.container[top.pendingListKey].push(value);
+  top.container.push(parseScalar(body.slice(2).trim()));
 }
 
 function handleMapEntry(stack, body, lineNo, indent) {
@@ -154,16 +158,23 @@ function handleMapEntry(stack, body, lineNo, indent) {
   const rest = body.slice(colonIdx + 1).trim();
   const top = stack[stack.length - 1];
 
+  if (Array.isArray(top.container)) {
+    throw new Error(`line ${lineNo + 1}: map entry inside list not supported`);
+  }
+
   if (rest === "") {
-    // Either a nested map, or a list will follow on next lines.
+    // Could become a map or an array depending on next line; start as map.
     top.container[key] = {};
-    top.pendingListKey = key;
-    stack.push({ indent, container: top.container[key], key });
+    stack.push({
+      indent,
+      container: top.container[key],
+      parent: top.container,
+      parentKey: key,
+    });
     return;
   }
 
   top.container[key] = parseScalar(rest);
-  top.pendingListKey = null;
 }
 
 function findKeyColon(body) {
