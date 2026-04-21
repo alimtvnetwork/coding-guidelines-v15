@@ -16,7 +16,6 @@
 #                [--config .codeguidelines.toml]
 #                [--jobs N|auto]            (default: 1, sequential)
 #                [--check-timeout SECONDS]  (default: 20)
-#                [--gctx-log PATH]          (G-CTX gate; opt-in, no-op if absent)
 #                [--output coding-guidelines.sarif] [--format sarif|text]
 #
 # Exit codes:
@@ -39,7 +38,6 @@ OUTPUT="coding-guidelines.sarif"
 FORMAT="sarif"
 JOBS="${LINTERS_JOBS:-1}"
 CHECK_TIMEOUT="20"
-GCTX_LOG="${LINTERS_GCTX_LOG:-}"
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -52,7 +50,6 @@ while [ $# -gt 0 ]; do
         --config)            CONFIG_FILE="$2"; shift 2 ;;
         --jobs)              JOBS="$2"; shift 2 ;;
         --check-timeout)     CHECK_TIMEOUT="$2"; shift 2 ;;
-        --gctx-log)          GCTX_LOG="$2"; shift 2 ;;
         --output)            OUTPUT="$2"; shift 2 ;;
         --format)            FORMAT="$2"; shift 2 ;;
         -h|--help)
