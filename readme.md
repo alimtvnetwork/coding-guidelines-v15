@@ -164,6 +164,75 @@ Edit `folders` to control which directories are downloaded. Files are merged int
 
 ---
 
+## Bundle Installers — `slides` & `consolidated`
+
+The named bundle installers in this repo (`<bundle>-install.sh` /
+`<bundle>-install.ps1`) are driven by [`bundles.json`](./bundles.json).
+Each entry declares a `src` (the path inside this repo / release archive)
+and a `dest` (where it lands under your install target — `--target-dir`
+on bash, `-TargetDir` on PowerShell, default = current working directory).
+
+### `slides-install` — Slides app + decks
+
+| Source in repo | Destination under `<TARGET>` |
+| --- | --- |
+| `spec-slides` | `spec/spec-slides` |
+| `slides-app`  | `spec/slides-app` |
+
+Resolved final paths (with `<TARGET>` = current dir, the default):
+
+- **Linux / macOS** (`bash slides-install.sh`):
+  - `./spec/spec-slides/`
+  - `./spec/slides-app/`
+- **Windows** (`pwsh -File slides-install.ps1`):
+  - `.\spec\spec-slides\`
+  - `.\spec\slides-app\`
+
+One-liners:
+
+```bash
+# Linux / macOS
+curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/slides-install.sh | bash
+
+# Windows
+irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/slides-install.ps1 | iex
+```
+
+### `consolidated-install` — Spec-authoring + error-manage + consolidated guidelines
+
+| Source in repo | Destination under `<TARGET>` |
+| --- | --- |
+| `spec/01-spec-authoring-guide`   | `spec/01-spec-authoring-guide` |
+| `spec/03-error-manage`           | `spec/03-error-manage` |
+| `spec/17-consolidated-guidelines` | `spec/17-consolidated-guidelines` |
+
+Resolved final paths (with `<TARGET>` = current dir, the default):
+
+- **Linux / macOS** (`bash consolidated-install.sh`):
+  - `./spec/01-spec-authoring-guide/`
+  - `./spec/03-error-manage/`
+  - `./spec/17-consolidated-guidelines/`
+- **Windows** (`pwsh -File consolidated-install.ps1`):
+  - `.\spec\01-spec-authoring-guide\`
+  - `.\spec\03-error-manage\`
+  - `.\spec\17-consolidated-guidelines\`
+
+One-liners:
+
+```bash
+# Linux / macOS
+curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/consolidated-install.sh | bash
+
+# Windows
+irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/consolidated-install.ps1 | iex
+```
+
+> Override the install root with `--target-dir <dir>` (bash) or
+> `-TargetDir <dir>` (pwsh). All `dest` paths above are joined under the
+> chosen target.
+
+---
+
 ## Release Scripts
 
 This repo now includes local release packager scripts modeled on the gitmap flow:
