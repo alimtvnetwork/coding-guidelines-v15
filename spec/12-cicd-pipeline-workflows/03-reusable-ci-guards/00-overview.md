@@ -62,6 +62,7 @@ pattern file is structured as:
 | 07 | [07-shared-cli-wrapper.md](./07-shared-cli-wrapper.md) | Shared CLI wrapper | Unified `--phase check\|lint\|test\|all` entry point dispatching to all six guards |
 | 08 | [08-config-schema.md](./08-config-schema.md) | Unified config schema | Single `ci-guards.yaml` parameterizes every guard; loader emits env vars consumed by Pattern 07 |
 | 09 | [09-workflow-templates.md](./09-workflow-templates.md) | GitHub Actions templates | Composite action + reusable workflow + 4 language starters wrapping Patterns 07/08 |
+| 10 | [10-reference-implementations.md](./10-reference-implementations.md) | Reference implementations | Concrete scripts under `.github/scripts/` implementing Patterns 01–06 end-to-end |
 | 99 | [99-ai-implementation-guide.md](./99-ai-implementation-guide.md) | AI handoff | How an AI should select, configure, and ship these guards |
 
 ---
