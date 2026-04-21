@@ -61,15 +61,17 @@ def strip_code_fences(text: str) -> str:
 
 def load_allowlist(repo_root: Path) -> set[str]:
     """Load waived broken links from linter-scripts/spec-cross-links.allowlist.
-    Format: one `relpath:line:target` entry per line; `#` comments allowed.
+    Format: one `relpath:line:target` entry per line. Lines starting with `#`
+    (after optional whitespace) are comments. Anchor fragments inside entries
+    are preserved.
     """
     path = repo_root / "linter-scripts" / "spec-cross-links.allowlist"
     if not path.exists():
         return set()
     out: set[str] = set()
     for raw in path.read_text(encoding="utf-8").splitlines():
-        line = raw.split("#", 1)[0].strip()
-        if line:
+        line = raw.strip()
+        if line and not line.startswith("#"):
             out.add(line)
     return out
 
