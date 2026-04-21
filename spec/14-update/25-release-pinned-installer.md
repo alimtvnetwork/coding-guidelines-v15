@@ -1,211 +1,186 @@
-# Release-Pinned Install Scripts (release-install.ps1 / release-install.sh)
+I want to have a `release-install.ps1` file, and that file will only be used for the release tab or release pages. The install script we were using before should not be used directly. The idea is that there will be a `release-install.ps1` and a similar shell file. When a user reaches the Release page from a URL, the script will know from that URL which version was requested. From the requested version, it will redirect its request to the same repo and ensure that it does not walk forward to the next `v1`, `v2`, `v3`, etc. There should be a parameter in the install script that fixates the version — something like `no-update` or `no-latest` — so that it installs exactly that version. Since we want to keep it simple, it should be a separate script that knows from this exact version which one to install. The first job is to write the release script spec file. Update the memory and the plan, and then we will do the implementation.
 
-**Version:** 1.0.0  
-**Updated:** 2026-04-21
+## Important
 
----
+- Do not act. Spec only. Implementation begins after explicit approval.
+- Pinned version is mandatory. Never resolve `latest`, `main`, `master`, or `HEAD`.
+- Generic `install.ps1` / `install.sh` remain unchanged as the "always latest" installers.
+- New scripts are additive: `release-install.ps1` and `release-install.sh`.
 
-## Purpose
+## Scope
 
-Define a **separate, additive** pair of installer scripts whose sole job is to install **exactly one specific release version** of the binary — never "latest", never auto-upgraded, never resolved against the GitHub `releases/latest` API.
+1. New Scripts
+   a. `release-install.ps1` (Windows / PowerShell)
+   b. `release-install.sh` (macOS / Linux / bash)
+   c. Located at repository root, alongside existing installers.
 
-These scripts are linked from individual GitHub Release pages (e.g. `releases/tag/v1.2.0`). They guarantee that a user who clicks "install this version" gets that version and nothing else, even if a newer `v1.3.0`, `v2.0.0`, or `v3.x` exists in the repo.
+2. Untouched
+   a. `install.ps1` and `install.sh` keep their current "latest" behavior.
+   b. Distributed via the existing `curl | iex` / `curl | bash` one-liner.
 
-The existing generic `install.ps1` / `install.sh` (latest-installer) remains unchanged.
+## Behavioral Contract
 
----
+1. Inputs
+   a. Explicit version
+   i. PowerShell: `-Version <tag>`
+   ii. Bash: `--version <tag>`
+   b. Pin enforcement
+   i. PowerShell: `-NoUpdate` (default ON, cannot be disabled)
+   ii. Bash: `--no-update` (default ON, cannot be disabled)
+   c. Help
+   i. PowerShell: `-Help` / `-?`
+   ii. Bash: `--help` / `-h`
 
-## Naming & Location
+2. Version Resolution Order
+   a. Explicit `-Version` / `--version` argument wins.
+   b. Otherwise use baked-in `VERSION_PLACEHOLDER` replaced at release-build time.
+   c. If neither is available, hard fail with non-zero exit.
+   d. Never fall back to `latest`, `main`, or `HEAD`.
 
-| File | Path | Role |
-|------|------|------|
-| `release-install.ps1` | repo root | Windows release-pinned installer |
-| `release-install.sh` | repo root | Linux/macOS release-pinned installer |
-| `install.ps1` | repo root | **Unchanged** — latest installer |
-| `install.sh` | repo root | **Unchanged** — latest installer |
+3. Pin Enforcement Guarantees
+   a. Download only from `https://github.com/<owner>/<repo>/releases/download/<PINNED_TAG>/...`.
+   b. Pass `--pinned-by-release-install <tag>` into any chained inner installer.
+   c. Inner installer must skip all update / self-upgrade logic when this flag is present.
+   d. Print resolved pinned version to stdout before any download.
+   e. Never query GitHub API for `latest` releases.
+   f. Never clone or fetch the source git repo.
 
-Sibling placement at repo root keeps raw GitHub URLs short and matches the existing installer pattern.
+4. Validation
+   a. Tag must match `^v?\d+\.\d+\.\d+(-[A-Za-z0-9.]+)?$`.
+   b. Reject anything else with a clear error to prevent URL path injection.
+   c. HEAD-check pinned asset URL before download. On 404, fail clearly.
 
----
+5. Checksum and Telemetry
+   a. Mirror the existing generic installer's verification approach (e.g., SHA256).
+   b. Verify checksums from the pinned tag's assets, not from `latest`.
+   c. No new telemetry introduced by the release script.
 
-## Version Resolution (Strict, No-Latest)
+## Resolution Algorithm
 
-The release script discovers its target version from these sources, **in order**:
+1. Parse arguments.
+2. If `-Version` / `--version` provided
+   a. `resolved_version = arg`
+   b. If baked-in placeholder is set and differs, warn to stderr.
+3. Else if `VERSION_PLACEHOLDER` has been replaced with a real tag
+   a. `resolved_version = baked-in value`
+4. Else
+   a. Error: "release-install requires a pinned version. Pass -Version <tag> or use the script from a Release page."
+   b. Exit 1.
+5. Validate `resolved_version` against semver regex; reject otherwise.
+6. Print: "Installing pinned version: <resolved_version>".
+7. Build asset URL: `https://github.com/<owner>/<repo>/releases/download/<resolved_version>/<asset>`.
+8. HEAD-check URL. On 404, error "release <tag> not found or asset missing"; exit 1.
+9. Download, verify checksum, extract.
+10. Invoke inner installer with `--pinned-by-release-install <resolved_version>`.
+11. Inner installer must skip all update/upgrade logic when this flag is present.
 
-| Order | Source | Notes |
-|-------|--------|-------|
-| 1 | `-Version` (PS) / `--version` (sh) CLI argument | Explicit override; highest priority |
-| 2 | `VERSION_PLACEHOLDER` baked in at release time | Replaced via `sed` during release pipeline |
-| 3 | **(none)** | If both above are empty/unresolved → **fatal error, exit 1** |
+## Failure Modes
 
-> The script **MUST NOT** call `https://api.github.com/repos/<repo>/releases/latest`, scrape the releases page, or parse `latest.json`. There is no fallback path.
+1. Exit 1: No version resolvable (no arg, no baked-in tag).
+2. Exit 2: Version string fails semver regex.
+3. Exit 3: Pinned release or asset not found (404).
+4. Exit 4: Checksum mismatch.
+5. Exit 5: Inner installer rejected `--pinned-by-release-install` (version skew).
 
----
+## Forbidden Behaviors
 
-## NoUpdate / no-update Flag
+1. Resolving `latest`, `main`, `master`, or `HEAD`.
+2. Walking forward to a newer tag.
+3. Cloning or fetching the source git repo.
+4. Silently disabling `-NoUpdate` / `--no-update`.
+5. Continuing past a checksum failure.
 
-Both scripts accept a flag that forces strict pinning behavior:
+## Release-Time Build Step
 
-| Script | Flag | Default |
-|--------|------|---------|
-| `release-install.ps1` | `-NoUpdate` | `$true` |
-| `release-install.sh` | `--no-update` | `true` |
+1. On tag push, the release workflow (e.g., GitHub Action) runs.
+2. Steps
+   a. Take canonical `release-install.ps1` / `release-install.sh` from repo root.
+   b. Replace `VERSION_PLACEHOLDER` with the concrete tag (e.g., `v1.4.2`).
+   c. Upload baked copies as release assets on that release.
+   d. Ensure the Release page advertises the one-liner pointing to those baked assets.
+3. Unbaked copies in repo root remain useful for
+   a. Standalone power-user invocation with `-Version`.
+   b. Being the canonical source the workflow bakes from.
 
-When `NoUpdate` is on (the default for the release script):
+## Release Page One-Liners
 
-- No call to `releases/latest`
-- No version-bump suggestion printed at the end
-- No "newer version available" notice
-- Self-update subsystem is NOT installed alongside (if such a hook exists in the binary's post-install)
+1. PowerShell
 
-The flag exists primarily so future code paths can branch on it; **toggling it off is reserved and currently a no-op** because the release script never queries latest under any condition.
+   ```powershell
+   irm https://github.com/<owner>/<repo>/releases/download/v1.4.2/release-install.ps1 | iex
+   ```
 
----
+2. Bash
 
-## CLI Surface
+   ```bash
+   curl -fsSL https://github.com/<owner>/<repo>/releases/download/v1.4.2/release-install.sh | bash
+   ```
 
-### PowerShell (`release-install.ps1`)
+## Ambiguities and Resolutions
 
-```powershell
-param(
-    [string]$Version    = "",        # Override baked-in version
-    [string]$InstallDir = "",        # Default: $env:LOCALAPPDATA\<binary>
-    [string]$Arch       = "",        # Auto-detect when empty
-    [switch]$NoPath,                 # Skip PATH mutation
-    [switch]$NoUpdate   = $true      # Always on; reserved flag
-)
-```
+1. AMB-1: Behavior when an explicit version is passed to the generic `install.sh` / `install.ps1`
+   a. Resolution: Honor strict pinning for that invocation. "Latest" applies only when no version is specified.
 
-### Bash (`release-install.sh`)
+2. AMB-2: What "look at the git repo" forbids when pinned
+   a. No `git clone`.
+   b. No fetching `main` / `master` / `HEAD` tarballs.
+   c. No GitHub API calls to `/releases/latest` or `/tags` beyond verifying the pinned tag exists.
+   d. Allowed: HEAD request to confirm the pinned asset URL returns 200.
 
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
+3. AMB-3: How the Release page advertises the URL
+   a. Out of scope for the script. Handled by the Release page generator (release notes template or GitHub Action).
 
-VERSION=""              # --version <v>
-INSTALL_DIR=""          # --dir <path>; default $HOME/.local/bin
-ARCH=""                 # --arch <amd64|arm64>
-NO_PATH=false           # --no-path
-NO_UPDATE=true          # --no-update (default true; reserved)
-```
+4. AMB-4: When `-Version` disagrees with baked-in tag
+   a. `-Version` wins. Print a warning to stderr. Proceed with user-requested version.
 
----
+5. AMB-5: Asset naming convention
+   a. Unchanged. Only the base URL changes from `/releases/latest/download/` to `/releases/download/<PINNED_TAG>/`.
 
-## Repo Pinning (No v1/v2/v3 Drift)
+6. AMB-6: Checksum / signature verification
+   a. Inherit existing generic installer's verification approach against the pinned tag's assets.
 
-The release script targets the **exact repo it was generated from**. The repo slug is baked in via `REPO_PLACEHOLDER` at release time and **MUST NOT** be overridable via CLI flag.
+7. AMB-7: Telemetry
+   a. Inherit existing installer behavior. No additions.
 
-This prevents the common drift bug where:
-
-- A user downloads `release-install.ps1` from `repo-v2` release page
-- The script is later re-used and silently pulls from `repo-v3`
-
-If the embedded `REPO_PLACEHOLDER` value still equals the literal string `REPO_PLACEHOLDER` at runtime, the script **MUST exit 1** with a clear "this script was not properly generated by the release pipeline" error.
-
----
-
-## Execution Flow
-
-```
-1.  Print banner: "Release-pinned installer — vX.Y.Z — <repo>"
-2.  Validate REPO_PLACEHOLDER was replaced (else exit 1)
-3.  Resolve Version (CLI arg → baked value → exit 1)
-4.  Detect OS + Arch (or use overrides)
-5.  Resolve install directory
-6.  Download <binary>-<version>-<os>-<arch>.{zip|tar.gz} from
-       https://github.com/<repo>/releases/download/v<version>/...
-7.  Download checksums.txt for that exact tag
-8.  Verify SHA-256 (fail hard on mismatch)
-9.  Rename-first upgrade (existing binary → .old)
-10. Extract and install
-11. Clean up .old + temp dir
-12. Add to PATH unless --no-path / -NoPath
-13. Run "<binary> version" to confirm
-14. Print success — DO NOT print "newer version available"
-```
-
----
-
-## What This Script MUST NOT Do
-
-| Behavior | Reason |
-|----------|--------|
-| Query `api.github.com/.../releases/latest` | Defeats the pin |
-| Read or write `latest.json` / `version-channel` | Not a self-updater |
-| Auto-bump on subsequent runs | Re-running must re-install the same version |
-| Accept a `--repo` / `-Repo` flag | Prevents v1↔v2↔v3 cross-repo drift |
-| Print upgrade nags | This is a pinned installer, not a channel client |
-| Fall back to "latest" if download 404s | Exit 1 instead — fail loud |
-
----
-
-## Release Pipeline Integration
-
-The release pipeline (see `17-release-pipeline.md`) gains a new step alongside the existing install-script generation:
-
-```bash
-# Existing
-sed -i "s|VERSION_PLACEHOLDER|$VERSION|g" dist/install.ps1
-sed -i "s|REPO_PLACEHOLDER|$REPO|g" dist/install.ps1
-
-# New
-sed -i "s|VERSION_PLACEHOLDER|$VERSION|g" dist/release-install.ps1
-sed -i "s|REPO_PLACEHOLDER|$REPO|g" dist/release-install.ps1
-sed -i "s|VERSION_PLACEHOLDER|$VERSION|g" dist/release-install.sh
-sed -i "s|REPO_PLACEHOLDER|$REPO|g" dist/release-install.sh
-chmod +x dist/release-install.sh
-```
-
-Both `release-install.ps1` and `release-install.sh` are published as **release assets on every tagged release**.
-
----
-
-## Release Body (One-Liners)
-
-The GitHub Release body gains a new section above the existing latest-installer block:
-
-```markdown
-## Install this exact version (v1.2.0)
-
-**Windows (PowerShell)**
-```
-irm https://github.com/<repo>/releases/download/v1.2.0/release-install.ps1 | iex
-```
-
-**Linux / macOS**
-```
-curl -fsSL https://github.com/<repo>/releases/download/v1.2.0/release-install.sh | bash
-```
-
-## Install latest (auto-updates on re-run)
-
-[unchanged install.ps1 / install.sh block]
-```
-
----
+8. AMB-8: Tag format validation
+   a. Accept `^v?\d+\.\d+\.\d+(-[A-Za-z0-9.]+)?$`. Reject anything else.
 
 ## Acceptance Criteria
 
-| # | Criterion |
-|---|-----------|
-| AC-01 | `release-install.ps1 -Version v1.2.0` installs exactly v1.2.0 |
-| AC-02 | Re-running the same script produces the same binary (idempotent) |
-| AC-03 | Removing the baked `VERSION_PLACEHOLDER` causes exit 1 |
-| AC-04 | Removing the baked `REPO_PLACEHOLDER` causes exit 1 |
-| AC-05 | No network call to `api.github.com/.../releases/latest` (verified by test harness) |
-| AC-06 | No `--repo` / `-Repo` flag is exposed |
-| AC-07 | Script published as release asset for every tag |
-| AC-08 | Existing `install.ps1` / `install.sh` behavior unchanged |
+1. Running `release-install.ps1` / `release-install.sh` with no version and no baked-in tag exits non-zero with the documented error.
+2. Running with `-Version v1.4.2` downloads only from `/releases/download/v1.4.2/` and never from `/releases/latest/`.
+3. Running the baked release-asset copy installs exactly that release's pinned version.
+4. Passing `-Version` that disagrees with the baked-in tag prints a stderr warning and uses the argument value.
+5. Invalid tag formats are rejected with exit code 2 before any network call.
+6. 404 on pinned asset URL exits with code 3 and a clear message.
+7. Checksum mismatch exits with code 4 and aborts installation.
+8. Inner installer receives `--pinned-by-release-install <tag>` and skips all update logic.
+9. Generic `install.ps1` / `install.sh` behavior is unchanged when invoked without a version.
+10. Generic installers, when invoked with `--version <tag>`, also enforce strict pinning (AMB-1).
 
----
+## Open Items for User Confirmation
 
-## Cross-References
+1. Repository target
+   a. Confirm the actual repo (owner/name) where these scripts live. The current Lovable project is a React template and is not the install-script repo.
 
-- `17-release-pipeline.md` — Pipeline that generates and publishes the script
-- `18-install-scripts.md` — Generic latest-installer companion script
-- `15-release-versioning.md` — Version resolution rules
-- `14-checksums-verification.md` — Mandatory checksum verification
+2. AMB-1 confirmation
+   a. Confirm that the generic `install.sh` / `install.ps1` should also enforce strict pinning when a version is passed.
 
----
+3. Asset naming (AMB-5)
+   a. Confirm existing asset naming scheme is unchanged.
 
-*Release-pinned installer spec — v1.0.0 — 2026-04-21*
+4. Checksum (AMB-6)
+   a. Confirm the generic installer's exact verification approach so the release variant mirrors it.
+
+## File System References
+
+1. Spec file: `prompts/01-release-install.md`
+
+## Job Sequence
+
+1. Job 1: Write this spec into the spec system. Status: Done on approval.
+2. Job 2: Implementation. Blocked on Open Items confirmation.
+   a. Create `release-install.ps1` and `release-install.sh` per Behavioral Contract.
+   b. Wire `VERSION_PLACEHOLDER` baking into the release workflow.
+   c. Add `--pinned-by-release-install` handling to existing inner installers.
+   d. Update README to document the two installer modes.
