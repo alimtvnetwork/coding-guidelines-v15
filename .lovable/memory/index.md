@@ -64,6 +64,7 @@
 - [Split Database](mem://architecture/split-database) — Root, App, Session hierarchical SQLite with WAL and Casbin.
 - [Seedable Config](mem://architecture/seedable-configuration) — SemVer GORM merge of config.seed.json.
 - [Self Update Arch](mem://features/self-update-architecture) — Rename-first deployment, atomicity with latest.json.
+- [Release-Pinned Installer](mem://features/release-pinned-installer) — Additive release-install.ps1/sh; pins exact version, no latest lookup, no cross-repo drift.
 - [Doc Standards](mem://project/documentation-standards) — Mandatory numeric folders (01-20 Core, 21+ App), JSON tree syncing.
 - [Author Attribution](mem://project/author-attribution) — Md. Alim Ul Karim, Riseup Asia LLC, SEO/footer requirements.
 - [Avoid Upstream Sync](mem://constraints/avoid-app-sync) — NEVER sync app/app-issues/general/tasks/consolidated-guidelines from upstream sibling repos.

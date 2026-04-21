@@ -1,7 +1,7 @@
 # Current Plan
 
-**Version:** 3.6.0  
-**Updated:** 2026-04-19
+**Version:** 3.7.0  
+**Updated:** 2026-04-21
 
 ---
 
@@ -19,6 +19,11 @@
 | 08 | Cross-link link-checker over `spec/` (Rule 9 / BOOL-NEG-001 / codegen-README anchors) | ⏳ Pending | Low |
 | 09 | End-to-end test: `./run.sh slides` on a clean checkout (verify build + browser open) | ⏳ Pending | Medium |
 | 10 | End-to-end test: `install.sh` on a clean dest dir pulls all 4 folders incl. `linters-cicd/` | ⏳ Pending | Medium |
+| 11 | Implement `release-install.ps1` per spec `14-update/25-release-pinned-installer.md` (v1.0.0) | ⏳ Pending | High |
+| 12 | Implement `release-install.sh` per spec `14-update/25-release-pinned-installer.md` (v1.0.0) | ⏳ Pending | High |
+| 13 | Wire release-install.* into `release.sh` / `release.ps1` (sed VERSION/REPO, ship as release assets) | ⏳ Pending | High |
+| 14 | Add release-pinned one-liner block to GitHub Release body template | ⏳ Pending | Medium |
+| 15 | Test harness asserting NO call to `api.github.com/.../releases/latest` from release-install.* | ⏳ Pending | Medium |
 
 ---
 
@@ -88,4 +93,4 @@
 
 ---
 
-*Plan — v3.5.0 — 2026-04-19*
+*Plan — v3.7.0 — 2026-04-21*
