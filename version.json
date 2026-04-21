@@ -1,18 +1,18 @@
 {
-  "version": "3.43.0",
+  "version": "3.44.0",
   "updated": "2026-04-22",
   "name": "coding-guidelines",
   "description": "Cross-language coding standards, error handling, CI/CD, and self-update specifications. Synced from package.json by scripts/sync-version.mjs.",
   "git": {
-    "sha": "4854877ad8467c500ac27d212bc831b7dee28744",
-    "shortSha": "4854877",
-    "branch": "edit/edt-f2b73c71-ba2c-478e-874a-bb1a51a5a9ed"
+    "sha": "4503e84f0ff26de18034ab406304c399df4701d1",
+    "shortSha": "4503e84",
+    "branch": "edit/edt-8ef645b4-1e78-4656-a81c-2ffa98bc518c"
   },
   "stats": {
-    "totalFiles": 601,
-    "totalLines": 127575,
+    "totalFiles": 602,
+    "totalLines": 127725,
     "totalFolders": 22,
-    "totalBytes": 4267954,
+    "totalBytes": 4272952,
     "rootFiles": 5
   },
   "folders": [
@@ -168,9 +168,9 @@
       "status": null,
       "aiConfidence": "Production-Ready",
       "ambiguity": "None",
-      "fileCount": 38,
-      "lineCount": 8226,
-      "byteCount": 266872
+      "fileCount": 39,
+      "lineCount": 8376,
+      "byteCount": 271870
     },
     {
       "path": "13-generic-cli",
