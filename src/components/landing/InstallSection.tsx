@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, Copy, Terminal } from "lucide-react";
+import { Check, Copy, Package, Terminal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -31,6 +31,83 @@ const installCommands: InstallCommand[] = [
     platform: "macOS / Linux (skip latest probe)",
     shell: "Bash",
     command: "curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.sh | bash -s -- -n",
+  },
+];
+
+type BundleCommand = {
+  bundle: string;
+  description: string;
+  folders: string[];
+  bash: string;
+  ps: string;
+};
+
+const RAW_BASE = "https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main";
+
+const bundleCommands: BundleCommand[] = [
+  {
+    bundle: "error-manage",
+    description: "Error-management spec + spec-authoring guide",
+    folders: ["spec/01-spec-authoring-guide", "spec/03-error-manage"],
+    bash: `curl -fsSL ${RAW_BASE}/error-manage-install.sh | bash`,
+    ps: `irm ${RAW_BASE}/error-manage-install.ps1 | iex`,
+  },
+  {
+    bundle: "splitdb",
+    description: "DB conventions + split-DB + seedable config",
+    folders: [
+      "spec/04-database-conventions",
+      "spec/05-split-db-architecture",
+      "spec/06-seedable-config-architecture",
+    ],
+    bash: `curl -fsSL ${RAW_BASE}/splitdb-install.sh | bash`,
+    ps: `irm ${RAW_BASE}/splitdb-install.ps1 | iex`,
+  },
+  {
+    bundle: "slides",
+    description: "Slides Vite app + source decks",
+    folders: ["spec-slides", "slides-app"],
+    bash: `curl -fsSL ${RAW_BASE}/slides-install.sh | bash`,
+    ps: `irm ${RAW_BASE}/slides-install.ps1 | iex`,
+  },
+  {
+    bundle: "linters",
+    description: "Project linters + CI/CD linter pack",
+    folders: ["linters", "linters-cicd"],
+    bash: `curl -fsSL ${RAW_BASE}/linters-install.sh | bash`,
+    ps: `irm ${RAW_BASE}/linters-install.ps1 | iex`,
+  },
+  {
+    bundle: "cli",
+    description: "PowerShell, CI/CD, generic CLI, update, distribution, generic release",
+    folders: [
+      "spec/11-powershell-integration",
+      "spec/12-cicd-pipeline-workflows",
+      "spec/13-generic-cli",
+      "spec/14-update",
+      "spec/15-distribution-and-runner",
+      "spec/16-generic-release",
+    ],
+    bash: `curl -fsSL ${RAW_BASE}/cli-install.sh | bash`,
+    ps: `irm ${RAW_BASE}/cli-install.ps1 | iex`,
+  },
+  {
+    bundle: "wp",
+    description: "WordPress plugin how-to spec",
+    folders: ["spec/18-wp-plugin-how-to"],
+    bash: `curl -fsSL ${RAW_BASE}/wp-install.sh | bash`,
+    ps: `irm ${RAW_BASE}/wp-install.ps1 | iex`,
+  },
+  {
+    bundle: "consolidated",
+    description: "Spec-authoring + error-manage + consolidated guidelines",
+    folders: [
+      "spec/01-spec-authoring-guide",
+      "spec/03-error-manage",
+      "spec/17-consolidated-guidelines",
+    ],
+    bash: `curl -fsSL ${RAW_BASE}/consolidated-install.sh | bash`,
+    ps: `irm ${RAW_BASE}/consolidated-install.ps1 | iex`,
   },
 ];
 
@@ -140,7 +217,66 @@ export function InstallSection() {
             <InstallCard key={item.platform} item={item} />
           ))}
         </div>
+
+        <div className="mt-16">
+          <div className="mb-6 text-center">
+            <h3 className="text-2xl font-bold text-foreground">Named Bundle Installers</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Install just the spec folders you need — each bundle wraps the main installer with a curated folder list.
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {bundleCommands.map((bundle) => (
+              <BundleCard key={bundle.bundle} bundle={bundle} />
+            ))}
+          </div>
+        </div>
       </div>
     </section>
+  );
+}
+
+function BundleCard({ bundle }: { bundle: BundleCommand }) {
+  return (
+    <Card className="overflow-hidden border-border/60 bg-card/50 transition-colors hover:border-primary/40">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-base font-semibold text-foreground">
+          <Package className="h-4 w-4 text-primary" />
+          <span className="font-mono text-sm">{bundle.bundle}</span>
+          <span className="ml-auto rounded-full border border-border bg-secondary px-2 py-0.5 text-xs font-medium text-muted-foreground">
+            {bundle.folders.length} folder{bundle.folders.length === 1 ? "" : "s"}
+          </span>
+        </CardTitle>
+        <p className="mt-1 text-xs text-muted-foreground">{bundle.description}</p>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        <BundleCommandRow label="bash" command={bundle.bash} />
+        <BundleCommandRow label="pwsh" command={bundle.ps} />
+        <ul className="mt-2 flex flex-wrap gap-1.5">
+          {bundle.folders.map((folder) => (
+            <li
+              key={folder}
+              className="rounded-md border border-border/60 bg-secondary/40 px-2 py-0.5 font-mono text-[10px] text-muted-foreground"
+            >
+              {folder}
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
+  );
+}
+
+function BundleCommandRow({ label, command }: { label: string; command: string }) {
+  return (
+    <div className="flex items-center gap-2 rounded-md border border-border bg-secondary/60 px-3 py-2 font-mono text-foreground/90">
+      <span className="select-none text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/80">
+        {label}
+      </span>
+      <code className="flex-1 break-all text-[11px] leading-relaxed sm:text-xs">
+        <HighlightedCommand command={command} />
+      </code>
+      <CopyButton command={command} />
+    </div>
   );
 }
