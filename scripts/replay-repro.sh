@@ -82,7 +82,10 @@ REPRO_EXIT=$?
 
 # --- Match expected error ---------------------------------------------------
 MATCH_LINE=""
-MATCH_LINE=$(grep -F -n -m 1 -- "$EXPECTED_ERROR" "$TRACE_FILE" || true)
+# Only search lines AFTER the "# ---" header separator so the header
+# (which echoes EXPECTED-ERROR/REPRO-CMD verbatim) cannot self-match.
+MATCH_LINE=$(awk '/^# ---$/ { found=1; next } found' "$TRACE_FILE" \
+  | grep -F -n -m 1 -- "$EXPECTED_ERROR" || true)
 
 is_match_found() {
   [ -n "$MATCH_LINE" ]
