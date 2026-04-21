@@ -38,6 +38,7 @@ FORCE=false
 DRY_RUN=false
 LIST_VERSIONS=false
 LIST_FOLDERS=false
+PINNED_BY_RELEASE_INSTALL=""
 
 # ── Colors ────────────────────────────────────────────────────────
 RED='\033[0;31m'
@@ -122,11 +123,12 @@ invoke_latest_version_probe() {
     if curl -fsSL "$newer_url" | bash; then exit 0; else exit $?; fi
 }
 
-# Skip probe when user pinned a version or asked for a listing
+# Skip probe when user pinned a version, asked for a listing, or was
+# launched by release-install.sh (handshake = --pinned-by-release-install).
 should_skip_probe() {
   for arg in "$@"; do
     case "$arg" in
-      --version|--list-versions|--list-folders|--no-probe|--no-latest|-n) return 0 ;;
+      --version|--list-versions|--list-folders|--no-probe|--no-latest|-n|--pinned-by-release-install) return 0 ;;
     esac
   done
   [[ -n "${INSTALL_NO_PROBE:-}" ]] && return 0
@@ -152,10 +154,24 @@ while [[ $# -gt 0 ]]; do
     --list-versions)  LIST_VERSIONS=true; shift ;;
     --list-folders)   LIST_FOLDERS=true; shift ;;
     --no-probe|--no-latest|-n) shift ;;
+    --pinned-by-release-install) PINNED_BY_RELEASE_INSTALL="$2"; shift 2 ;;
     -h|--help)        usage ;;
     *) err "Unknown option: $1"; exit 1 ;;
   esac
 done
+
+# Pinning handshake: when invoked by release-install.sh, the version
+# arg MUST agree with the handshake value. Mismatch = exit 2 so the
+# parent can detect version skew (per spec §Failure Modes).
+if [[ -n "$PINNED_BY_RELEASE_INSTALL" ]]; then
+  if [[ -z "$VERSION" ]]; then
+    VERSION="$PINNED_BY_RELEASE_INSTALL"
+  elif [[ "$VERSION" != "$PINNED_BY_RELEASE_INSTALL" ]]; then
+    err "Pinning handshake mismatch: --version=$VERSION vs --pinned-by-release-install=$PINNED_BY_RELEASE_INSTALL"
+    exit 2
+  fi
+  step "Pinned by release-install: $PINNED_BY_RELEASE_INSTALL (auto-update disabled)"
+fi
 
 if $PROMPT_MODE && $FORCE; then
   err "--prompt and --force are mutually exclusive"
