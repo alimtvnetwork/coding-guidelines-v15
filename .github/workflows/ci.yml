@@ -78,6 +78,41 @@ jobs:
       - name: Check forbidden strings (TOML-driven rename guards)
         run: python3 linter-scripts/check-forbidden-strings.py
 
+  cross-links:
+    name: Spec Cross-Reference Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify checker present
+        run: |
+          test -f linter-scripts/check-spec-cross-links.py \
+            || { echo "::error::check-spec-cross-links.py missing"; exit 1; }
+
+      - name: Validate spec internal cross-references
+        # Walks spec/, parses every markdown link, fails on any broken link
+        # or missing heading anchor. Waivers live in
+        # linter-scripts/spec-cross-links.allowlist (baseline).
+        run: |
+          python3 linter-scripts/check-spec-cross-links.py \
+            --root spec \
+            --repo-root . \
+            --github
+
+      - name: Upload JSON report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: spec-cross-links-report
+          path: /tmp/spec-cross-links-report.json
+          if-no-files-found: ignore
+
   sync-drift:
     name: Sync Drift Check (version.json + specTree.json)
     runs-on: ubuntu-latest
