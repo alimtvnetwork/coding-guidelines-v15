@@ -170,7 +170,12 @@ function shouldSkip(fullPath, relPath, mode) {
   // verification logic — never touch them.
   if (relPath.split(sep).length === 1) return true;
   // overview-only mode: only touch each folder's 00-overview.md.
-  if (mode === "overview-only" && base !== "00-overview.md") return true;
+  if (mode === "overview-only") {
+    if (base !== "00-overview.md") return true;
+    // Only the top-level overview (e.g. spec/04-database-conventions/00-overview.md
+    // — depth 2). Skip nested 00-overview.md files in subfolders.
+    if (relPath.split(sep).length !== 2) return true;
+  }
   return false;
 }
 
