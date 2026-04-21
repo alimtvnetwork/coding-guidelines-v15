@@ -19,7 +19,8 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WORK="$(mktemp -d)"
 ARCHIVES="${WORK}/archives"
 SERVER_LOG="${WORK}/server.log"
-PORT=18475
+# Pick a free port automatically (caller can override with TEST_PORT).
+PORT="${TEST_PORT:-$(python3 -c 'import socket; s=socket.socket(); s.bind(("127.0.0.1",0)); print(s.getsockname()[1]); s.close()')}"
 FAKE_VERSION="vtest"
 
 cleanup() {
@@ -46,16 +47,29 @@ for bundle in ${BUNDLE_NAMES}; do
 done
 
 echo "▸ starting local HTTP server on port ${PORT}"
-( cd "${ARCHIVES}" && python3 -m http.server "${PORT}" >"${SERVER_LOG}" 2>&1 ) &
+( cd "${ARCHIVES}" && python3 -m http.server "${PORT}" --bind 127.0.0.1 >"${SERVER_LOG}" 2>&1 ) &
 SERVER_PID=$!
 
-# Wait for server to be ready (max ~10s).
+# Wait for OUR archives endpoint to serve a 200 (not just any process
+# that happens to own this port).
+READY=0
 for _ in $(seq 1 50); do
-  if curl -fsS "http://127.0.0.1:${PORT}/" >/dev/null 2>&1; then
+  if curl -fsS "http://127.0.0.1:${PORT}/download/${FAKE_VERSION}/" >/dev/null 2>&1; then
+    READY=1
     break
+  fi
+  if ! kill -0 "${SERVER_PID}" 2>/dev/null; then
+    echo "::error::HTTP server died — log follows" >&2
+    cat "${SERVER_LOG}" >&2
+    exit 1
   fi
   sleep 0.2
 done
+if [[ ${READY} -ne 1 ]]; then
+  echo "::error::HTTP server failed to serve archives within 10s" >&2
+  cat "${SERVER_LOG}" >&2
+  exit 1
+fi
 
 LOCAL_BASE="http://127.0.0.1:${PORT}"
 FAILED=()
