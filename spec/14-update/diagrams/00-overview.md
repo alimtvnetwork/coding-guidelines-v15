@@ -43,25 +43,3 @@ These `.mmd` files use Mermaid flowchart syntax. To render:
 ---
 
 *Diagrams Overview — v3.2.0 — 2026-04-15*
-
----
-
-## Verification
-
-_Auto-generated section — see `spec/14-update/97-acceptance-criteria.md` for the full criteria index._
-
-### AC-UPD-000a: Self-update conformance: Overview
-
-**Given** Exercise the rename-first deploy path against a fixture release directory.  
-**When** Run the verification command shown below.  
-**Then** `latest.json` is written atomically; the old binary is renamed (not deleted) before the new one is moved into place; rollback restores the previous version.
-
-**Verification command:**
-
-```bash
-python3 linter-scripts/check-spec-cross-links.py --root spec
-```
-
-**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
-
-_Verification section last updated: 2026-04-21_
