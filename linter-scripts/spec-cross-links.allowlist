@@ -103,3 +103,7 @@ spec/16-generic-release/06-release-metadata.md:175:../01-app/13-release-data-mod
 spec/16-generic-release/07-known-issues-and-fixes.md:341:../02-app-issues/13-release-pipeline-dist-directory.md
 spec/16-generic-release/07-known-issues-and-fixes.md:342:../14-update/09-winres-icon-constraint.md
 spec/17-consolidated-guidelines/09-code-block-system.md:604:url
+
+# Missing-section waivers (anchor not found in target file)
+spec/02-coding-guidelines/06-cicd-integration/07-performance.md:131:./00-overview.md#layer-1--portable-check-scripts-linters-cicdchecks
+spec/12-cicd-pipeline-workflows/02-release-pipeline.md:98:./10-release-pipeline-issues-rca.md#issue-1--npm-ci-fails-lockfile-out-of-sync
