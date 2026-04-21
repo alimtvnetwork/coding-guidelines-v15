@@ -341,3 +341,25 @@ Apply before merging any change to `release.yml`:
 - [spec/02-app-issues/13-release-pipeline-dist-directory.md](../02-app-issues/13-release-pipeline-dist-directory.md) — `dist` post-mortem
 - [spec/14-update/09-winres-icon-constraint.md](../14-update/09-winres-icon-constraint.md) — winres icon post-mortem
 - [spec/17-consolidated-guidelines/15-cicd-pipeline-workflows.md](../17-consolidated-guidelines/15-cicd-pipeline-workflows.md) — Consolidated CI/CD guidelines
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/16-generic-release/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-REL-007: Conformance check for this release-pipeline rule
+
+**Given** Run the release matrix check.  
+**When** Run the verification command shown below.  
+**Then** Build matrix produces all six pairs (`linux/amd64`, `linux/arm64`, `darwin/amd64`, `darwin/arm64`, `windows/amd64`, `windows/arm64`); every release tag matches the SemVer regex.
+
+**Verification command:**
+
+```bash
+bash tests/release/matrix-check.sh
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

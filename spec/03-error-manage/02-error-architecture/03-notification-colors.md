@@ -283,3 +283,25 @@ Toasts are always clickable above all modals and dialogs. This is enforced in `i
 4. ❌ Never use `toast()` (base) for errors — always use `toast.error()`
 5. ❌ Never skip the "View Details" action for API errors — always link to Error Modal
 6. ❌ Never use default duration for server crashes — use `15000` for 5xx errors
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/03-error-manage/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-ERR-003b: Conformance check for this error-management rule
+
+**Given** Run the error-handling linter against the codebase.  
+**When** Run the verification command shown below.  
+**Then** Zero empty `catch {}` blocks; every `apperror.New(...)` call carries a file/path context; all `Err*` identifiers are PascalCase.
+
+**Verification command:**
+
+```bash
+grep -rnE 'catch[[:space:]]*\([^)]*\)[[:space:]]*\{[[:space:]]*\}' src/ ; test $? -eq 1
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

@@ -489,3 +489,25 @@ type TransactionListResponse = ApiResponse<Transaction>;
 | Schema design | [./02-schema-design.md](./02-schema-design.md) |
 | Key naming PascalCase | [../02-coding-guidelines/01-cross-language/11-key-naming-pascalcase.md](../02-coding-guidelines/01-cross-language/11-key-naming-pascalcase.md) |
 | Slug conventions | [../02-coding-guidelines/01-cross-language/28-slug-conventions.md](../02-coding-guidelines/01-cross-language/28-slug-conventions.md) |
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/04-database-conventions/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-DB-006: Conformance check for this database convention
+
+**Given** Run the SQL schema linter against your DDL files.  
+**When** Run the verification command shown below.  
+**Then** Every table is PascalCase singular; PK is `<TableName>Id INTEGER PRIMARY KEY AUTOINCREMENT`; columns are `NOT NULL` unless waived; no `createdAt`, `created_at`, `UUID` tokens.
+
+**Verification command:**
+
+```bash
+python3 linter-scripts/check-db-schema.py path/to/schema.sql
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

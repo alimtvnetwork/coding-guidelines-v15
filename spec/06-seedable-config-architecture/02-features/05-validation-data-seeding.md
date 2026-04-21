@@ -606,3 +606,25 @@ GET /api/v1/config/validation/:category/:key
 | RAG Chunk Settings | `./02-rag-chunk-settings.md` |
 | RAG Validation Helpers | `./03-rag-validation-helpers.md` |
 | AI SEO Guidelines | `../22-ai-bridge-cli/01-backend/17-ai-seo-core-guidelines.md` |
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/06-seedable-config-architecture/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-CFG-005b: Conformance check for this seedable config rule
+
+**Given** Run the config-merge unit tests.  
+**When** Run the verification command shown below.  
+**Then** Seed merge is idempotent (re-run produces byte-identical output) and preserves user overrides + unknown keys.
+
+**Verification command:**
+
+```bash
+go test ./config/... -run TestSeedMerge
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

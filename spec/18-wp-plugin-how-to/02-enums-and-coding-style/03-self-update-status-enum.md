@@ -161,3 +161,25 @@ $status->label();
 ---
 
 *Reference implementation — 17 cases with match-based metadata.*
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/18-wp-plugin-how-to/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-WP-003b: Conformance check for this WP plugin rule
+
+**Given** Run the WP plugin acceptance harness against a clean WordPress install.  
+**When** Run the verification command shown below.  
+**Then** `wp plugin activate <plugin-slug>` exits 0; `php -l` reports `No syntax errors` for every `.php` file; external cross-references resolve.
+
+**Verification command:**
+
+```bash
+bash tests/wp-plugin/run-acceptance.sh
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

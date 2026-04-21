@@ -160,3 +160,25 @@ curl -fsSL https://raw.githubusercontent.com/<owner>/<repo>/main/scripts/install
 ---
 
 *GitHub Release standard — updated: 2026-04-10*
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/12-cicd-pipeline-workflows/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-CI-002: Conformance check for this CI/CD pipeline rule
+
+**Given** Validate every workflow YAML and inspect release artifacts.  
+**When** Run the verification command shown below.  
+**Then** Every `.github/workflows/*.yml` validates against `schemas/github-workflow.json`; every git tag matches `^v\d+\.\d+\.\d+(-(alpha|beta|rc)\.\d+)?$`.
+
+**Verification command:**
+
+```bash
+bash linters-cicd/run-all.sh --workflows-only
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

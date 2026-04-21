@@ -273,3 +273,25 @@ The overlay backdrop uses `backdrop-filter: blur(4px)` with `z-index: 998`.
 | Design Principles (Motion Rule) | [01-design-principles.md](./01-design-principles.md) |
 | Button System (Slide Animation) | [09-button-system.md](./09-button-system.md) |
 | Code Block Interactions | [07-code-blocks.md](./07-code-blocks.md) |
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/07-design-system/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-DS-006: Conformance check for this design-system rule
+
+**Given** Scan source for hardcoded colors and verify token contract.  
+**When** Run the verification command shown below.  
+**Then** Every semantic token is defined in HSL in `src/index.css` for both `:root` and `.dark`; zero hardcoded color classes in components.
+
+**Verification command:**
+
+```bash
+grep -rnE '(text|bg|border)-(white|black|gray-[0-9])' src/components/ ; test $? -eq 1
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

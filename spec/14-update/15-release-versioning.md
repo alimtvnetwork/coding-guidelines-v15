@@ -698,3 +698,25 @@ git tag -d v1.2.0
 ---
 
 *Release versioning — v3.2.0 — 2026-04-10*
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/14-update/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-UPD-015: Conformance check for this self-update rule
+
+**Given** Run the update-flow acceptance harness.  
+**When** Run the verification command shown below.  
+**Then** `update --check` exit codes are 0 (none) / 10 (available) / >10 (error); on a `kill -9` mid-update the previous binary is restored (rename-first invariant).
+
+**Verification command:**
+
+```bash
+bash tests/update/acceptance.sh
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

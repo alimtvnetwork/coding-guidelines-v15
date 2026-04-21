@@ -257,3 +257,25 @@ $ <tool> update
 - Empty lines before and after major sections for readability
 - No color codes unless Virtual Terminal Processing is confirmed
 - All status messages end with a period or specific value (never ellipsis-only)
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/12-cicd-pipeline-workflows/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-CI-008: Conformance check for this CI/CD pipeline rule
+
+**Given** Validate every workflow YAML and inspect release artifacts.  
+**When** Run the verification command shown below.  
+**Then** Every `.github/workflows/*.yml` validates against `schemas/github-workflow.json`; every git tag matches `^v\d+\.\d+\.\d+(-(alpha|beta|rc)\.\d+)?$`.
+
+**Verification command:**
+
+```bash
+bash linters-cicd/run-all.sh --workflows-only
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

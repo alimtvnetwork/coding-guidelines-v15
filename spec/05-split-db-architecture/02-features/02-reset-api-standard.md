@@ -333,3 +333,25 @@ Common errors:
 | GSearch Database | `spec/20-gsearch-cli/01-backend/22-database-architecture.md` |
 | BRun Database | `spec/21-brun-cli/01-backend/16-database-architecture.md` |
 | Nexus Flow Database | `spec/24-nexus-flow-cli/01-backend/05-database-architecture.md` |
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/05-split-db-architecture/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-SDB-002b: Conformance check for this split-DB architecture rule
+
+**Given** Initialize the app and inspect the on-disk DB hierarchy.  
+**When** Run the verification command shown below.  
+**Then** Root, App, and Session DB files exist at the documented paths and report `journal_mode=wal` via `PRAGMA journal_mode;`.
+
+**Verification command:**
+
+```bash
+bash tests/split-db/acceptance.sh
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

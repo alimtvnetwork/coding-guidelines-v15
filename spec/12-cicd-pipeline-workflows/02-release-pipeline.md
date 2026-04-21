@@ -301,3 +301,24 @@ The GitHub Release description is assembled from multiple sources:
 - **`20-terminal-output-design.md`** — defines the ASCII-only, color-tagged report format every binary must emit. Release packaging MUST NOT strip color codes or rewrap report tables, and install-script success/failure banners MUST follow the same color/severity tokens so users see one consistent visual language from `install.sh` through `<tool> doctor`.
 - **`21-post-install-shell-activation.md`** — the release pipeline's install scripts and the binary's `setup` subcommand jointly own the post-install activation contract (PATH export, profile snippet injection, in-session activation, `doctor` LOADED/INSTALLED_BUT_NOT_LOADED/NOT_INSTALLED states). Any change to install scripts, setup output, or doctor checks in this pipeline MUST conform to that spec to prevent the "binary on PATH but wrapper not loaded" class of post-release bugs.
 
+---
+
+## Verification
+
+_Auto-generated section — see `spec/12-cicd-pipeline-workflows/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-CI-002: Conformance check for this CI/CD pipeline rule
+
+**Given** Validate every workflow YAML and inspect release artifacts.  
+**When** Run the verification command shown below.  
+**Then** Every `.github/workflows/*.yml` validates against `schemas/github-workflow.json`; every git tag matches `^v\d+\.\d+\.\d+(-(alpha|beta|rc)\.\d+)?$`.
+
+**Verification command:**
+
+```bash
+bash linters-cicd/run-all.sh --workflows-only
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

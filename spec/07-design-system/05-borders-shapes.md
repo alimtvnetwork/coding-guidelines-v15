@@ -139,3 +139,25 @@ background: linear-gradient(
 | Theme Variables | [02-theme-variable-architecture.md](./02-theme-variable-architecture.md) |
 | Code Block Borders | [07-code-blocks.md](./07-code-blocks.md) |
 | Motion System | [06-motion-transitions.md](./06-motion-transitions.md) |
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/07-design-system/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-DS-005: Conformance check for this design-system rule
+
+**Given** Scan source for hardcoded colors and verify token contract.  
+**When** Run the verification command shown below.  
+**Then** Every semantic token is defined in HSL in `src/index.css` for both `:root` and `.dark`; zero hardcoded color classes in components.
+
+**Verification command:**
+
+```bash
+grep -rnE '(text|bg|border)-(white|black|gray-[0-9])' src/components/ ; test $? -eq 1
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

@@ -148,3 +148,25 @@ Include a formatted checksum table in the release description:
   - [Facebook](https://www.facebook.com/riseupasia.talent/)
   - [LinkedIn](https://www.linkedin.com/company/105304484/)
   - [YouTube](https://www.youtube.com/@riseup-asia)
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/16-generic-release/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-REL-004: Conformance check for this release-pipeline rule
+
+**Given** Run the release matrix check.  
+**When** Run the verification command shown below.  
+**Then** Build matrix produces all six pairs (`linux/amd64`, `linux/arm64`, `darwin/amd64`, `darwin/arm64`, `windows/amd64`, `windows/arm64`); every release tag matches the SemVer regex.
+
+**Verification command:**
+
+```bash
+bash tests/release/matrix-check.sh
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

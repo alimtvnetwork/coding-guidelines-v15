@@ -355,3 +355,25 @@ When an AI is asked to create or modify a database schema, follow this checklist
 | REST API format | [./06-rest-api-format.md](./06-rest-api-format.md) |
 | Boolean principles | [../02-coding-guidelines/01-cross-language/02-boolean-principles/00-overview.md](../02-coding-guidelines/01-cross-language/02-boolean-principles/00-overview.md) |
 | No-negatives rule | [../02-coding-guidelines/01-cross-language/12-no-negatives.md](../02-coding-guidelines/01-cross-language/12-no-negatives.md) |
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/04-database-conventions/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-DB-005: Conformance check for this database convention
+
+**Given** Run the SQL schema linter against your DDL files.  
+**When** Run the verification command shown below.  
+**Then** Every table is PascalCase singular; PK is `<TableName>Id INTEGER PRIMARY KEY AUTOINCREMENT`; columns are `NOT NULL` unless waived; no `createdAt`, `created_at`, `UUID` tokens.
+
+**Verification command:**
+
+```bash
+python3 linter-scripts/check-db-schema.py path/to/schema.sql
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_
