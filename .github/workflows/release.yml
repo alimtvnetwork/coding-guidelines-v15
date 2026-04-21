@@ -209,6 +209,33 @@ jobs:
             bash ./linters-cicd/run-all.sh --path .
             ```
 
+            ## Named Bundle Installers (NEW)
+
+            Install just the spec folders you need with a single one-liner.
+            All bundles forward `install.sh` / `install.ps1` flags
+            (`--version`, `--dest`, `--dry-run`, `--prompt`, `--force`).
+
+            | Bundle | Spec folders |
+            |---|---|
+            | `error-manage` | spec/01-spec-authoring-guide, spec/03-error-manage |
+            | `splitdb` | spec/04-database-conventions, spec/05-split-db-architecture, spec/06-seedable-config-architecture |
+            | `slides` | spec-slides, slides-app |
+            | `linters` | linters, linters-cicd |
+            | `cli` | spec/11 → spec/16 |
+            | `wp` | spec/18-wp-plugin-how-to |
+            | `consolidated` | spec/01, spec/03, spec/17 |
+
+            **Bash example (error-manage):**
+            ```bash
+            curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/error-manage-install.sh | bash
+            ```
+            **PowerShell example (splitdb):**
+            ```powershell
+            irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/splitdb-install.ps1 | iex
+            ```
+            Offline zips are also published per bundle:
+            `coding-guidelines-<bundle>-${{ steps.version.outputs.version }}.zip`.
+
             ## Checksums
             See `checksums.txt` for SHA-256 verification hashes.
           prerelease: ${{ contains(steps.version.outputs.version, '-') }}
