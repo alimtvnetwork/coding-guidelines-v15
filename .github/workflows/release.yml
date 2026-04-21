@@ -71,12 +71,48 @@ jobs:
           ls -lh "$ZIP_NAME"
           sha256sum "$ZIP_NAME" >> release-artifacts/checksums.txt
           mv "$ZIP_NAME" release-artifacts/
-          cp linters-cicd/install.sh release-artifacts/linters-install.sh
 
       - name: Verify linters-cicd artifact
         run: |
           test -f "release-artifacts/coding-guidelines-linters-${{ steps.version.outputs.version }}.zip" \
             || { echo "::error::linters-cicd zip missing"; exit 1; }
+
+      # ── Bundle zips (one per named install bundle) ──────────────────
+      # Each bundle below mirrors the folder list baked into its
+      # <bundle>-install.{sh,ps1} wrapper at the repo root. The zip is
+      # an offline alternative to the curl|bash one-liner.
+      - name: Package named bundles
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          declare -A BUNDLES=(
+            [error-manage]="spec/01-spec-authoring-guide spec/03-error-manage"
+            [splitdb]="spec/04-database-conventions spec/05-split-db-architecture spec/06-seedable-config-architecture"
+            [cli]="spec/11-powershell-integration spec/12-cicd-pipeline-workflows spec/13-generic-cli spec/14-update spec/15-distribution-and-runner spec/16-generic-release"
+            [wp]="spec/18-wp-plugin-how-to"
+            [consolidated]="spec/01-spec-authoring-guide spec/03-error-manage spec/17-consolidated-guidelines"
+          )
+          for bundle in "${!BUNDLES[@]}"; do
+            ZIP_NAME="coding-guidelines-${bundle}-${VERSION}.zip"
+            # shellcheck disable=SC2086
+            zip -rq "$ZIP_NAME" ${BUNDLES[$bundle]}
+            sha256sum "$ZIP_NAME" >> release-artifacts/checksums.txt
+            mv "$ZIP_NAME" release-artifacts/
+            echo "  ✓ packaged $ZIP_NAME"
+          done
+
+      - name: Stage bundle install scripts
+        run: |
+          set -euo pipefail
+          mkdir -p release-artifacts
+          for bundle in error-manage splitdb slides linters cli wp consolidated; do
+            cp "${bundle}-install.sh"  "release-artifacts/${bundle}-install.sh"
+            cp "${bundle}-install.ps1" "release-artifacts/${bundle}-install.ps1"
+            chmod +x "release-artifacts/${bundle}-install.sh"
+            sha256sum "release-artifacts/${bundle}-install.sh"  >> release-artifacts/checksums.txt
+            sha256sum "release-artifacts/${bundle}-install.ps1" >> release-artifacts/checksums.txt
+          done
 
       # ── Pinned-version installers (release-install.{sh,ps1}) ────────
       # Substitute `__VERSION_PLACEHOLDER__` with the concrete tag and
