@@ -187,3 +187,25 @@ Phase 1 (Scaffold)
   - [Facebook](https://www.facebook.com/riseupasia.talent/)
   - [LinkedIn](https://www.linkedin.com/company/105304484/)
   - [YouTube](https://www.youtube.com/@riseup-asia)
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/13-generic-cli/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-CLI-013: Conformance check for this generic-CLI rule
+
+**Given** Run the CLI smoke harness.  
+**When** Run the verification command shown below.  
+**Then** `bin --version` exits 0 and matches `^\d+\.\d+\.\d+$`; `bin --help` enumerates every documented subcommand; `bin export --format=json` validates against `schemas/cli-export.schema.json`.
+
+**Verification command:**
+
+```bash
+bash tests/generic-cli/acceptance.sh
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

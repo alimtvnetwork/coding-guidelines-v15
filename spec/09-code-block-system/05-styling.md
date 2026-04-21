@@ -395,3 +395,25 @@ These are the few hardcoded HSL values used in code blocks (not derived from the
 ---
 
 *Styling — updated: 2026-04-08*
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/09-code-block-system/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-CB-005: Conformance check for this code-block-system rule
+
+**Given** Run the Playwright suite for the code-block component.  
+**When** Run the verification command shown below.  
+**Then** `LineSelectionState` is exported with the documented shape; shift-click range selection works; drag-select 100 lines completes <100ms.
+
+**Verification command:**
+
+```bash
+bunx playwright test tests/code-block/
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

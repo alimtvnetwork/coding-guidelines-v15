@@ -352,3 +352,25 @@ The **ErrorDetailModal** (standalone viewer used on E2E Tests page) uses the sam
 ---
 
 *Modal structure — updated: 2026-04-09*
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/03-error-manage/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-ERR-004d: Conformance check for this error-management rule
+
+**Given** Run the error-handling linter against the codebase.  
+**When** Run the verification command shown below.  
+**Then** Zero empty `catch {}` blocks; every `apperror.New(...)` call carries a file/path context; all `Err*` identifiers are PascalCase.
+
+**Verification command:**
+
+```bash
+grep -rnE 'catch[[:space:]]*\([^)]*\)[[:space:]]*\{[[:space:]]*\}' src/ ; test $? -eq 1
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

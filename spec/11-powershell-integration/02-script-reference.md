@@ -562,3 +562,25 @@ When `-q` is used **without** `-pp`:
 - [Configuration Schema](./01-configuration-schema.md) - JSON config format
 - [Error Codes](./04-error-codes.md) - Detailed error handling
 - Upload Scripts - WordPress plugin deployment scripts — *folder pending creation*
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/11-powershell-integration/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-PS-002: Conformance check for this PowerShell integration rule
+
+**Given** Invoke the Pester suite.  
+**When** Run the verification command shown below.  
+**Then** Pester exits 0 with FailedCount=0; `Invoke-ScriptAnalyzer -Severity Error` returns zero diagnostics on every shipped `.ps1`.
+
+**Verification command:**
+
+```bash
+pwsh -Command 'Invoke-Pester tests/powershell/ -CI'
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

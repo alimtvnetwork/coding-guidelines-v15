@@ -290,3 +290,25 @@ $ <tool> release info v1.3.0
 - Changelog format must be parseable by `awk` (line-based, `## v` headers)
 - Date format is `YYYY-MM-DD` (ISO 8601)
 - Each version entry is self-contained — no references to "same as above"
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/12-cicd-pipeline-workflows/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-CI-005: Conformance check for this CI/CD pipeline rule
+
+**Given** Validate every workflow YAML and inspect release artifacts.  
+**When** Run the verification command shown below.  
+**Then** Every `.github/workflows/*.yml` validates against `schemas/github-workflow.json`; every git tag matches `^v\d+\.\d+\.\d+(-(alpha|beta|rc)\.\d+)?$`.
+
+**Verification command:**
+
+```bash
+bash linters-cicd/run-all.sh --workflows-only
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

@@ -157,3 +157,25 @@ When a module's numeric prefix changes (e.g., `09-gsearch-cli` → `09-gsearch-c
 5. **Consistency reports** — If they mention module paths
 
 **This is why module renaming should be done carefully and in batches.**
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/01-spec-authoring-guide/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-SAG-008: Conformance check for this spec authoring guide section
+
+**Given** Run the spec-structure linter against `spec/`.  
+**When** Run the verification command shown below.  
+**Then** Every folder MUST contain a valid `00-overview.md` and follow the naming rules in this document.
+
+**Verification command:**
+
+```bash
+python3 linter-scripts/check-spec-folder-refs.py && bash linter-scripts/check-forbidden-spec-paths.sh
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

@@ -650,3 +650,25 @@ func (m *UserDbManager) DeleteAllUserData(appName, userId string, companySlug ..
 - [00-overview.md](../00-overview.md) - Split DB Architecture Overview
 - [01-cli-examples.md](./01-cli-examples.md) - CLI-specific Examples
 - [04-rbac-casbin.md](./04-rbac-casbin.md) - RBAC with Casbin
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/05-split-db-architecture/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-SDB-005b: Conformance check for this split-DB architecture rule
+
+**Given** Initialize the app and inspect the on-disk DB hierarchy.  
+**When** Run the verification command shown below.  
+**Then** Root, App, and Session DB files exist at the documented paths and report `journal_mode=wal` via `PRAGMA journal_mode;`.
+
+**Verification command:**
+
+```bash
+bash tests/split-db/acceptance.sh
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

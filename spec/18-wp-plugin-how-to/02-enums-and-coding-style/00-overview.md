@@ -57,3 +57,25 @@ See [02-enum-metadata-pattern.md](02-enum-metadata-pattern.md) for the full patt
 - [Go Enum Specification](../../02-coding-guidelines/03-golang/01-enum-specification/00-overview.md) — equivalent pattern for Go
 - [Go Info-Object Pattern](../../02-coding-guidelines/03-golang/01-enum-specification/05-info-object-pattern.md) — Go version of the metadata pattern (uses info-object, not `match`)
 - [Phase 10 — Deployment Patterns](../10-deployment-patterns.md) — uses `SelfUpdateStatusType`
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/18-wp-plugin-how-to/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-WP-000b: Conformance check for this WP plugin rule
+
+**Given** Run the WP plugin acceptance harness against a clean WordPress install.  
+**When** Run the verification command shown below.  
+**Then** `wp plugin activate <plugin-slug>` exits 0; `php -l` reports `No syntax errors` for every `.php` file; external cross-references resolve.
+
+**Verification command:**
+
+```bash
+bash tests/wp-plugin/run-acceptance.sh
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

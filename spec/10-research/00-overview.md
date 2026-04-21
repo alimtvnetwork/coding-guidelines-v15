@@ -42,3 +42,25 @@ _No research documents added yet. Add research files as numbered entries (e.g., 
 | Coding Guidelines Research | [../02-coding-guidelines/10-research/00-overview.md](../02-coding-guidelines/10-research/00-overview.md) |
 | Spec Authoring Guide | [../01-spec-authoring-guide/00-overview.md](../01-spec-authoring-guide/00-overview.md) |
 | Consolidated Guidelines | [../17-consolidated-guidelines/12-root-research.md](../17-consolidated-guidelines/12-root-research.md) |
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/10-research/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-RES-000: Conformance check for this research-document rule
+
+**Given** Run the research-structure linter.  
+**When** Run the verification command shown below.  
+**Then** Every research file contains H2 sections `Objective`, `Methodology`, `Findings`, `Conclusion` and links to at least one consolidated guideline.
+
+**Verification command:**
+
+```bash
+python3 linters-cicd/scripts/check-research-structure.py spec/10-research/
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

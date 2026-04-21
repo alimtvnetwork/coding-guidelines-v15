@@ -96,3 +96,25 @@ This list is the contract. It MUST stay in sync with §"Distributable artifacts"
 ---
 
 *Distribution-and-runner overview — v1.0.0 — 2026-04-19*
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/15-distribution-and-runner/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-DIST-000: Conformance check for this distribution/runner rule
+
+**Given** Run the install + runner contract tests on a clean host.  
+**When** Run the verification command shown below.  
+**Then** Install drops the binary at the documented platform path; runner exit codes follow the 0/1/2/3/4/64+ contract; required deps (`bun >=1.1`, `git >=2.40`, `unzip`, `curl`) are documented per script.
+
+**Verification command:**
+
+```bash
+bash tests/distribution/acceptance.sh && pwsh tests/distribution/acceptance.ps1
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

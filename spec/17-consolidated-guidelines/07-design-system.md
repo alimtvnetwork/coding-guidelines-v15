@@ -707,3 +707,25 @@ Change HSL values in `:root {}` and `.dark {}` — every component updates autom
 ---
 
 *Consolidated design system — v3.2.0 — 2026-04-16*
+
+---
+
+## Verification
+
+_Auto-generated section — see `spec/17-consolidated-guidelines/97-acceptance-criteria.md` for the full criteria index._
+
+### AC-CON-007: Conformance check for this consolidated-guideline rule
+
+**Given** Run the standalone-implementability checker.  
+**When** Run the verification command shown below.  
+**Then** This file contains at least one fenced code block and zero relative parent links (`grep -c '\[.*\](\.\./' file.md` MUST be 0).
+
+**Verification command:**
+
+```bash
+python3 linters-cicd/scripts/check-consolidated-standalone.py
+```
+
+**Expected:** exit 0. Any non-zero exit is a hard fail and blocks merge.
+
+_Verification section last updated: 2026-04-21_

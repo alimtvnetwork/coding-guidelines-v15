@@ -1,18 +1,18 @@
 {
-  "version": "3.30.0",
+  "version": "3.31.0",
   "updated": "2026-04-22",
   "name": "coding-guidelines",
   "description": "Cross-language coding standards, error handling, CI/CD, and self-update specifications. Synced from package.json by scripts/sync-version.mjs.",
   "git": {
-    "sha": "475abfd236702ca0da37a5406ee225431f3ff4a1",
-    "shortSha": "475abfd",
-    "branch": "edit/edt-8fb69d98-1694-4011-b307-7f080c1e6b32"
+    "sha": "0cd6252fb8fb1a5ff10d2c38851d658c65035b14",
+    "shortSha": "0cd6252",
+    "branch": "edit/edt-634c8a8a-26aa-4f56-a199-ce1f9c4cc7ea"
   },
   "stats": {
-    "totalFiles": 603,
-    "totalLines": 126588,
+    "totalFiles": 591,
+    "totalLines": 136259,
     "totalFolders": 22,
-    "totalBytes": 4227277,
+    "totalBytes": 4542889,
     "rootFiles": 5
   },
   "folders": [
@@ -26,8 +26,8 @@
       "aiConfidence": "Production-Ready",
       "ambiguity": "None",
       "fileCount": 15,
-      "lineCount": 2882,
-      "byteCount": 108842
+      "lineCount": 3146,
+      "byteCount": 117230
     },
     {
       "path": "02-coding-guidelines",
@@ -39,8 +39,8 @@
       "aiConfidence": "Production-Ready",
       "ambiguity": "None",
       "fileCount": 191,
-      "lineCount": 32552,
-      "byteCount": 1016185
+      "lineCount": 35887,
+      "byteCount": 1129371
     },
     {
       "path": "03-error-manage",
@@ -52,8 +52,8 @@
       "aiConfidence": "Production-Ready",
       "ambiguity": "None",
       "fileCount": 118,
-      "lineCount": 18481,
-      "byteCount": 677068
+      "lineCount": 20591,
+      "byteCount": 745033
     },
     {
       "path": "04-database-conventions",
@@ -64,9 +64,9 @@
       "status": "Active",
       "aiConfidence": "Production-Ready",
       "ambiguity": "None",
-      "fileCount": 10,
-      "lineCount": 2801,
-      "byteCount": 103555
+      "fileCount": 9,
+      "lineCount": 2897,
+      "byteCount": 106988
     },
     {
       "path": "05-split-db-architecture",
@@ -78,8 +78,8 @@
       "aiConfidence": "Production-Ready",
       "ambiguity": "Low",
       "fileCount": 14,
-      "lineCount": 4079,
-      "byteCount": 169190
+      "lineCount": 4277,
+      "byteCount": 175164
     },
     {
       "path": "06-seedable-config-architecture",
@@ -91,8 +91,8 @@
       "aiConfidence": "Production-Ready",
       "ambiguity": "Low",
       "fileCount": 15,
-      "lineCount": 3955,
-      "byteCount": 122008
+      "lineCount": 4175,
+      "byteCount": 128376
     },
     {
       "path": "07-design-system",
@@ -104,8 +104,8 @@
       "aiConfidence": "Production-Ready",
       "ambiguity": "Low",
       "fileCount": 16,
-      "lineCount": 2691,
-      "byteCount": 82122
+      "lineCount": 2999,
+      "byteCount": 92104
     },
     {
       "path": "08-docs-viewer-ui",
@@ -116,9 +116,9 @@
       "status": null,
       "aiConfidence": "90%",
       "ambiguity": "10%",
-      "fileCount": 15,
-      "lineCount": 2078,
-      "byteCount": 66434
+      "fileCount": 14,
+      "lineCount": 2268,
+      "byteCount": 72438
     },
     {
       "path": "09-code-block-system",
@@ -129,9 +129,9 @@
       "status": null,
       "aiConfidence": null,
       "ambiguity": null,
-      "fileCount": 13,
-      "lineCount": 2145,
-      "byteCount": 62439
+      "fileCount": 12,
+      "lineCount": 2313,
+      "byteCount": 67765
     },
     {
       "path": "10-research",
@@ -142,9 +142,9 @@
       "status": null,
       "aiConfidence": "Production-Ready",
       "ambiguity": "None",
-      "fileCount": 3,
-      "lineCount": 172,
-      "byteCount": 4796
+      "fileCount": 2,
+      "lineCount": 120,
+      "byteCount": 3493
     },
     {
       "path": "11-powershell-integration",
@@ -155,9 +155,9 @@
       "status": "Active",
       "aiConfidence": null,
       "ambiguity": null,
-      "fileCount": 14,
-      "lineCount": 2834,
-      "byteCount": 82827
+      "fileCount": 13,
+      "lineCount": 2996,
+      "byteCount": 87808
     },
     {
       "path": "12-cicd-pipeline-workflows",
@@ -168,9 +168,9 @@
       "status": null,
       "aiConfidence": "Production-Ready",
       "ambiguity": "None",
-      "fileCount": 29,
-      "lineCount": 6338,
-      "byteCount": 202142
+      "fileCount": 28,
+      "lineCount": 6785,
+      "byteCount": 216746
     },
     {
       "path": "13-generic-cli",
@@ -181,9 +181,9 @@
       "status": "Active",
       "aiConfidence": null,
       "ambiguity": null,
-      "fileCount": 23,
-      "lineCount": 4523,
-      "byteCount": 144980
+      "fileCount": 22,
+      "lineCount": 4906,
+      "byteCount": 157181
     },
     {
       "path": "14-update",
@@ -194,9 +194,9 @@
       "status": "Active",
       "aiConfidence": "Production-Ready",
       "ambiguity": "None",
-      "fileCount": 42,
-      "lineCount": 8255,
-      "byteCount": 261896
+      "fileCount": 41,
+      "lineCount": 8968,
+      "byteCount": 283360
     },
     {
       "path": "15-distribution-and-runner",
@@ -207,9 +207,9 @@
       "status": "Authoritative — implementation must match this spec.",
       "aiConfidence": null,
       "ambiguity": null,
-      "fileCount": 7,
-      "lineCount": 708,
-      "byteCount": 24430
+      "fileCount": 6,
+      "lineCount": 738,
+      "byteCount": 26189
     },
     {
       "path": "16-generic-release",
@@ -220,9 +220,9 @@
       "status": "Active",
       "aiConfidence": null,
       "ambiguity": null,
-      "fileCount": 11,
-      "lineCount": 2190,
-      "byteCount": 69417
+      "fileCount": 10,
+      "lineCount": 2292,
+      "byteCount": 72973
     },
     {
       "path": "17-consolidated-guidelines",
@@ -233,9 +233,9 @@
       "status": "Active",
       "aiConfidence": "Production-Ready",
       "ambiguity": "None",
-      "fileCount": 26,
-      "lineCount": 11502,
-      "byteCount": 380597
+      "fileCount": 25,
+      "lineCount": 11934,
+      "byteCount": 394413
     },
     {
       "path": "18-wp-plugin-how-to",
@@ -246,9 +246,9 @@
       "status": "Active",
       "aiConfidence": "Production-Ready",
       "ambiguity": "None",
-      "fileCount": 32,
-      "lineCount": 17339,
-      "byteCount": 573660
+      "fileCount": 31,
+      "lineCount": 17904,
+      "byteCount": 591568
     },
     {
       "path": "21-app",
