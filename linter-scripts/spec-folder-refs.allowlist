@@ -37,3 +37,6 @@
 28-wp-plugin-development
 31-generic-enforce
 33-ai-bridge-non-vector-rag
+
+# --- documentation-only references (not real spec folders) ---
+15-domain-migration
