@@ -1,18 +1,18 @@
 {
-  "version": "3.29.0",
-  "updated": "2026-04-21",
+  "version": "3.30.0",
+  "updated": "2026-04-22",
   "name": "coding-guidelines",
   "description": "Cross-language coding standards, error handling, CI/CD, and self-update specifications. Synced from package.json by scripts/sync-version.mjs.",
   "git": {
-    "sha": "68f4f5fe858cbc6e47cc28cd3db834301533a83a",
-    "shortSha": "68f4f5f",
-    "branch": "edit/edt-eae9c138-9b51-4850-b374-9c2af38d85bc"
+    "sha": "475abfd236702ca0da37a5406ee225431f3ff4a1",
+    "shortSha": "475abfd",
+    "branch": "edit/edt-8fb69d98-1694-4011-b307-7f080c1e6b32"
   },
   "stats": {
-    "totalFiles": 591,
-    "totalLines": 125664,
+    "totalFiles": 603,
+    "totalLines": 126588,
     "totalFolders": 22,
-    "totalBytes": 4201849,
+    "totalBytes": 4227277,
     "rootFiles": 5
   },
   "folders": [
@@ -64,9 +64,9 @@
       "status": "Active",
       "aiConfidence": "Production-Ready",
       "ambiguity": "None",
-      "fileCount": 9,
-      "lineCount": 2721,
-      "byteCount": 101148
+      "fileCount": 10,
+      "lineCount": 2801,
+      "byteCount": 103555
     },
     {
       "path": "05-split-db-architecture",
@@ -116,9 +116,9 @@
       "status": null,
       "aiConfidence": "90%",
       "ambiguity": "10%",
-      "fileCount": 14,
-      "lineCount": 2004,
-      "byteCount": 64232
+      "fileCount": 15,
+      "lineCount": 2078,
+      "byteCount": 66434
     },
     {
       "path": "09-code-block-system",
@@ -129,9 +129,9 @@
       "status": null,
       "aiConfidence": null,
       "ambiguity": null,
-      "fileCount": 12,
-      "lineCount": 2071,
-      "byteCount": 60373
+      "fileCount": 13,
+      "lineCount": 2145,
+      "byteCount": 62439
     },
     {
       "path": "10-research",
@@ -142,9 +142,9 @@
       "status": null,
       "aiConfidence": "Production-Ready",
       "ambiguity": "None",
-      "fileCount": 2,
-      "lineCount": 98,
-      "byteCount": 2804
+      "fileCount": 3,
+      "lineCount": 172,
+      "byteCount": 4796
     },
     {
       "path": "11-powershell-integration",
@@ -155,9 +155,9 @@
       "status": "Active",
       "aiConfidence": null,
       "ambiguity": null,
-      "fileCount": 13,
-      "lineCount": 2754,
-      "byteCount": 80603
+      "fileCount": 14,
+      "lineCount": 2834,
+      "byteCount": 82827
     },
     {
       "path": "12-cicd-pipeline-workflows",
@@ -168,9 +168,9 @@
       "status": null,
       "aiConfidence": "Production-Ready",
       "ambiguity": "None",
-      "fileCount": 28,
-      "lineCount": 6258,
-      "byteCount": 199940
+      "fileCount": 29,
+      "lineCount": 6338,
+      "byteCount": 202142
     },
     {
       "path": "13-generic-cli",
@@ -181,9 +181,9 @@
       "status": "Active",
       "aiConfidence": null,
       "ambiguity": null,
-      "fileCount": 22,
-      "lineCount": 4443,
-      "byteCount": 142837
+      "fileCount": 23,
+      "lineCount": 4523,
+      "byteCount": 144980
     },
     {
       "path": "14-update",
@@ -194,9 +194,9 @@
       "status": "Active",
       "aiConfidence": "Production-Ready",
       "ambiguity": "None",
-      "fileCount": 41,
-      "lineCount": 8175,
-      "byteCount": 259732
+      "fileCount": 42,
+      "lineCount": 8255,
+      "byteCount": 261896
     },
     {
       "path": "15-distribution-and-runner",
@@ -207,9 +207,9 @@
       "status": "Authoritative — implementation must match this spec.",
       "aiConfidence": null,
       "ambiguity": null,
-      "fileCount": 6,
-      "lineCount": 628,
-      "byteCount": 22254
+      "fileCount": 7,
+      "lineCount": 708,
+      "byteCount": 24430
     },
     {
       "path": "16-generic-release",
@@ -220,9 +220,9 @@
       "status": "Active",
       "aiConfidence": null,
       "ambiguity": null,
-      "fileCount": 10,
-      "lineCount": 2116,
-      "byteCount": 67501
+      "fileCount": 11,
+      "lineCount": 2190,
+      "byteCount": 69417
     },
     {
       "path": "17-consolidated-guidelines",
@@ -233,9 +233,9 @@
       "status": "Active",
       "aiConfidence": "Production-Ready",
       "ambiguity": "None",
-      "fileCount": 25,
-      "lineCount": 11428,
-      "byteCount": 378566
+      "fileCount": 26,
+      "lineCount": 11502,
+      "byteCount": 380597
     },
     {
       "path": "18-wp-plugin-how-to",
@@ -246,9 +246,9 @@
       "status": "Active",
       "aiConfidence": "Production-Ready",
       "ambiguity": "None",
-      "fileCount": 31,
-      "lineCount": 17265,
-      "byteCount": 571755
+      "fileCount": 32,
+      "lineCount": 17339,
+      "byteCount": 573660
     },
     {
       "path": "21-app",
