@@ -35,6 +35,45 @@ def slugify(text: str) -> str:
     return text.strip("-")
 
 
+def strip_code_fences(text: str) -> str:
+    """Replace fenced code blocks with blank lines so example links inside
+    aren't validated. Preserves line numbers for accurate reporting.
+    """
+    out_lines: list[str] = []
+    in_fence = False
+    fence_marker = ""
+    for line in text.splitlines():
+        stripped = line.lstrip()
+        is_open = (stripped.startswith("```") or stripped.startswith("~~~")) and not in_fence
+        is_close = in_fence and stripped.startswith(fence_marker)
+        if is_open:
+            in_fence = True
+            fence_marker = "```" if stripped.startswith("```") else "~~~"
+            out_lines.append("")
+            continue
+        if is_close:
+            in_fence = False
+            out_lines.append("")
+            continue
+        out_lines.append("" if in_fence else line)
+    return "\n".join(out_lines)
+
+
+def load_allowlist(repo_root: Path) -> set[str]:
+    """Load waived broken links from linter-scripts/spec-cross-links.allowlist.
+    Format: one `relpath:line:target` entry per line; `#` comments allowed.
+    """
+    path = repo_root / "linter-scripts" / "spec-cross-links.allowlist"
+    if not path.exists():
+        return set()
+    out: set[str] = set()
+    for raw in path.read_text(encoding="utf-8").splitlines():
+        line = raw.split("#", 1)[0].strip()
+        if line:
+            out.add(line)
+    return out
+
+
 def collect_headings(path: Path) -> set[str]:
     try:
         content = path.read_text(encoding="utf-8", errors="ignore")
