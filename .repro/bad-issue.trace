@@ -1,6 +1,0 @@
-# replay-repro.sh v1.0.0
-# issue:    /tmp/repro-test/bad-issue.md
-# command:  echo hello world
-# expected: ThisWillNotAppear
-# ---
-hello world

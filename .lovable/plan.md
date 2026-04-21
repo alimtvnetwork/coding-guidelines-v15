@@ -1,6 +1,6 @@
 # Current Plan
 
-**Version:** 3.8.0
+**Version:** 3.12.0
 **Updated:** 2026-04-21
 
 ---
@@ -24,10 +24,6 @@
 | 13 | Wire release-install.* into `release.sh` / `release.ps1` (sed VERSION/REPO, ship as release assets) | ⏳ Pending | High |
 | 14 | Add release-pinned one-liner block to GitHub Release body template | ⏳ Pending | Medium |
 | 15 | Test harness asserting NO call to `api.github.com/.../releases/latest` from release-install.* | ⏳ Pending | Medium |
-| 16 | Create `tests/replay/anti-flicker.spec.ts` covering A1–A7 (per spec 19) | ⏳ Pending | High |
-| 17 | Create `scripts/replay-repro.sh` for G-REP gate (per spec 19) | ⏳ Pending | Medium |
-| 18 | Wire G-CTX static check into `run-all.sh` (per spec 19) | ⏳ Pending | Medium |
-| 19 | Promote ⚠ NEEDS REAL EXAMPLE rows in `19-ai-reliability/02-failure-taxonomy.md` | ⏳ Pending | Low |
 
 ---
 
@@ -76,8 +72,7 @@
 | 39 | Created `spec/15-distribution-and-runner/` (00–04, v1.0.0) — install/runner/release/config contracts | 2026-04-19 |
 | 40 | Added `linters-cicd` to `install-config.json` default folders | 2026-04-19 |
 | 41 | Extended root `run.ps1` / `run.sh` with `slides`/`lint`/`help` sub-commands | 2026-04-19 |
-| 42 | Created `spec/19-ai-reliability/` (00, 01–07, 97, 99) targeting ASR ≥ 98% | 2026-04-21 |
-| 43 | CHANGELOG `[3.23.0]` + plan v3.8.0 | 2026-04-21 |
+| 42 | Removed `spec/19-ai-reliability/` and all dependent artifacts (per user request); CHANGELOG `[3.23.0]` rewritten | 2026-04-21 |
 
 ---
 
@@ -99,4 +94,4 @@
 
 ---
 
-*Plan — v3.8.0 — 2026-04-21*
+*Plan — v3.12.0 — 2026-04-21*
