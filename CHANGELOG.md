@@ -7,6 +7,23 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.20.0] - 2026-04-21
+
+### Changed
+- **`check-spec-folder-refs.py` — section-aware allowlist + clearer errors.**
+  The linter now distinguishes documentation-only references from real
+  external (sibling-repo) folder references.
+  - `spec-folder-refs.allowlist` is now divided into `[external]` and
+    `[doc-only]` sections. Entries before any header default to
+    `[external]` for backward compatibility.
+  - Stale-reference output now includes a fuzzy "Did you mean …?" hint
+    using the nearest existing spec folder, plus a 3-option decision
+    tree (typo / sibling-repo / doc-only) so authors know exactly how
+    to resolve each finding.
+  - The previously-allowlisted `15-domain-migration` was removed — the
+    only consumer (CHANGELOG.md) was fixed in 3.19.x cleanup, so
+    `[doc-only]` starts empty.
+
 ## [3.19.0] - 2026-04-20
 
 ### Added
