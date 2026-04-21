@@ -120,28 +120,35 @@ def check_link(source: Path, target: str, repo_root: Path) -> tuple[str, str] | 
 
 def scan(root: Path, repo_root: Path) -> list[dict]:
     failures: list[dict] = []
+    allowlist = load_allowlist(repo_root)
     for md in iter_markdown_files(root):
         try:
             text = md.read_text(encoding="utf-8", errors="ignore")
         except OSError as exc:
             failures.append({"file": str(md), "kind": "read-error", "detail": str(exc)})
             continue
-        for match in MD_LINK_RE.finditer(text):
+        scan_text = strip_code_fences(text)
+        for match in MD_LINK_RE.finditer(scan_text):
             target = match.group(2).strip()
             if is_external(target):
                 continue
-            line_num = text.count("\n", 0, match.start()) + 1
+            line_num = scan_text.count("\n", 0, match.start()) + 1
             issue = check_link(md, target, repo_root)
             if issue is None:
                 continue
             kind, detail = issue
+            rel_file = str(md.relative_to(repo_root))
+            waiver_key = f"{rel_file}:{line_num}:{target}"
+            if waiver_key in allowlist:
+                continue
             failures.append({
-                "file": str(md.relative_to(repo_root)),
+                "file": rel_file,
                 "line": line_num,
                 "kind": kind,
                 "link_text": match.group(1),
                 "target": target,
                 "detail": detail,
+                "waiver_key": waiver_key,
             })
     return failures
 
