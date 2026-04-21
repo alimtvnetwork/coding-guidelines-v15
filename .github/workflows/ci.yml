@@ -78,6 +78,16 @@ jobs:
       - name: Check forbidden strings (TOML-driven rename guards)
         run: python3 linter-scripts/check-forbidden-strings.py
 
+      # ── G-REL gate: release-install.{sh,ps1} must never resolve "latest" ──
+      # Per spec/14-update/25-release-pinned-installer.md §"Pin Enforcement
+      # Guarantees" rules e (no latest API) and f (no git clone). This is a
+      # static text scan — no network is used.
+      - name: Run no-latest harness for release-install scripts
+        run: bash tests/release-install/no-latest.test.sh
+
+      - name: Self-test the no-latest harness (positive control)
+        run: bash tests/release-install/self-test.sh
+
   sync-drift:
     name: Sync Drift Check (version.json + specTree.json)
     runs-on: ubuntu-latest
