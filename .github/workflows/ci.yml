@@ -208,3 +208,50 @@ jobs:
             exit 1
           fi
           echo " OK specTree.json is in sync with spec/ source files."
+
+  bundle-installers:
+    name: Bundle Installer Smoke Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Python (for local archive HTTP server)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify generated install scripts present
+        # Each bundle in bundles.json must have both a .sh and .ps1
+        # wrapper checked in. Catches "forgot to run npm run bundles:generate".
+        run: |
+          set -euo pipefail
+          for bundle in $(node scripts/read-bundles.mjs names); do
+            test -f "${bundle}-install.sh"  || { echo "::error::missing ${bundle}-install.sh";  exit 1; }
+            test -f "${bundle}-install.ps1" || { echo "::error::missing ${bundle}-install.ps1"; exit 1; }
+          done
+
+      - name: Syntax-check generated bash scripts
+        run: |
+          set -euo pipefail
+          for f in *-install.sh; do
+            bash -n "$f" || { echo "::error::syntax error in $f"; exit 1; }
+          done
+
+      - name: Run bash installer harness (archive mode + folder assertions)
+        # Builds local .tar.gz archives from the manifest, serves them via
+        # python http.server, points each <bundle>-install.sh at the local
+        # URL via RELEASE_BASE override, runs it with --version vtest
+        # --target <tmp>, and asserts every declared dest folder lands under
+        # the install target.
+        run: bash scripts/test-bundle-installers.sh
+
+      - name: Run PowerShell installer harness (archive mode + folder assertions)
+        # Same flow as the bash harness but with .zip archives and pwsh.
+        # `pwsh` is preinstalled on ubuntu-latest runners.
+        run: pwsh -NoProfile -File scripts/test-bundle-installers.ps1
