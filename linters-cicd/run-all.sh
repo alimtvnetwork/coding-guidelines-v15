@@ -16,6 +16,7 @@
 #                [--config .codeguidelines.toml]
 #                [--jobs N|auto]            (default: 1, sequential)
 #                [--check-timeout SECONDS]  (default: 20)
+#                [--gctx-log PATH]          (G-CTX gate; opt-in, no-op if absent)
 #                [--output coding-guidelines.sarif] [--format sarif|text]
 #
 # Exit codes:
@@ -38,6 +39,7 @@ OUTPUT="coding-guidelines.sarif"
 FORMAT="sarif"
 JOBS="${LINTERS_JOBS:-1}"
 CHECK_TIMEOUT="20"
+GCTX_LOG="${LINTERS_GCTX_LOG:-}"
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -50,6 +52,7 @@ while [ $# -gt 0 ]; do
         --config)            CONFIG_FILE="$2"; shift 2 ;;
         --jobs)              JOBS="$2"; shift 2 ;;
         --check-timeout)     CHECK_TIMEOUT="$2"; shift 2 ;;
+        --gctx-log)          GCTX_LOG="$2"; shift 2 ;;
         --output)            OUTPUT="$2"; shift 2 ;;
         --format)            FORMAT="$2"; shift 2 ;;
         -h|--help)
@@ -119,6 +122,7 @@ echo "       rules:          ${RULES:-all}"
 echo "       exclude-rules:  ${EXCLUDE_RULES:-none}"
 echo "       jobs:           $JOBS"
 echo "       check-timeout:  ${CHECK_TIMEOUT}s"
+[ -n "$GCTX_LOG" ]         && echo "       gctx-log:       $GCTX_LOG"
 [ -n "$BASELINE" ]         && echo "       baseline:       $BASELINE"
 [ -n "$REFRESH_BASELINE" ] && echo "       refresh:        $REFRESH_BASELINE"
 [ -z "$TIMEOUT_BIN" ]      && echo "       ⚠️  no 'timeout' binary — running without per-check timeout"
@@ -281,6 +285,25 @@ fi
 
 if [ "$EXIT" -ne 2 ] && [ "$POST_RC" -eq 1 ]; then
     EXIT=1
+fi
+
+# ---- G-CTX gate (opt-in via --gctx-log) ----
+# Per spec/19-ai-reliability/06-validation-gates.md: G-CTX is non-negotiable.
+# When the AI tool-call log is provided, ANY redundant code--view blocks the run.
+if [ -n "$GCTX_LOG" ]; then
+    echo ""
+    if python3 "$SCRIPT_DIR/scripts/check-context-hygiene.py" --log "$GCTX_LOG"; then
+        :
+    else
+        GCTX_RC=$?
+        # rc=1 → FAIL (block, even if everything else passed)
+        # rc=2 → ERROR (treat as tool error)
+        if [ "$GCTX_RC" -eq 2 ]; then
+            EXIT=2
+        else
+            EXIT=1
+        fi
+    fi
 fi
 
 echo "    📄 merged → $OUTPUT"
