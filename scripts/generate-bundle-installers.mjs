@@ -353,6 +353,9 @@ function writeFile(relPath, contents, executable = false) {
 }
 
 console.log(`Generating bundle installers from ${MANIFEST_PATH}...`);
+console.log("\nValidating manifest against expected bundle layouts...");
+validateManifest(BUNDLES);
+console.log("");
 for (const bundle of BUNDLES) {
   writeFile(`${bundle.name}-install.sh`, bashScript(bundle), true);
   writeFile(`${bundle.name}-install.ps1`, powershellScript(bundle), false);
