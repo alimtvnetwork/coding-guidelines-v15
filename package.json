@@ -1,7 +1,7 @@
 {
   "name": "vite_react_shadcn_ts",
   "private": true,
-  "version": "3.34.0",
+  "version": "3.37.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -25,6 +25,9 @@
     "spec:verify:inject": "node scripts/spec-verification/inject-verification-sections.mjs",
     "spec:verify:inject:dry": "node scripts/spec-verification/inject-verification-sections.mjs --dry-run",
     "spec:verify:report": "node scripts/spec-verification/generate-coverage-report.mjs --out reports/spec-verification/coverage.md && node scripts/spec-verification/generate-coverage-report.mjs --json --out reports/spec-verification/coverage.json",
+    "spec:verify:report:strict": "node scripts/spec-verification/generate-coverage-report.mjs --out reports/spec-verification/coverage.md --strict && node scripts/spec-verification/generate-coverage-report.mjs --json --out reports/spec-verification/coverage.json --strict",
+    "spec:verify:report:all": "node scripts/spec-verification/generate-coverage-report.mjs --mode all-files --out reports/spec-verification/coverage-all-files.md",
+    "spec:verify:ci": "node scripts/spec-verification/generate-coverage-report.mjs --strict --out reports/spec-verification/coverage.md",
     "spec:verify:docs": "node scripts/spec-verification/generate-templates-doc.mjs"
   },
   "dependencies": {
