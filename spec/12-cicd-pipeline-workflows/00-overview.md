@@ -89,6 +89,7 @@ AI INSTRUCTION:
 | 04 | [04-baseline-diff-lint-gate.md](./03-reusable-ci-guards/04-baseline-diff-lint-gate.md) | Fail build only on NEW lint findings vs cached baseline | ✅ Active |
 | 05 | [05-actionable-lint-suggestions.md](./03-reusable-ci-guards/05-actionable-lint-suggestions.md) | PR comment mapping each new finding to a fix template | ✅ Active |
 | 06 | [06-matrix-test-aggregator.md](./03-reusable-ci-guards/06-matrix-test-aggregator.md) | Combine matrix-job test outputs into one copy-paste report | ✅ Active |
+| 07 | [07-shared-cli-wrapper.md](./03-reusable-ci-guards/07-shared-cli-wrapper.md) | Unified `--phase check\|lint\|test\|all` wrapper around all six guards (`scripts/ci-runner.sh`) | ✅ Active |
 | 99 | [99-ai-implementation-guide.md](./03-reusable-ci-guards/99-ai-implementation-guide.md) | How an AI should select, configure, and ship these guards | ✅ Active |
 
 ---
