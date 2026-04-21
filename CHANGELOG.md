@@ -7,6 +7,44 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.23.0] - 2026-04-21
+
+### Added
+- **New spec folder `spec/19-ai-reliability/`** — generic "AI doing
+  work" success-rate program targeting ASR ≥ 98% across replay
+  rendering, generated code, multi-step plans, and bug repro.
+  - `00-overview.md` — purpose, surfaces, file index
+  - `01-success-rate-model.md` — ASR definition, gates G-PASS / G-WARN
+    / G-BLOCK, 65 → 98 lift roadmap (6 phases)
+  - `02-failure-taxonomy.md` — `FAIL-{RPL,GEN,PLN,REP,CTX}-NNN` IDs
+    (10 RPL, 9 GEN mirroring `common-ai-mistakes.md`, 5 PLN, 4 REP,
+    5 CTX)
+  - `03-debugging-playbook.md` — five mandatory steps
+    Reproduce → Instrument → Bisect → Fix → Prove with anti-pattern
+    table and loop-out conditions
+  - `04-anti-flicker-rules.md` — A1–A7 rules (diff-only application,
+    inlined stylesheets, recorded-timestamp scheduling, font preload,
+    color-scheme pinning, 100 ms warmup, frame-time budget) each
+    paired with a named test
+  - `05-missing-information-recovery.md` — M1–M7 recovery paths for
+    dropped events, missing snapshots, cross-origin iframes, empty
+    canvas, missing network traces, missing context files, missing
+    acceptance criteria
+  - `06-validation-gates.md` — G-GEN/G-RPL/G-PLN/G-REP/G-CTX gates
+    with runnable commands plus the 12-point pre-output gate the AI
+    must self-check before shipping
+  - `07-edge-condition-checklist.md` — programmer-style edge cases
+    (inputs, time/concurrency, state, replay-specific,
+    code-gen-specific)
+  - `97-acceptance-criteria.md` + `99-consistency-report.md`
+
+### Changed
+- `.lovable/plan.md` bumped to v3.8.0; spec 19 work logged as
+  completed; pending follow-ups (anti-flicker test file, repro
+  script) added to backlog.
+
+---
+
 ## [3.22.0] - 2026-04-21
 
 ### Changed
