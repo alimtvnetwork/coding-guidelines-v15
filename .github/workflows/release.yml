@@ -142,6 +142,29 @@ jobs:
             curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.sh | bash
             ```
 
+            ## Pinned Installation (this exact version)
+
+            The scripts below NEVER resolve `latest`. They install
+            `${{ steps.version.outputs.version }}` and only this version.
+            Spec: [`spec/14-update/25-release-pinned-installer.md`](https://github.com/alimtvnetwork/coding-guidelines-v15/blob/${{ steps.version.outputs.version }}/spec/14-update/25-release-pinned-installer.md).
+
+            **Windows (PowerShell)**
+            ```powershell
+            irm https://github.com/alimtvnetwork/coding-guidelines-v15/releases/download/${{ steps.version.outputs.version }}/release-install.ps1 | iex
+            ```
+
+            **Linux / macOS**
+            ```bash
+            curl -fsSL https://github.com/alimtvnetwork/coding-guidelines-v15/releases/download/${{ steps.version.outputs.version }}/release-install.sh | bash
+            ```
+
+            Both scripts have `${{ steps.version.outputs.version }}` baked
+            in at release time, so re-running them always reinstalls the
+            same artifacts — no API calls to `/releases/latest`, no
+            checkouts of `main` / `master` / `HEAD`. Override with
+            `--version <tag>` (bash) or `-Version <tag>` (PowerShell) to
+            install a different pinned tag.
+
             ## Slide Deck
 
             Download `coding-guidelines-slides-${{ steps.version.outputs.version }}.zip`,
