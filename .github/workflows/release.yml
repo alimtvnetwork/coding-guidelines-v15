@@ -282,6 +282,21 @@ jobs:
             Offline zips are also published per bundle:
             `coding-guidelines-<bundle>-${{ steps.version.outputs.version }}.zip`.
 
+            ## Error-Manage Standalone Archives (NEW)
+
+            Stable, version-agnostic asset names that always point at the
+            latest `spec/01-spec-authoring-guide` + `spec/03-error-manage`:
+
+            **Windows (PowerShell):**
+            ```powershell
+            irm https://github.com/alimtvnetwork/coding-guidelines-v15/releases/latest/download/error-manage.zip -OutFile error-manage.zip
+            Expand-Archive error-manage.zip -DestinationPath .
+            ```
+            **Linux / macOS:**
+            ```bash
+            curl -fsSL https://github.com/alimtvnetwork/coding-guidelines-v15/releases/latest/download/error-manage.tar.gz | tar xz
+            ```
+
             ## Checksums
             See `checksums.txt` for SHA-256 verification hashes.
           prerelease: ${{ contains(steps.version.outputs.version, '-') }}
