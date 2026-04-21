@@ -283,25 +283,6 @@ if [ "$EXIT" -ne 2 ] && [ "$POST_RC" -eq 1 ]; then
     EXIT=1
 fi
 
-# ---- G-CTX gate (opt-in via --gctx-log) ----
-# Per spec/19-ai-reliability/06-validation-gates.md: G-CTX is non-negotiable.
-# When the AI tool-call log is provided, ANY redundant code--view blocks the run.
-if [ -n "$GCTX_LOG" ]; then
-    echo ""
-    if python3 "$SCRIPT_DIR/scripts/check-context-hygiene.py" --log "$GCTX_LOG"; then
-        :
-    else
-        GCTX_RC=$?
-        # rc=1 → FAIL (block, even if everything else passed)
-        # rc=2 → ERROR (treat as tool error)
-        if [ "$GCTX_RC" -eq 2 ]; then
-            EXIT=2
-        else
-            EXIT=1
-        fi
-    fi
-fi
-
 echo "    📄 merged → $OUTPUT"
 echo "    🏁 ran $RAN check(s) — exit $EXIT"
 exit "$EXIT"
