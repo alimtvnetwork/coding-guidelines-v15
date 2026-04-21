@@ -9,13 +9,40 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [3.21.0] - 2026-04-21
 
+### Added
+- **`release-install.sh` and `release-install.ps1`** — pinned-version
+  installers for GitHub Release pages. Implementation of
+  `spec/14-update/25-release-pinned-installer.md`.
+  - Version source priority: `--version` / `-Version` argument →
+    baked-in `__VERSION_PLACEHOLDER__` (substituted at release time) →
+    fatal exit 1.
+  - Strict semver validation (`^v?\d+\.\d+\.\d+(-[A-Za-z0-9.]+)?$`);
+    invalid input exits 2 before any network call.
+  - Hybrid download: tries `releases/download/<tag>/source-code.{tar.gz,zip}`
+    first, falls back to `codeload.github.com/.../refs/tags/<tag>`.
+    Both 404 → exit 3 with both probed URLs and HTTP codes.
+  - Hands off to inner installer with `--pinned-by-release-install <tag>`
+    handshake; auto-update / version-probe is disabled for the run.
+  - `--no-update` / `-NoUpdate` accepted as no-ops (pinning is always on).
+  - Checksum verification deferred — matches existing `install.*`
+    behavior. Tracked as a follow-up.
+- **`install.sh` and `install.ps1` pinning handshake.** Both now accept
+  `--pinned-by-release-install <tag>` / `-PinnedByReleaseInstall <tag>`.
+  When set:
+  - Version-probe / auto-update is skipped unconditionally.
+  - If `--version` is also passed, it must equal the handshake value;
+    mismatch exits 2 (handshake-skew detection per spec §Failure Modes).
+  - Implements AMB-1 from the spec: generic installers also enforce
+    strict pinning when an explicit version is requested.
+
 ### Removed
 - **Stale `LEGACY-CDN-DOMAIN` allowlist entries.** Removed
-  `spec/15-domain-migration/` and `docs/legacy-domains.md` from the rule's
-  allowlist in `linter-scripts/forbidden-strings.toml` — neither path
-  exists in the repository, so they could only mask future legitimate
-  findings. Allowlist is now empty for this rule.
-- Updated the 3.19.0 changelog entry to reflect the empty allowlist.
+  `spec/15-domain-migration/` and `docs/legacy-domains.md` from the
+  rule's allowlist in `linter-scripts/forbidden-strings.toml` — neither
+  path exists in the repository, so they could only mask future
+  legitimate findings. Allowlist is now empty for this rule. Added
+  `CHANGELOG.md` to `exclude_files` so changelog prose can describe
+  legacy patterns without false positives.
 
 ## [3.20.0] - 2026-04-21
 
@@ -41,7 +68,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   references (`cdn.riseup-asia.com`) that should be `cdn.riseup.asia` per the
   current infrastructure standard.
   - Pattern: `cdn\.riseup-asia\.com`
-  - Allowlist: empty — no legitimate occurrences exist in the repo.
+  - Allowlist: `docs/legacy-domains.md` (legitimate historical migration documentation).
   - Added to `linter-scripts/forbidden-strings.toml` as the third `[[rule]]`
     demonstrating the TOML-driven scanner's extensibility.
 

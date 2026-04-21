@@ -36,7 +36,8 @@ param(
     [switch]$ListVersions,
     [switch]$ListFolders,
     [Alias('n','NoLatest')]
-    [switch]$NoProbe
+    [switch]$NoProbe,
+    [string]$PinnedByReleaseInstall = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -126,7 +127,19 @@ function Invoke-LatestVersionProbe {
     catch { Write-Warn "Hand-off failed: $($_.Exception.Message)." }
 }
 
-$skipProbe = $NoProbe -or $Version -or $ListVersions -or $ListFolders -or $env:INSTALL_NO_PROBE
+# Pinning handshake: when invoked by release-install.ps1, the version
+# arg MUST agree with the handshake value. Mismatch = exit 2.
+if ($PinnedByReleaseInstall) {
+    if (-not $Version) {
+        $Version = $PinnedByReleaseInstall
+    } elseif ($Version -ne $PinnedByReleaseInstall) {
+        Write-Err "Pinning handshake mismatch: -Version=$Version vs -PinnedByReleaseInstall=$PinnedByReleaseInstall"
+        exit 2
+    }
+    Write-Step "Pinned by release-install: $PinnedByReleaseInstall (auto-update disabled)"
+}
+
+$skipProbe = $NoProbe -or $Version -or $ListVersions -or $ListFolders -or $env:INSTALL_NO_PROBE -or $PinnedByReleaseInstall
 if (-not $skipProbe) {
     try { Invoke-LatestVersionProbe } catch { Write-Warn "Probe error: $($_.Exception.Message)." }
 }
