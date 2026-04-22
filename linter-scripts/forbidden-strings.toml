@@ -29,6 +29,7 @@ allowlist = [
   "spec/06-seedable-config-architecture/97-changelog.md",
   "CHANGELOG.md",
   "spec/14-update/23-install-script-version-probe.md",
+  "spec/14-update/26-repo-major-version-migrator.md",
   "src/data/specTree.json",
   ".lovable/memory/index.md",
   ".lovable/strictly-avoid.md",
