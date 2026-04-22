@@ -147,8 +147,6 @@ All bundles share these traits:
 | Author a WordPress plugin to the Gold-Standard spec | `wp` |
 | Get the master consolidated reference (everything in one place) | `consolidated` |
 
----
-
 <h3 align="center">🚨 <code>error-manage</code> — Structured Errors Bundle</h3>
 <p align="center" id="bundle-error-manage">
   <img alt="Spec Authoring Guide" src="https://img.shields.io/badge/spec--authoring--guide-included-3B82F6?style=flat-square"/>
@@ -164,8 +162,6 @@ irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/e
 ```bash
 curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/error-manage-install.sh | bash
 ```
-
----
 
 <h3 align="center">🗄️ <code>splitdb</code> — Root · App · Session Database Bundle</h3>
 <p align="center" id="bundle-splitdb">
@@ -184,8 +180,6 @@ irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/s
 curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/splitdb-install.sh | bash
 ```
 
----
-
 <h3 align="center">🎬 <code>slides</code> — Teach-a-Team Bundle</h3>
 <p align="center" id="bundle-slides">
   <img alt="Spec Slides" src="https://img.shields.io/badge/spec--slides-included-EC4899?style=flat-square"/>
@@ -202,8 +196,6 @@ irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/s
 curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/slides-install.sh | bash
 ```
 
----
-
 <h3 align="center">✅ <code>linters</code> — Polyglot CI Bundle</h3>
 <p align="center" id="bundle-linters">
   <img alt="Linters" src="https://img.shields.io/badge/linters-included-10B981?style=flat-square"/>
@@ -219,8 +211,6 @@ irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/l
 ```bash
 curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/linters-install.sh | bash
 ```
-
----
 
 <h3 align="center">⚙️ <code>cli</code> — Cross-Platform CLI Bundle</h3>
 <p align="center" id="bundle-cli">
@@ -242,8 +232,6 @@ irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/c
 curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/cli-install.sh | bash
 ```
 
----
-
 <h3 align="center">🐘 <code>wp</code> — WordPress Plugin Bundle</h3>
 <p align="center" id="bundle-wp">
   <img alt="WordPress Plugin How-To" src="https://img.shields.io/badge/wp--plugin--how--to-included-21759B?style=flat-square&logo=wordpress&logoColor=white"/>
@@ -258,8 +246,6 @@ irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/w
 ```bash
 curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/wp-install.sh | bash
 ```
-
----
 
 <h3 align="center">📚 <code>consolidated</code> — Everything-in-One Bundle</h3>
 <p align="center" id="bundle-consolidated">
