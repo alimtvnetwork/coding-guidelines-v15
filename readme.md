@@ -383,47 +383,18 @@ Each release publishes a `checksums.txt` next to the bundle archive — verify w
 
 ## 🛠️ Full-Repo Install Scripts
 
-When you want **everything** (specs + linters + scripts), use the generic installers. They support remote one-liners and local re-runs with overrides.
-
-### Remote one-liner (no clone required)
-
-🪟 **Windows (PowerShell)**
-```powershell
-irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.ps1 | iex
-```
-
-🐧 **Linux / macOS (Bash)**
-```bash
-curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.sh | bash
-```
-
-Skip the latest-version probe with `-n` / `--no-latest`:
+Use the generic installer for **everything** (specs + linters + scripts):
 
 ```powershell
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.ps1))) -n
+irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.ps1 | iex   # Windows
 ```
-
 ```bash
-curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.sh | bash -s -- -n
+curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.sh | bash   # Linux/macOS
 ```
 
-> By default the installer probes 20 candidate "next" repository versions in parallel and hands off to the newest one it finds. Pass `-n` to skip that probe entirely.
+Skip the latest-version probe with `-n` (PowerShell: `... | iex` wrapped in `& ([scriptblock]::Create(...)) -n`; Bash: `... | bash -s -- -n`). Local re-runs: `.\install.ps1` or `./install.sh`.
 
-### Local script (after cloning)
-
-🪟 **Windows (PowerShell)**
-```powershell
-.\install.ps1
-```
-
-🐧 **Linux / macOS (Bash)**
-```bash
-chmod +x install.sh && ./install.sh
-```
-
-### Power-user flags
-
-Both installers accept the same flags: `--repo`/`-Repo`, `--branch`/`-Branch`, `--version`/`-Version`, `--folders`/`-Folders`, `--dest`/`-Dest`, `--config`/`-ConfigFile`, `--prompt`/`-Prompt`, `--force`/`-Force`, `--dry-run`/`-DryRun`, `--list-versions`/`-ListVersions`, `--list-folders`/`-ListFolders`, and `-n`/`-NoProbe` to skip the latest-version probe. `--prompt` and `--force` are mutually exclusive. Defaults can be set in `install-config.json`.
+**Power-user flags** (both installers): `--repo`, `--branch`, `--version`, `--folders`, `--dest`, `--config`, `--prompt`, `--force`, `--dry-run`, `--list-versions`, `--list-folders`, `-n`. `--prompt` and `--force` are mutually exclusive. Defaults via `install-config.json`. **CI/CD repo migration** (v15 → v16): `npm run migrate:repo:dry` — see [`spec/14-update/26-repo-major-version-migrator.md`](spec/14-update/26-repo-major-version-migrator.md).
 
 ---
 
@@ -470,9 +441,9 @@ Full strengths/weaknesses table, FAQ, and design philosophy: [`docs/author.md`](
 
 ---
 
-## 👤 Author
+<h2 align="center">👤 Author</h2>
 
-### [Md. Alim Ul Karim](https://alimkarim.com/)
+<h3 align="center"><a href="https://alimkarim.com/">Md. Alim Ul Karim</a></h3>
 
 **[Creator & Lead Architect](https://alimkarim.com)** · Chief Software Engineer, [Riseup Asia LLC](https://riseup-asia.com)
 
