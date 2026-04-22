@@ -390,28 +390,18 @@ Full strengths/weaknesses table, FAQ, and design philosophy: [`docs/author.md`](
 
 <h3 align="center"><a href="https://alimkarim.com/">Md. Alim Ul Karim</a></h3>
 
-**[Creator & Lead Architect](https://alimkarim.com)** · Chief Software Engineer, [Riseup Asia LLC](https://riseup-asia.com)
+<p align="center"><strong><a href="https://alimkarim.com">Creator & Lead Architect</a></strong> · Chief Software Engineer, <a href="https://riseup-asia.com">Riseup Asia LLC</a></p>
 
-A software architect with **20+ years** of experience across enterprise, fintech, and distributed systems. Stack spans **.NET/C# (18+ yrs)**, **JavaScript (10+ yrs)**, **TypeScript (6+ yrs)**, and **Golang (4+ yrs)**. Recognized as a **top 1% talent at Crossover** with active presence on **[Stack Overflow](https://stackoverflow.com/users/513511/md-alim-ul-karim)** (2,452+ rep, since 2010) and **[LinkedIn](https://www.linkedin.com/in/alimkarim)** (12,500+ followers).
+<p align="center">Software architect, <strong>20+ years</strong> across enterprise, fintech, and distributed systems. Stack: <strong>.NET/C# (18+ yrs)</strong>, <strong>JavaScript (10+ yrs)</strong>, <strong>TypeScript (6+ yrs)</strong>, <strong>Golang (4+ yrs)</strong>. <strong>Top 1% at Crossover</strong> · <a href="https://stackoverflow.com/users/513511/md-alim-ul-karim">Stack Overflow</a> 2,452+ rep · <a href="https://www.linkedin.com/in/alimkarim">LinkedIn</a> 12,500+ followers.</p>
 
-| | |
-|---|---|
-| **Website** | [alimkarim.com](https://alimkarim.com/) · [my.alimkarim.com](https://my.alimkarim.com/) |
-| **LinkedIn** | [linkedin.com/in/alimkarim](https://www.linkedin.com/in/alimkarim) |
-| **Stack Overflow** | [users/513511/md-alim-ul-karim](https://stackoverflow.com/users/513511/md-alim-ul-karim) |
-| **Google** | [Alim Ul Karim](https://www.google.com/search?q=Alim+Ul+Karim) |
-| **Role** | Chief Software Engineer, [Riseup Asia LLC](https://riseup-asia.com/) |
+| | Md. Alim Ul Karim | Riseup Asia LLC |
+|---|---|---|
+| **Website** | [alimkarim.com](https://alimkarim.com/) · [my.alimkarim.com](https://my.alimkarim.com/) | [riseup-asia.com](https://riseup-asia.com/) |
+| **LinkedIn** | [in/alimkarim](https://www.linkedin.com/in/alimkarim) | [Riseup Asia](https://www.linkedin.com/company/105304484/) |
+| **Stack Overflow** | [513511](https://stackoverflow.com/users/513511/md-alim-ul-karim) | — |
+| **Social** | [Google](https://www.google.com/search?q=Alim+Ul+Karim) | [Facebook](https://www.facebook.com/riseupasia.talent/) · [YouTube](https://www.youtube.com/@riseup-asia) |
 
-### Riseup Asia LLC
-
-[Top Leading Software Company in WY (2026)](https://riseup-asia.com)
-
-| | |
-|---|---|
-| **Website** | [riseup-asia.com](https://riseup-asia.com/) |
-| **Facebook** | [riseupasia.talent](https://www.facebook.com/riseupasia.talent/) |
-| **LinkedIn** | [Riseup Asia](https://www.linkedin.com/company/105304484/) |
-| **YouTube** | [@riseup-asia](https://www.youtube.com/@riseup-asia) |
+<p align="center"><a href="https://riseup-asia.com">Top Leading Software Company in WY (2026)</a></p>
 
 Full bio, design philosophy, and FAQ: [`docs/author.md`](docs/author.md).
 
