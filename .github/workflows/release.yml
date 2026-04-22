@@ -104,12 +104,29 @@ jobs:
             FOLDERS=$(node scripts/read-bundles.mjs folders "$bundle")
             STABLE=$(node scripts/read-bundles.mjs stable-name "$bundle")
             VERSIONED=$(node scripts/read-bundles.mjs versioned-prefix "$bundle")
+            PREBUILT_SRC=$(node scripts/read-bundles.mjs prebuilt-src "$bundle")
+            PREBUILT_BUILD=$(node scripts/read-bundles.mjs prebuilt-build "$bundle")
 
             echo "▸ packaging bundle: $bundle  [folders: $FOLDERS]"
 
             for src in $FOLDERS; do
               test -d "$src" || { echo "::error::missing source folder $src for bundle $bundle"; exit 1; }
             done
+
+            # If the bundle declares a prebuilt artifact, ensure it exists
+            # on disk before packaging. The slides-app build runs in an
+            # earlier step; this guard catches drift if that step is moved
+            # or skipped. Falls back to running the declared build command.
+            if [[ -n "$PREBUILT_SRC" ]]; then
+              if [[ ! -d "$PREBUILT_SRC" ]]; then
+                if [[ -n "$PREBUILT_BUILD" ]]; then
+                  echo "  ▸ prebuilt $PREBUILT_SRC missing — running: $PREBUILT_BUILD"
+                  bash -c "$PREBUILT_BUILD"
+                fi
+              fi
+              test -d "$PREBUILT_SRC" || { echo "::error::prebuilt folder $PREBUILT_SRC missing for bundle $bundle"; exit 1; }
+              echo "  ✓ prebuilt artifact present: $PREBUILT_SRC"
+            fi
 
             STABLE_ZIP="${STABLE}.zip"
             STABLE_TGZ="${STABLE}.tar.gz"
