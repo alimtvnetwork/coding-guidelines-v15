@@ -1,7 +1,7 @@
 # Consistency Report — Consolidated Guidelines
 
-**Version:** 3.3.0  
-**Updated:** 2026-04-16
+**Version:** 3.4.0  
+**Updated:** 2026-04-22
 
 ---
 
@@ -32,8 +32,10 @@
 | 21 | `20-wp-plugin-conventions.md` | ✅ Present | 570+ | 92% |
 | 22 | `21-lovable-folder-structure.md` | ✅ Present | 220+ | 91% |
 | 23 | `22-app-database.md` | ✅ Present | 310+ | 90% |
+| 24 | `23-generic-cli.md` | ✅ Present | 600+ | 93% |
+| 25 | `24-folder-mapping.md` | ✅ Present | 184 | (meta-index) |
 
-**Total:** 23 files (including this report and gap analysis)
+**Total:** 25 files (including this report, gap analysis, and folder mapping)
 
 ---
 
@@ -97,7 +99,8 @@
 | 2026-04-15 | 5.1.0 | Enforced singular table names across all consolidated and source specs |
 | 2026-04-16 | 3.2.0 | Cross-reference validation after error-manage restructuring, coding-guidelines flattening, global version bump to 3.1.0. Dashboard: 0 broken links. |
 | 2026-04-16 | 3.3.0 | Reflected recent expansions: `01-spec-authoring.md` 90%→95% (330+ lines), `16-app-design-system-and-ui.md` 88%→93% (530+ lines), `22-app-database.md` added (310+ lines, 90%), placeholders 11/12/13 expanded to 88%. Added implementability summary table. Total: 23 files, 17 at 90%+. |
+| 2026-04-22 | 3.4.0 | Added `24-folder-mapping.md` — bidirectional source-folder ↔ consolidated-file index with coverage heatmap, reverse index, and blind-spot tracking. Registered `23-generic-cli.md` in inventory. Total: 25 files. |
 
 ---
 
-*Consistency Report — v3.3.0 — 2026-04-16*
+*Consistency Report — v3.4.0 — 2026-04-22*
