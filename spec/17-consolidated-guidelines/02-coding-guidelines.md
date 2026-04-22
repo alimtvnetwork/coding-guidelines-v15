@@ -1283,6 +1283,7 @@ The orchestrator scripts (#10/#11) run linters in this order. **Do not re-order*
 | `forbidden token found` | Used a string from `forbidden-strings.toml` | Replace with the suggested alternative in the rule's `reason` field |
 | `axios version blocked` | Bumped to `1.14.1` or `0.30.4` | Pin to `1.14.0` or `0.30.3` exactly |
 | `validate-guidelines: function too long` | Function > 15 lines | Split per Code-Red metrics: 8–15 lines per function |
+| `memory-mirror-drift: token X not found` | Edited `mem://index.md` Core section without updating §X mirror | Update §X in `21-lovable-folder-structure.md` to include the new rule, OR remove the obsolete token from `EXPECTED_TOKENS` in `check-memory-mirror-drift.py` |
 
 ### 34.8 AI Pre-Flight Checklist
 
