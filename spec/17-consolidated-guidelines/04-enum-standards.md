@@ -517,3 +517,104 @@ Before generating any enum-related code:
 ---
 
 *Consolidated enum standards v1.0.0 — Go, TypeScript, PHP, Rust — 2026-04-10*
+
+---
+
+## §11 Cross-Language Enum Generator — Source-of-Truth Workflow
+
+This section closes the gap on **how** enums stay synchronized across Go, TypeScript, PHP, and Rust. Without this, a blind AI will add an enum value to one language and ship a partial implementation that compiles in CI but breaks downstream language ports.
+
+### 11.1 The Source of Truth
+
+Every cross-language enum is defined **once** in a YAML manifest:
+
+```
+spec/<module>/enums/<EnumName>.yaml
+```
+
+Example: `spec/03-error-manage/enums/ErrorSeverity.yaml`
+
+```yaml
+name: ErrorSeverity
+description: Severity classification for thrown errors
+package: apperror
+values:
+  - name: Info
+    ordinal: 0
+    description: Informational only; no user impact
+  - name: Warning
+    ordinal: 1
+    description: Degraded behavior; recoverable
+  - name: Error
+    ordinal: 2
+    description: Failure; user-visible
+  - name: Critical
+    ordinal: 3
+    description: System-level failure; alert ops
+```
+
+**Required fields:** `name`, `description`, `package`, `values[].name`, `values[].ordinal`, `values[].description`.
+
+### 11.2 The Generator Scripts
+
+| Generator | Reads | Emits | Output Path Pattern |
+|-----------|-------|-------|---------------------|
+| `gen-go-enums.mjs` | `spec/**/enums/*.yaml` | Go file with `iota` block, `String()`, `ParseEnum()`, `MarshalJSON`, `UnmarshalJSON` | `internal/<package>/<enum_name>_generated.go` |
+| `gen-ts-enums.mjs` | same | TS union type, `parse()`, `is<Name>()` guard, JSON I/O | `src/lib/enums/<enumName>.generated.ts` |
+| `gen-php-enums.mjs` | same | PHP 8.1 backed enum with `from()`, `tryFrom()`, `cases()` | `src/Enums/<EnumName>.php` |
+| `gen-rust-enums.mjs` | same | Rust `enum` with `FromStr`, `Display`, `Serialize`, `Deserialize` derives | `src/enums/<enum_name>_generated.rs` |
+
+All four generators are invoked from `scripts/codegen/`.
+
+### 11.3 Invocation
+
+```bash
+# Single enum, all languages:
+node scripts/codegen/gen-all-enums.mjs --enum ErrorSeverity
+
+# All enums in a module, all languages:
+node scripts/codegen/gen-all-enums.mjs --module 03-error-manage
+
+# Full repo regeneration (used in CI):
+node scripts/codegen/gen-all-enums.mjs --all
+```
+
+### 11.4 Drift Detection in CI
+
+CI runs `gen-all-enums.mjs --all` and then `git diff --exit-code` on all generated paths. **Any uncommitted generator output fails CI** with:
+
+```
+Error: enum codegen drift detected in <file>
+Hint: run `node scripts/codegen/gen-all-enums.mjs --all` and commit the result
+```
+
+### 11.5 The 7-Step Workflow for Adding/Modifying an Enum
+
+```
+1. Edit spec/<module>/enums/<EnumName>.yaml — add/modify a value
+2. node scripts/codegen/gen-all-enums.mjs --enum <EnumName>
+3. Verify the 4 emitted files compile in their respective languages
+4. Update tests that reference the enum (one per language)
+5. Run language-specific test suites (go test / npm test / phpunit / cargo test)
+6. node scripts/sync-version.mjs && node scripts/sync-spec-tree.mjs
+7. Commit YAML + 4 generated files + tests + version.json in ONE atomic commit
+```
+
+**Skipping any step** results in either CI drift failure (skip step 2 or 6) or runtime breakage in one language (skip step 3 or 4).
+
+### 11.6 Forbidden Patterns
+
+A blind AI must **never**:
+- Hand-edit a `*_generated.{go,ts,php,rs}` file — changes will be overwritten on next codegen.
+- Define an enum directly in a language file — it will collide with future codegen.
+- Use a numeric value directly in business code — use the enum constant via `ParseEnum`/`from`/`parse`.
+- Add a new value with a non-sequential `ordinal` — codegen requires monotonic ordinals.
+
+### 11.7 Cross-Reference
+
+- §27 (Error Code Registry) uses the same generator pattern for error codes.
+- §10 (this file) documents the parsing methods that the generated code provides.
+
+---
+
+*Cross-Language Enum Generator added — v1.1.0 — 2026-04-22*
