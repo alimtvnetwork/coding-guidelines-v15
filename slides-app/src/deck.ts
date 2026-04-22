@@ -1,5 +1,8 @@
 import type { ComponentType } from "react";
 import Title from "./slides/00-title";
+import CorePrinciples1 from "./slides/01a-core-principles-1";
+import CorePrinciples2 from "./slides/01b-core-principles-2";
+import CorePrinciples3 from "./slides/01c-core-principles-3";
 import Naming from "./slides/01-naming-conventions";
 import NestedIf from "./slides/02-nested-if-else";
 import BooleanPrefixes from "./slides/03-boolean-prefixes";
@@ -22,6 +25,9 @@ export interface SlideEntry {
 
 export const DECK: readonly SlideEntry[] = [
   { id: "00-title", title: "Title", component: Title },
+  { id: "01a-core-principles-1", title: "Core Principles · 1", component: CorePrinciples1 },
+  { id: "01b-core-principles-2", title: "Core Principles · 2", component: CorePrinciples2 },
+  { id: "01c-core-principles-3", title: "Core Principles · 3", component: CorePrinciples3 },
   { id: "01-naming", title: "Naming conventions", component: Naming },
   { id: "02-nested-if", title: "Nested if-else", component: NestedIf },
   { id: "03-boolean-prefixes", title: "Boolean prefixes", component: BooleanPrefixes },
