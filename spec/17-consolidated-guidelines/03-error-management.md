@@ -1,7 +1,7 @@
 # Consolidated: Error Management — Complete Reference
 
-**Version:** 3.2.0  
-**Updated:** 2026-04-16  
+**Version:** 3.3.0  
+**Updated:** 2026-04-22  
 **Source Module:** [`spec/03-error-manage/`](../03-error-manage/00-overview.md)
 
 ---
@@ -11,6 +11,24 @@
 This is the **standalone consolidated reference** for all error management. An AI reading only this file must be able to enforce every rule without consulting source specs.
 
 > 🔴 **#1 PRIORITY** — Error management is the highest priority specification. It must be implemented from the very first line of code.
+
+### Source-Folder Coverage Map
+
+The source module `spec/03-error-manage/` contains 3 top-level subfolders and 13 nested ones. Every one is summarized below. Use the table to jump to the relevant section.
+
+| Source Path | Section | Status |
+|-------------|---------|--------|
+| `01-error-resolution/` (cheat sheet, cross-ref diagram) | §§1–4, §17 | ✅ Full |
+| `01-error-resolution/03-retrospectives/` | §18 Retrospectives | ✅ Reference |
+| `01-error-resolution/04-verification-patterns/` | §19 Verification Patterns | ✅ Reference |
+| `01-error-resolution/05-debugging-guides/` | §20 Per-Language Debugging | ✅ Full |
+| `02-error-architecture/01-error-handling-reference.md` | §§5–10 (envelope, codes, registry) | ✅ Full |
+| `02-error-architecture/03-notification-colors.md` | §21 Notification Colors | ✅ Full |
+| `02-error-architecture/04-error-modal/` (6 files) | §22 Error Modal System | ✅ Full |
+| `02-error-architecture/05-response-envelope/` (6 files + 6 JSON fixtures) | §23 Response Envelope Reference | ✅ Full |
+| `02-error-architecture/06-apperror-package/` | §24 apperror Package Reference | ✅ Full |
+| `02-error-architecture/07-logging-and-diagnostics/` | §25 Logging & Diagnostics | ✅ Full |
+| `03-error-code-registry/` (registry + linter scripts + schemas) | §26 Error Code Registry | ✅ Full |
 
 ---
 
