@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <!-- STAMP:BADGES -->[![Version](https://img.shields.io/badge/version-3.58.0-3B82F6?style=flat-square)](https://github.com/alimtvnetwork/coding-guidelines-v15/releases) [![Spec Files](https://img.shields.io/badge/spec%20files-610-10B981?style=flat-square)](spec/) [![Folders](https://img.shields.io/badge/folders-22-8B5CF6?style=flat-square)](spec/) [![Lines](https://img.shields.io/badge/lines-131%2C441-F59E0B?style=flat-square)](version.json) [![License](https://img.shields.io/badge/license-MIT-22C55E?style=flat-square)](LICENSE) [![AI Ready](https://img.shields.io/badge/AI%20ready-yes-FF6E3C?style=flat-square)](llm.md) [![Updated](https://img.shields.io/badge/updated-2026--04--22-0EA5E9?style=flat-square)](version.json)<!-- /STAMP:BADGES -->
+  <!-- STAMP:BADGES -->[![Version](https://img.shields.io/badge/version-3.58.0-3B82F6?style=flat-square)](https://github.com/alimtvnetwork/coding-guidelines-v15/releases) [![Spec Files](https://img.shields.io/badge/spec%20files-610-10B981?style=flat-square)](spec/) [![Folders](https://img.shields.io/badge/folders-22-8B5CF6?style=flat-square)](spec/) [![Lines](https://img.shields.io/badge/lines-131%2C442-F59E0B?style=flat-square)](version.json) [![License](https://img.shields.io/badge/license-MIT-22C55E?style=flat-square)](LICENSE) [![AI Ready](https://img.shields.io/badge/AI%20ready-yes-FF6E3C?style=flat-square)](llm.md) [![Updated](https://img.shields.io/badge/updated-2026--04--22-0EA5E9?style=flat-square)](version.json)<!-- /STAMP:BADGES -->
 </p>
 
 <p align="center">
@@ -33,7 +33,7 @@
 </p>
 
 <p align="center">
-  <em>Stats:</em> <!-- STAMP:FILES -->610<!-- /STAMP:FILES --> spec files · <!-- STAMP:FOLDERS -->22<!-- /STAMP:FOLDERS --> top-level folders · <!-- STAMP:LINES -->131,441<!-- /STAMP:LINES --> lines · v<!-- STAMP:VERSION -->3.58.0<!-- /STAMP:VERSION --> · updated <!-- STAMP:UPDATED -->2026-04-22<!-- /STAMP:UPDATED -->
+  <em>Stats:</em> <!-- STAMP:FILES -->610<!-- /STAMP:FILES --> spec files · <!-- STAMP:FOLDERS -->22<!-- /STAMP:FOLDERS --> top-level folders · <!-- STAMP:LINES -->131,442<!-- /STAMP:LINES --> lines · v<!-- STAMP:VERSION -->3.58.0<!-- /STAMP:VERSION --> · updated <!-- STAMP:UPDATED -->2026-04-22<!-- /STAMP:UPDATED -->
 </p>
 
 ---
