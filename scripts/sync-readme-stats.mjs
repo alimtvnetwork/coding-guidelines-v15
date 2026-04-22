@@ -37,27 +37,33 @@ function loadHealth() {
   return JSON.parse(readFileSync(HEALTH_PATH, "utf8"));
 }
 
+// GitHub disables markdown processing inside block-level HTML (e.g. our
+// centered <p align="center"> hero blocks). We therefore emit raw HTML
+// <a><img/></a> tags rather than [![alt](url)](href) markdown so the
+// badges actually render as images instead of link text.
+function htmlBadge({ alt, src, href }) {
+  return `<a href="${href}"><img alt="${alt}" src="${src}"/></a>`;
+}
+
 function buildBadges(s) {
   const repo = "alimtvnetwork/coding-guidelines-v15";
   // shields.io uses `--` to render a literal dash in the value segment.
   const escDash = (v) => String(v).replace(/-/g, "--");
   const enc = (v) => encodeURIComponent(escDash(v));
   return [
-    `[![Version](https://img.shields.io/badge/version-${enc(s.version)}-3B82F6?style=flat-square)](https://github.com/${repo}/releases)`,
-    `[![Spec Files](https://img.shields.io/badge/spec%20files-${enc(s.files)}-10B981?style=flat-square)](spec/)`,
-    `[![Folders](https://img.shields.io/badge/folders-${enc(s.folders)}-8B5CF6?style=flat-square)](spec/)`,
-    `[![Lines](https://img.shields.io/badge/lines-${enc(s.lines.toLocaleString())}-F59E0B?style=flat-square)](version.json)`,
-    `[![License](https://img.shields.io/badge/license-MIT-22C55E?style=flat-square)](LICENSE)`,
-    `[![AI Ready](https://img.shields.io/badge/AI%20ready-yes-FF6E3C?style=flat-square)](llm.md)`,
-    `[![Updated](https://img.shields.io/badge/updated-${enc(s.updated)}-0EA5E9?style=flat-square)](version.json)`,
+    htmlBadge({ alt: "Version", src: `https://img.shields.io/badge/version-${enc(s.version)}-3B82F6?style=flat-square`, href: `https://github.com/${repo}/releases` }),
+    htmlBadge({ alt: "Spec Files", src: `https://img.shields.io/badge/spec%20files-${enc(s.files)}-10B981?style=flat-square`, href: "spec/" }),
+    htmlBadge({ alt: "Folders", src: `https://img.shields.io/badge/folders-${enc(s.folders)}-8B5CF6?style=flat-square`, href: "spec/" }),
+    htmlBadge({ alt: "Lines", src: `https://img.shields.io/badge/lines-${enc(s.lines.toLocaleString())}-F59E0B?style=flat-square`, href: "version.json" }),
+    htmlBadge({ alt: "License", src: "https://img.shields.io/badge/license-MIT-22C55E?style=flat-square", href: "LICENSE" }),
+    htmlBadge({ alt: "AI Ready", src: "https://img.shields.io/badge/AI%20ready-yes-FF6E3C?style=flat-square", href: "llm.md" }),
+    htmlBadge({ alt: "Updated", src: `https://img.shields.io/badge/updated-${enc(s.updated)}-0EA5E9?style=flat-square`, href: "version.json" }),
   ].join(" ");
 }
 
 function buildPlatformBadges() {
   const repo = "alimtvnetwork/coding-guidelines-v15";
   const health = loadHealth();
-  const escDash = (v) => String(v).replace(/-/g, "--");
-  const enc = (v) => encodeURIComponent(escDash(v));
   const healthLabel = health.overallScore != null
     ? `${health.overallScore}%2F100%20(${health.grade})`
     : "unknown";
@@ -65,15 +71,15 @@ function buildPlatformBadges() {
     : (health.overallScore ?? 0) >= 75 ? "F59E0B" : "EF4444";
   const auditScore = health.blindAiAudit?.score != null ? `${health.blindAiAudit.score}%2F100` : "unknown";
   return [
-    `[![Languages](https://img.shields.io/badge/languages-Go%20%7C%20TS%20%7C%20PHP%20%7C%20Rust%20%7C%20C%23-EC4899?style=flat-square)](spec/02-coding-guidelines/)`,
-    `[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-6366F1?style=flat-square)](#-bundle-installers)`,
-    `[![Bundles](https://img.shields.io/badge/bundles-7-14B8A6?style=flat-square)](bundles.json)`,
-    `[![Health Score](https://img.shields.io/badge/health-${healthLabel}-${healthColor}?style=flat-square)](public/health-score.json)`,
-    `[![Blind%20AI%20Audit](https://img.shields.io/badge/blind%20AI%20audit-${auditScore}-FF6E3C?style=flat-square)](spec/17-consolidated-guidelines/29-blind-ai-audit-v3.md)`,
-    `[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-22C55E?style=flat-square)](#-contributing)`,
-    `[![Made With Lovable](https://img.shields.io/badge/made%20with-Lovable-FF6E3C?style=flat-square)](https://lovable.dev)`,
-    `[![Stars](https://img.shields.io/github/stars/${repo}?style=flat-square&color=F59E0B)](https://github.com/${repo}/stargazers)`,
-    `[![Issues](https://img.shields.io/github/issues/${repo}?style=flat-square&color=EF4444)](https://github.com/${repo}/issues)`,
+    htmlBadge({ alt: "Languages", src: "https://img.shields.io/badge/languages-Go%20%7C%20TS%20%7C%20PHP%20%7C%20Rust%20%7C%20C%23-EC4899?style=flat-square", href: "spec/02-coding-guidelines/" }),
+    htmlBadge({ alt: "Platform", src: "https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-6366F1?style=flat-square", href: "#-bundle-installers" }),
+    htmlBadge({ alt: "Bundles", src: "https://img.shields.io/badge/bundles-7-14B8A6?style=flat-square", href: "bundles.json" }),
+    htmlBadge({ alt: "Health Score", src: `https://img.shields.io/badge/health-${healthLabel}-${healthColor}?style=flat-square`, href: "public/health-score.json" }),
+    htmlBadge({ alt: "Blind AI Audit", src: `https://img.shields.io/badge/blind%20AI%20audit-${auditScore}-FF6E3C?style=flat-square`, href: "spec/17-consolidated-guidelines/29-blind-ai-audit-v3.md" }),
+    htmlBadge({ alt: "PRs Welcome", src: "https://img.shields.io/badge/PRs-welcome-22C55E?style=flat-square", href: "#-contributing" }),
+    htmlBadge({ alt: "Made With Lovable", src: "https://img.shields.io/badge/made%20with-Lovable-FF6E3C?style=flat-square", href: "https://lovable.dev" }),
+    htmlBadge({ alt: "Stars", src: `https://img.shields.io/github/stars/${repo}?style=flat-square&color=F59E0B`, href: `https://github.com/${repo}/stargazers` }),
+    htmlBadge({ alt: "Issues", src: `https://img.shields.io/github/issues/${repo}?style=flat-square&color=EF4444`, href: `https://github.com/${repo}/issues` }),
   ].join(" ");
 }
 
