@@ -62,7 +62,9 @@ def has_centered_h1(body: str) -> bool:
 
 
 def count_badges(body: str) -> int:
-    return len(re.findall(r'!\[[^\]]*\]\(https://img\.shields\.io/', body))
+    md = re.findall(r'!\[[^\]]*\]\(https://img\.shields\.io/', body)
+    html = re.findall(r'<img\s[^>]*src="https://img\.shields\.io/', body)
+    return len(md) + len(html)
 
 
 def has_author_block(body: str) -> bool:
