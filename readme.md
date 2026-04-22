@@ -96,9 +96,24 @@
 
 ---
 
-## 📦 Bundle Installers
+<h2 align="center">📦 Bundle Installers</h2>
 
-Each bundle is an **independent one-line installer** that pulls only the spec folders it needs. Use these instead of the full repo install when you want a focused subset.
+<p align="center">
+  Each bundle is an <strong>independent one-line installer</strong> that pulls only the spec folders it needs.<br/>
+  Pick a card to jump to its install command — or use the full table below.
+</p>
+
+<p align="center">
+  <a href="#bundle-error-manage"><img alt="error-manage bundle" src="https://img.shields.io/badge/%F0%9F%9A%A8%20error--manage-Structured%20errors-EF4444?style=for-the-badge"/></a>
+  <a href="#bundle-splitdb"><img alt="splitdb bundle" src="https://img.shields.io/badge/%F0%9F%97%84%EF%B8%8F%20splitdb-Root%20%C2%B7%20App%20%C2%B7%20Session-3B82F6?style=for-the-badge"/></a>
+  <a href="#bundle-slides"><img alt="slides bundle" src="https://img.shields.io/badge/%F0%9F%8E%AC%20slides-Teach%20a%20team-EC4899?style=for-the-badge"/></a>
+  <a href="#bundle-linters"><img alt="linters bundle" src="https://img.shields.io/badge/%E2%9C%85%20linters-Polyglot%20CI-10B981?style=for-the-badge"/></a>
+  <br/>
+  <a href="#bundle-cli"><img alt="cli bundle" src="https://img.shields.io/badge/%E2%9A%99%EF%B8%8F%20cli-Cross--platform%20CLI-8B5CF6?style=for-the-badge"/></a>
+  <a href="#bundle-wp"><img alt="wp bundle" src="https://img.shields.io/badge/%F0%9F%90%98%20wp-WordPress%20plugin-21759B?style=for-the-badge"/></a>
+  <a href="#bundle-consolidated"><img alt="consolidated bundle" src="https://img.shields.io/badge/%F0%9F%93%9A%20consolidated-Everything%20in%20one-F59E0B?style=for-the-badge"/></a>
+  <a href="bundles.json"><img alt="bundles.json manifest" src="https://img.shields.io/badge/bundles.json-Manifest-14B8A6?style=for-the-badge&logo=json&logoColor=white"/></a>
+</p>
 
 <p align="center">
   <img
@@ -108,17 +123,17 @@ Each bundle is an **independent one-line installer** that pulls only the spec fo
   />
 </p>
 
-*One line. Any bundle. Anywhere — no clone required.*
+<p align="center"><em>One line. Any bundle. Anywhere — no clone required.</em></p>
 
 | Bundle | What it installs | Bash one-liner | PowerShell one-liner |
 |---|---|---|---|
-| **error-manage** | `spec/01-spec-authoring-guide/` + `spec/03-error-manage/` | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/error-manage-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/error-manage-install.ps1 \| iex` |
-| **splitdb** | `04-database-conventions/` + `05-split-db-architecture/` + `06-seedable-config-architecture/` | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/splitdb-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/splitdb-install.ps1 \| iex` |
-| **slides** | `spec-slides/` decks + `slides-app/` Vite presentation app | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/slides-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/slides-install.ps1 \| iex` |
-| **linters** | `linters/` (golangci-lint, phpcs, sonarqube, stylecop) + `linters-cicd/` runner pack | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/linters-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/linters-install.ps1 \| iex` |
-| **cli** | `spec/11`–`spec/16` (PowerShell, CI/CD, generic CLI, update, distribution, release) | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/cli-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/cli-install.ps1 \| iex` |
-| **wp** | `spec/18-wp-plugin-how-to/` (WordPress plugin Gold-Standard spec) | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/wp-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/wp-install.ps1 \| iex` |
-| **consolidated** | `01-spec-authoring-guide/` + `03-error-manage/` + `17-consolidated-guidelines/` | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/consolidated-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/consolidated-install.ps1 \| iex` |
+| <a id="bundle-error-manage"></a>**error-manage** | `spec/01-spec-authoring-guide/` + `spec/03-error-manage/` | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/error-manage-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/error-manage-install.ps1 \| iex` |
+| <a id="bundle-splitdb"></a>**splitdb** | `04-database-conventions/` + `05-split-db-architecture/` + `06-seedable-config-architecture/` | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/splitdb-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/splitdb-install.ps1 \| iex` |
+| <a id="bundle-slides"></a>**slides** | `spec-slides/` decks + `slides-app/` Vite presentation app | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/slides-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/slides-install.ps1 \| iex` |
+| <a id="bundle-linters"></a>**linters** | `linters/` (golangci-lint, phpcs, sonarqube, stylecop) + `linters-cicd/` runner pack | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/linters-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/linters-install.ps1 \| iex` |
+| <a id="bundle-cli"></a>**cli** | `spec/11`–`spec/16` (PowerShell, CI/CD, generic CLI, update, distribution, release) | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/cli-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/cli-install.ps1 \| iex` |
+| <a id="bundle-wp"></a>**wp** | `spec/18-wp-plugin-how-to/` (WordPress plugin Gold-Standard spec) | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/wp-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/wp-install.ps1 \| iex` |
+| <a id="bundle-consolidated"></a>**consolidated** | `01-spec-authoring-guide/` + `03-error-manage/` + `17-consolidated-guidelines/` | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/consolidated-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/consolidated-install.ps1 \| iex` |
 
 All bundles share these traits:
 
