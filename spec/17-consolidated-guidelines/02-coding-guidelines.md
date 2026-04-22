@@ -1270,6 +1270,7 @@ The orchestrator scripts (#10/#11) run linters in this order. **Do not re-order*
 5. check-spec-cross-links.py     (markdown link integrity)
 6. check-spec-folder-refs.py     (folder-reference integrity)
 7. generate-dashboard-data.cjs   (artifact regeneration — last)
+8. check-memory-mirror-drift.py  (memory↔mirror parity — informational)
 ```
 
 ### 34.7 Failure Recovery Quick-Reference
