@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "generated": "2026-04-22T09:13:54.695Z",
+  "version": "3.59.0",
+  "overallScore": 100,
+  "grade": "A+",
+  "totals": {
+    "files": 610,
+    "folders": 22,
+    "lines": 131442
+  },
+  "blindAiAudit": {
+    "version": "v3",
+    "score": 99.8,
+    "handoffWeighted": 99.9
+  },
+  "sources": [
+    "spec/health-dashboard.md",
+    "spec/17-consolidated-guidelines/29-blind-ai-audit-v3.md",
+    "version.json"
+  ]
+}
