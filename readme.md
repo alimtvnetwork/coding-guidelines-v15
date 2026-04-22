@@ -152,15 +152,12 @@ Why this matters: callers ALWAYS see the same shape, so guard helpers (`HasError
 <h2 align="center">What is this? Who is it for?</h2>
 
 <p align="center">
-  A specification system trusted by production engineering teams. Drop these folders into any codebase to enforce<br/>
-  consistent naming, structured error handling, zero-nesting rules, and AI-friendly documentation —<br/>
-  without inventing your own conventions. <strong>Pick a bundle, run one command, ship compliant code.</strong>
+  A specification system trusted by production engineering teams. Drop these folders into any codebase for consistent naming, structured error handling, zero-nesting rules, and AI-friendly docs. <strong>Pick a bundle, run one command, ship compliant code.</strong>
 </p>
 
 <p align="center">
   <a href="docs/principles.md"><img alt="Developer — start with principles" src="https://img.shields.io/badge/%F0%9F%A7%91%E2%80%8D%F0%9F%92%BB%20Developer-Start%20with%20principles-3B82F6?style=for-the-badge"/></a>
   <a href="docs/architecture.md"><img alt="Spec author — read architecture" src="https://img.shields.io/badge/%E2%9C%8D%EF%B8%8F%20Spec%20Author-Read%20architecture-8B5CF6?style=for-the-badge"/></a>
-  <br/>
   <a href="spec/18-wp-plugin-how-to/00-overview.md"><img alt="WordPress dev — wp bundle" src="https://img.shields.io/badge/%F0%9F%90%98%20WordPress%20Dev-Use%20the%20wp%20bundle-21759B?style=for-the-badge"/></a>
   <a href="#-for-ai-agents"><img alt="AI agent — canonical entry points" src="https://img.shields.io/badge/%F0%9F%A4%96%20AI%20Agent-Canonical%20entry%20points-FF6E3C?style=for-the-badge"/></a>
 </p>
@@ -173,37 +170,26 @@ Why this matters: callers ALWAYS see the same shape, so guard helpers (`HasError
   />
 </p>
 
-<p align="center">
-  <em>(Animated version: <a href="public/images/coding-guidelines-walkthrough.gif">coding-guidelines-walkthrough.gif</a>)</em>
-</p>
+<p align="center"><em>Animated: <a href="public/images/coding-guidelines-walkthrough.gif">coding-guidelines-walkthrough.gif</a></em></p>
 
 ---
 
 <h2 align="center">🤖 For AI Agents</h2>
 
-<p align="center">
-  If you are an LLM or autonomous coding agent, these are your <strong>canonical entry points</strong>.<br/>
-  Load them in order — each card links directly to the file.
-</p>
+<p align="center">LLMs / coding agents — load these <strong>canonical entry points</strong> in order:</p>
 
 <p align="center">
   <a href="llm.md"><img alt="llm.md — repository map" src="https://img.shields.io/badge/llm.md-Repository%20map-3B82F6?style=for-the-badge&logo=readthedocs&logoColor=white"/></a>
   <a href="bundles.json"><img alt="bundles.json — machine-readable catalogue" src="https://img.shields.io/badge/bundles.json-Bundle%20catalogue-10B981?style=for-the-badge&logo=json&logoColor=white"/></a>
   <a href="version.json"><img alt="version.json — live counts" src="https://img.shields.io/badge/version.json-Live%20counts-F59E0B?style=for-the-badge&logo=semver&logoColor=white"/></a>
-  <br/>
   <a href="spec/02-coding-guidelines/06-ai-optimization/04-condensed-master-guidelines.md"><img alt="Condensed master guidelines" src="https://img.shields.io/badge/Condensed%20Master-Load%20this%20first-FF6E3C?style=for-the-badge"/></a>
   <a href="spec/02-coding-guidelines/06-ai-optimization/01-anti-hallucination-rules.md"><img alt="Anti-hallucination rules" src="https://img.shields.io/badge/Anti--hallucination-34%20rules-EF4444?style=for-the-badge"/></a>
   <a href="spec/17-consolidated-guidelines/00-overview.md"><img alt="Consolidated guidelines index" src="https://img.shields.io/badge/Consolidated-Master%20index-8B5CF6?style=for-the-badge"/></a>
-  <br/>
   <a href=".lovable/memory/index.md"><img alt="Project memory index" src="https://img.shields.io/badge/Project%20Memory-Naming%20%C2%B7%20DB%20%C2%B7%20rules-14B8A6?style=for-the-badge"/></a>
   <a href=".lovable/prompts/00-index.md"><img alt="Reusable prompts" src="https://img.shields.io/badge/Prompts-blind%20audit%20%C2%B7%20gap-EC4899?style=for-the-badge"/></a>
 </p>
 
-<p align="center">
-  <strong>To answer "which bundle do I need?"</strong> — fetch <a href="bundles.json"><code>bundles.json</code></a>,<br/>
-  match the user's <code>intent</code> + <code>audience</code> to a bundle <code>name</code>,<br/>
-  then return the matching one-liner from the <a href="#-bundle-installers">Bundle Installers</a> table.
-</p>
+<p align="center"><strong>"Which bundle?"</strong> — fetch <code>bundles.json</code>, match <code>intent</code>+<code>audience</code> to a bundle <code>name</code>, return its one-liner.</p>
 
 ---
 
@@ -236,27 +222,7 @@ Why this matters: callers ALWAYS see the same shape, so guard helpers (`HasError
 
 <p align="center"><em>One line. Any bundle. Anywhere — no clone required.</em></p>
 
-| Bundle | What it installs | Bash one-liner | PowerShell one-liner |
-|---|---|---|---|
-All bundles share these traits:
-
-- **Zero dependencies on each other** — install any combination, in any order.
-- **Idempotent** — re-running overwrites in place; nothing gets duplicated.
-- **Temp-clean** — downloads to `/tmp` (or `%TEMP%`), copies the bundle's folders, then deletes the temp dir even on failure.
-- **Versionable** — every bundle ships in a versioned GitHub Release archive (e.g. `coding-guidelines-error-manage-v1.4.0.zip`) with `checksums.txt`.
-- **Manifest-backed** — defined in [`bundles.json`](bundles.json) at the repo root.
-
-### Pick a bundle by goal
-
-| If you want to… | Install |
-|---|---|
-| Adopt the error-management architecture in a new project | `error-manage` |
-| Set up a multi-database (Root / App / Session) backend | `splitdb` |
-| Teach a team the guidelines via slides | `slides` |
-| Add the linter ruleset + CI runners to a polyglot repo | `linters` |
-| Build a cross-platform CLI tool with self-update | `cli` |
-| Author a WordPress plugin to the Gold-Standard spec | `wp` |
-| Get the master consolidated reference (everything in one place) | `consolidated` |
+<p align="center">All bundles are <strong>independent</strong>, <strong>idempotent</strong>, <strong>temp-clean</strong>, <strong>versioned</strong> (with <code>checksums.txt</code>), and defined in <a href="bundles.json"><code>bundles.json</code></a>.</p>
 
 <h3 align="center">🚨 <code>error-manage</code> — Structured Errors Bundle</h3>
 <p align="center" id="bundle-error-manage">
