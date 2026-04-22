@@ -40,6 +40,119 @@
 
 <h2 align="center">What is this? Who is it for?</h2>
 
+<h2 align="center">📑 Table of Contents</h2>
+
+<p align="center">
+  <a href="#-table-of-contents">Table of Contents</a> ·
+  <a href="#-core-development-principles">Core Development Principles</a> ·
+  <a href="#-real-world-example-code-red-violations">Real-world Code Red Violations</a> ·
+  <a href="#-error-management-summary">Error Management Summary</a> ·
+  <a href="#-type-aliases-for-common-generic-results">Type Aliases for Generic Results</a> ·
+  <a href="#-for-ai-agents">For AI Agents</a> ·
+  <a href="#-bundle-installers">Bundle Installers</a> ·
+  <a href="#%EF%B8%8F-full-repo-install-scripts">Full-Repo Install Scripts</a> ·
+  <a href="#-documentation">Documentation</a> ·
+  <a href="#-neutral-ai-assessment">Neutral AI Assessment</a> ·
+  <a href="#-contributing">Contributing</a> ·
+  <a href="#-author">Author</a>
+</p>
+
+---
+
+<h2 align="center">🧭 Core Development Principles</h2>
+
+<p align="center">
+  Nine non-negotiables. Every spec, every linter, every PR enforces them.<br/>
+  Full reference: <a href="docs/principles.md"><code>docs/principles.md</code></a>.
+</p>
+
+| # | Principle | One-line rule |
+|---|---|---|
+| 1 | **Zero-Nesting Discipline** | No nested `if`-`else`. Use early-return guards. |
+| 2 | **Two-Operand Maximum** | Boolean expressions take ≤ 2 operands; extract the third. |
+| 3 | **Positively Named Booleans** | `isReady`, `hasError`, `canPublish` — never `!isNotReady`. |
+| 4 | **Structured Error Wrapping** | Every error crosses a boundary as `AppError` with stack + context. |
+| 5 | **Strict Function & File Metrics** | Functions 8-15 lines · files < 300 · React components < 100. |
+| 6 | **PascalCase Everywhere** | Identifiers, DB columns, JSON keys, types. Acronyms stay full-caps. |
+| 7 | **No Magic Strings** | Constants, enums, or typed action discriminators — never inline strings. |
+| 8 | **Spec-First Workflow** | Spec the change in `spec/` before writing code. |
+| 9 | **Cache Invalidation by Contract** | Explicit TTLs, deterministic keys, invalidate on mutation. |
+
+---
+
+<h2 align="center">🚨 Real-world Example — Code Red Violations</h2>
+
+<p align="center">
+  Pulled from the <strong>Riseup Asia Uploader</strong> codebase audit.<br/>
+  These exact patterns are now blocked by <a href="linter-scripts/"><code>linter-scripts/</code></a>.
+</p>
+
+```ts
+// ❌ CODE RED — nested if, three operands, error swallowed, magic string
+function process(user) {
+  if (user) {
+    if (user.role === "admin" && user.active && !user.banned) {
+      try { doWork(user); } catch (e) { /* silent */ }
+    }
+  }
+}
+
+// ✅ Refactored — guards, two operands, AppError, named constant
+const ROLE_ADMIN = "admin";
+function isEligible(user: User): boolean {
+  return user.active && !user.banned;
+}
+function process(user: User): Result<void> {
+  if (!user) return Err(AppError.new("UserMissing"));
+  if (user.role !== ROLE_ADMIN) return Err(AppError.new("NotAdmin"));
+  if (!isEligible(user)) return Err(AppError.new("Ineligible"));
+  return TryDo(() => doWork(user));
+}
+```
+
+Full case study with five more violations: [`docs/principles.md`](docs/principles.md#real-world-violations).
+
+---
+
+<h2 align="center">🛡️ Error Management Summary</h2>
+
+| Layer | Rule | Tool |
+|---|---|---|
+| **Wrap at boundary** | Every external call returns `Result[T]`; raw exceptions never escape. | `apperror` package |
+| **Carry evidence** | `AppError` ships with stack trace, file path, and `Code` enum. | `AppError.new(Code, msg)` |
+| **Check before unwrap** | `if (res.HasError()) return res;` precedes every `.Value()`. | Linter rule `ERR-UNWRAP-001` |
+| **Log structurally** | One `Log.Error(err, fields)` per boundary — no console spam. | `structured-logging` spec |
+| **Map to UI** | UI translates `Code` → user-visible message. Error `Code` is the contract. | `error-code` registry |
+
+Full architecture: [`docs/architecture.md#error-management`](docs/architecture.md#error-management) · spec: [`spec/02-coding-guidelines/03-error-handling/`](spec/02-coding-guidelines/03-error-handling/).
+
+---
+
+<h2 align="center">🧬 Type Aliases for Common Generic Results</h2>
+
+```ts
+// Result wrapper — every fallible function returns one of these.
+type Result<T>      = Ok<T> | Err;
+type AsyncResult<T> = Promise<Result<T>>;
+
+// Specialised aliases — shorter call sites, identical semantics.
+type VoidResult     = Result<void>;
+type IdResult       = Result<number>;        // PK lookups
+type ListResult<T>  = Result<readonly T[]>;
+type PageResult<T>  = Result<{ Items: readonly T[]; Total: number }>;
+
+// Cross-language equivalents (TS shown above):
+// Go:   apperror.Result[T]      / apperror.AsyncResult[T]
+// Rust: Result<T, AppError>     / async fn -> Result<T, AppError>
+// C#:   Result<T>               / Task<Result<T>>
+```
+
+Why this matters: callers ALWAYS see the same shape, so guard helpers (`HasError`, `Map`, `AndThen`) work uniformly. Spec: [`spec/02-coding-guidelines/03-error-handling/04-result-types.md`](spec/02-coding-guidelines/03-error-handling/04-result-types.md).
+
+---
+
+<h2 align="center">What is this? Who is it for?</h2>
+
 <p align="center">
   A specification system trusted by production engineering teams. Drop these folders into any codebase to enforce<br/>
   consistent naming, structured error handling, zero-nesting rules, and AI-friendly documentation —<br/>
