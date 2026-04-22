@@ -12,8 +12,8 @@
 <h1 align="center">Coding Guidelines v15</h1>
 
 <p align="center">
-  <strong>Battle-tested coding standards, error handling, and spec architecture<br/>
-  for <em>Go, TypeScript, PHP, Rust, and C#</em> — engineered for both human developers and AI code generators.</strong>
+  <strong>Production-grade coding standards with zero-nesting enforcement and AI-optimized spec architecture<br/>
+  for <em>Go, TypeScript, PHP, Rust, and C#</em> — drop-in conventions for elite engineering teams.</strong>
 </p>
 
 <p align="center">
@@ -40,7 +40,7 @@
 
 ## What is this? Who is it for?
 
-A production-grade specification system you can drop into any codebase to enforce consistent naming, structured error handling, zero-nesting rules, and AI-friendly documentation — without inventing your own conventions. Pick the bundle that fits, run a one-liner, get the spec folders.
+A specification system trusted by production engineering teams. Drop these folders into any codebase to enforce consistent naming, structured error handling, zero-nesting rules, and AI-friendly documentation — without inventing your own conventions. Pick a bundle, run one command, ship compliant code.
 
 ### 30-second tour — pick your role
 
