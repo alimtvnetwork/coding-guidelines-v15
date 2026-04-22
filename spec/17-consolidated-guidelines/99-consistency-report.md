@@ -32,8 +32,10 @@
 | 21 | `20-wp-plugin-conventions.md` | ✅ Present | 570+ | 92% |
 | 22 | `21-lovable-folder-structure.md` | ✅ Present | 220+ | 91% |
 | 23 | `22-app-database.md` | ✅ Present | 310+ | 90% |
+| 24 | `23-generic-cli.md` | ✅ Present | 600+ | 93% |
+| 25 | `24-folder-mapping.md` | ✅ Present | 184 | (meta-index) |
 
-**Total:** 23 files (including this report and gap analysis)
+**Total:** 25 files (including this report, gap analysis, and folder mapping)
 
 ---
 
