@@ -57,6 +57,7 @@ This folder provides **standalone, self-contained AI-readable references** for e
 | 21 | [21-lovable-folder-structure.md](./21-lovable-folder-structure.md) | `.lovable/` folder structure — memory, tasks, suggestions, strictly-avoid, AI reading order |
 | 22 | [22-app-database.md](./22-app-database.md) | `23-app-database/` — App-specific schema design, migration strategy, query patterns, ORM integration |
 | 23 | [23-generic-cli.md](./23-generic-cli.md) | `13-generic-cli/` — CLI creation blueprint: project structure, subcommands, flags, config, output, errors, help, database, build, testing, shell completion |
+| 24 | [24-folder-mapping.md](./24-folder-mapping.md) | **Meta** — Bidirectional folder-by-folder mapping: every source spec folder ↔ consolidated file, with coverage heatmap and blind-spots |
 
 ---
 
