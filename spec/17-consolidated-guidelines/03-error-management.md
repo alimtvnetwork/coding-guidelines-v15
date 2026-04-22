@@ -1,7 +1,7 @@
 # Consolidated: Error Management — Complete Reference
 
-**Version:** 3.2.0  
-**Updated:** 2026-04-16  
+**Version:** 3.3.0  
+**Updated:** 2026-04-22  
 **Source Module:** [`spec/03-error-manage/`](../03-error-manage/00-overview.md)
 
 ---
@@ -11,6 +11,24 @@
 This is the **standalone consolidated reference** for all error management. An AI reading only this file must be able to enforce every rule without consulting source specs.
 
 > 🔴 **#1 PRIORITY** — Error management is the highest priority specification. It must be implemented from the very first line of code.
+
+### Source-Folder Coverage Map
+
+The source module `spec/03-error-manage/` contains 3 top-level subfolders and 13 nested ones. Every one is summarized below. Use the table to jump to the relevant section.
+
+| Source Path | Section | Status |
+|-------------|---------|--------|
+| `01-error-resolution/` (cheat sheet, cross-ref diagram) | §§1–4, §17 | ✅ Full |
+| `01-error-resolution/03-retrospectives/` | §18 Retrospectives | ✅ Reference |
+| `01-error-resolution/04-verification-patterns/` | §19 Verification Patterns | ✅ Reference |
+| `01-error-resolution/05-debugging-guides/` | §20 Per-Language Debugging | ✅ Full |
+| `02-error-architecture/01-error-handling-reference.md` | §§5–10 (envelope, codes, registry) | ✅ Full |
+| `02-error-architecture/03-notification-colors.md` | §21 Notification Colors | ✅ Full |
+| `02-error-architecture/04-error-modal/` (6 files) | §22 Error Modal System | ✅ Full |
+| `02-error-architecture/05-response-envelope/` (6 files + 6 JSON fixtures) | §23 Response Envelope Reference | ✅ Full |
+| `02-error-architecture/06-apperror-package/` | §24 apperror Package Reference | ✅ Full |
+| `02-error-architecture/07-logging-and-diagnostics/` | §25 Logging & Diagnostics | ✅ Full |
+| `03-error-code-registry/` (registry + linter scripts + schemas) | §26 Error Code Registry | ✅ Full |
 
 ---
 
@@ -467,6 +485,267 @@ console.log(import.meta.env.VITE_API_URL)
 ## Validation
 
 Run `linter-scripts/validate-guidelines.py` — zero **CODE-RED** violations required.
+
+---
+
+## 18. Retrospectives
+
+**Source:** `01-error-resolution/03-retrospectives/` (4 retrospective files)
+
+Every production error escalation produces a retrospective file in this folder. Required sections:
+
+1. **What happened** — symptom, blast radius, time to detect / mitigate / resolve.
+2. **Root cause** — exact line of code or config drift.
+3. **Why guards failed** — which spec rule should have caught it (cite section).
+4. **Spec change** — which spec file gets a new rule, with the diff.
+5. **Linter change** — new rule ID added to `linter-scripts/`.
+6. **Memory update** — new entry in `mem://issues/` if the lesson is project-wide.
+
+Existing retrospectives cover: health-endpoint mismatch, retry/debounce/dedup race, ZIP finalization-before-return bug, activation-endpoint casing fix.
+
+---
+
+## 19. Verification Patterns
+
+**Source:** `01-error-resolution/04-verification-patterns/`
+
+Documents the **frontend↔backend sync verification** pattern: every fixed bug must include a paired test (one in the producing tier, one in the consuming tier) that would have failed before the fix. CI gate: PR description must include both test paths or be rejected.
+
+---
+
+## 20. Per-Language Debugging Guides
+
+**Source:** `01-error-resolution/05-debugging-guides/` (PHP, Go, TypeScript guides)
+
+| Language | Required Tools | Mandatory First-Step |
+|----------|---------------|---------------------|
+| PHP | Xdebug, `FileLogger` tail, WP debug.log | `tail -f wp-content/debug.log` while reproducing |
+| Go | `dlv`, session log file, `pprof` for perf bugs | Inspect `error.log.txt` for the request ID |
+| TypeScript | Browser devtools, React DevTools, `errorStore` snapshot | Open the Global Error Modal → Copy Full Report |
+
+Every debugging session **must** capture: timestamp, request ID, full stack trace, file paths involved. Verbal "it's broken" reports are insufficient.
+
+---
+
+## 21. Notification Colors
+
+**Source:** `02-error-architecture/03-notification-colors.md`
+
+Toast and modal severity colors are defined as CSS variables and **must not be hard-coded** in components.
+
+| Severity | Token | Default HSL |
+|----------|-------|-------------|
+| Success | `--toast-success` | `142 71% 45%` |
+| Info | `--toast-info` | `217 91% 60%` |
+| Warning | `--toast-warning` | `38 92% 50%` |
+| Error | `--toast-error` | `0 84% 60%` |
+| Critical (CODE-RED) | `--toast-critical` | `0 100% 35%` (deeper red, plus pulse animation) |
+
+The Global Error Modal uses these same tokens for the severity badge.
+
+---
+
+## 22. Error Modal System
+
+**Source:** `02-error-architecture/04-error-modal/` (overview + 6 sub-areas: copy formats, React components, full reference, color themes, history persistence, suppression)
+
+### 22.1 Modal Tabs
+
+The Global Error Modal has **5 tabs**: Summary, Stack, Request, Response, Click Path. Each tab renders from the same `CapturedError` shape — never duplicate state.
+
+### 22.2 Copy Formats (3)
+
+| Format | Use Case | Function |
+|--------|---------|----------|
+| Full Report | Bug report to engineer | `generateErrorReport(error, app)` |
+| Compact Report | Slack / chat paste | `generateCompactReport(error, app)` |
+| Raw JSON | Programmatic re-ingest | `JSON.stringify(error, null, 2)` |
+
+Source files: `src/components/errors/errorReportGenerator.ts` (pure functions, no React deps), `errorLogAdapter.ts` (maps backend `ErrorLog` → `CapturedError`).
+
+### 22.3 History Persistence
+
+Errors are persisted to IndexedDB with a 50-entry rolling window keyed by capture timestamp. The history pane is keyboard-navigable (`↑`/`↓`, `Enter` to inspect).
+
+### 22.4 Suppression
+
+`suppressGlobalError(predicate)` allows hiding the modal for known-recoverable errors (e.g., 401 on a probe request). Suppression is **logged** even when the modal is hidden — never silently swallow.
+
+---
+
+## 23. Response Envelope Reference
+
+**Source:** `02-error-architecture/05-response-envelope/` (6 docs + 6 JSON fixtures + JSON schema)
+
+### 23.1 Schema Fixtures
+
+Every envelope variant has a fixture in the source folder for snapshot testing:
+
+| Fixture | Scenario |
+|---------|----------|
+| `envelope-minimal.json` | Success with no Meta |
+| `envelope-single.json` | Single typed result |
+| `envelope-multiple.json` | Multiple result blocks |
+| `envelope-error.json` | Error envelope with `Errors` array |
+| `envelope-debug.json` | Debug-mode envelope including `MethodsStack` |
+| `envelope.schema.json` | JSON Schema 2020-12 for the envelope |
+
+CI runs every backend response through schema validation; mismatches fail the build.
+
+### 23.2 Configurability
+
+- `Meta` block is freely extensible (only key-naming rule applies).
+- `Errors` block has a **fixed shape**: `Code`, `Message`, `Detail`, `StackTrace`, `Context`, `RequestId`. Additional keys are forbidden.
+- `MethodsStack` and `Attributes` are debug-only — must be stripped in production builds via `STRIP_DEBUG_ENVELOPE=1`.
+
+---
+
+## 24. apperror Package Reference
+
+**Source:** `02-error-architecture/06-apperror-package/01-apperror-reference/` (8 modules: overview, AppError struct, Result types, codes/policy, AppErrType enums, usage/adapters, serialization/guards)
+
+### 24.1 Core Types
+
+```go
+type StackTrace struct {
+    Frames []StackFrame  // file, line, function, package
+}
+
+type AppError struct {
+    Code      AppErrType        // E1xxx–E14xxx domain enum
+    Message   string            // human-readable
+    Cause     error             // wrapped underlying
+    Stack     StackTrace        // captured at Wrap()
+    Context   map[string]any    // PascalCase keys
+}
+
+type Result[T any] struct {
+    value *T
+    err   *AppError
+}
+
+type ResultSlice[T any] = Result[[]T]
+type ResultMap[K comparable, V any] = Result[map[K]V]
+```
+
+### 24.2 Constructors
+
+| Function | When to use |
+|----------|------------|
+| `apperror.Ok(v)` | Success path, return value |
+| `apperror.Err` (generic on T) | Failure path, propagate typed `*AppError` (signature: `apperror.Err` accepts `*AppError` and returns `Result` of T) |
+| `apperror.Wrap(err)` | Convert any `error` to `*AppError`, capturing stack at this point |
+| `apperror.New(code, msg)` | Construct from scratch with no underlying cause |
+
+### 24.3 Stack Trace Skip Rules
+
+`Wrap()` skips the wrap call itself + `runtime.Callers`. `New()` skips one extra frame. Service-layer adapters that immediately re-wrap should use `WrapSkip(2)` to keep the trace pointing at the originating site.
+
+### 24.4 AppErrType Enum Ranges
+
+| Range | Domain |
+|-------|--------|
+| E1xxx | Configuration / startup |
+| E2xxx | Validation |
+| E3xxx | Authentication / authorization |
+| E4xxx | Database |
+| E5xxx | Filesystem / IO |
+| E6xxx | Network / HTTP client |
+| E7xxx | External service (third-party APIs) |
+| E8xxx | Business logic |
+| E9xxx | Concurrency / queue |
+| E10xxx | Cache |
+| E11xxx | Cryptography |
+| E12xxx | Self-update |
+| E13xxx | CI/CD pipeline |
+| E14xxx | Reserved for app-specific extensions |
+
+Full enum definitions live in `05-apperrtype-enums.md` (340 lines). Adding a new code requires registry update (§26).
+
+### 24.5 Service Adapter Unwrap Pattern
+
+```go
+func (s *Service) ProcessOrder(id string) apperror.Result[Order] {
+    rawResult := s.repo.LoadOrder(id)
+    if rawResult.HasError() {
+        return apperror.Err[Order](rawResult.Error().
+            WithCode(apperror.E8001OrderLoadFailed).
+            WithContext("OrderId", id))
+    }
+    return apperror.Ok(rawResult.Unwrap())
+}
+```
+
+The adapter pattern preserves the original stack trace while adding domain-specific context. **Never** call `.Unwrap()` without a preceding `.HasError()` guard — this is a CODE-RED.
+
+### 24.6 JSON Serialization
+
+`AppError.MarshalJSON()` emits: `{"Code", "Message", "Detail", "StackTrace": [...], "Context": {...}}`. Stack frames serialize as `{"File", "Line", "Function", "Package"}`. The `Cause` chain is flattened into `Detail` to keep the wire format flat.
+
+---
+
+## 25. Logging & Diagnostics
+
+**Source:** `02-error-architecture/07-logging-and-diagnostics/` (3 files: overview, React execution logger, session-based logging)
+
+### 25.1 Two-Tier Logging (Backend)
+
+| Tier | When | Destination | Rotation |
+|------|------|-------------|----------|
+| Bootstrap (`ErrorLogHelper`) | Before session is established | `error.bootstrap.log` | Manual / weekly |
+| Runtime (`FileLogger`) | After request enters handler | `sessions/<RequestId>/error.log.txt` | Per-request directory |
+
+The bootstrap tier exists because session context isn't available before middleware runs. Runtime tier is mandatory for everything else.
+
+### 25.2 Session-Based Logging
+
+- Every request gets a UUID `RequestId` injected as the first middleware.
+- All logs for that request go to `sessions/<RequestId>/`.
+- Directory is preserved for **24 hours** then garbage-collected by a scheduled task.
+- The `RequestId` is echoed in the response envelope's `Meta.RequestId` for client correlation.
+
+### 25.3 React Execution Logger (Debug Mode)
+
+When `localStorage.debugExecutionLog === '1'`, the frontend captures every component render, hook call, and event handler invocation into a circular buffer. Buffer is dumped into the Global Error Modal's Click Path tab on capture. Disabled in production builds via tree-shaking.
+
+---
+
+## 26. Error Code Registry
+
+**Source:** `03-error-code-registry/` (registry, integration guide, collision resolution, utilization report, overlap validator, schemas, linter scripts, templates)
+
+### 26.1 Registry File
+
+`error-codes-master.json` is the **single source of truth** for every error code across all languages (Go, PHP, TypeScript). Schema:
+
+```json
+{
+  "Code": "E2001",
+  "Name": "ValidationFailed",
+  "Domain": "Validation",
+  "Severity": "Error",
+  "MessageTemplate": "Validation failed for field '{Field}'",
+  "OwningSpec": "spec/03-error-manage/...",
+  "FirstSeenVersion": "1.4.0"
+}
+```
+
+### 26.2 Adding a New Code (4-Step Process)
+
+1. Append entry to `error-codes-master.json` (validated by `07-schemas/error-codes.schema.json`).
+2. Run `python3 spec/03-error-manage/03-error-code-registry/08-linter-scripts/check-code-collisions.py` — must exit 0.
+3. Run code generators to emit `apperror_codes_generated.go`, `ErrorCode.php`, `errorCodes.generated.ts` from the master.
+4. Update the relevant retrospective or feature spec to reference the new code.
+
+### 26.3 Collision Rules
+
+- Code numbers are **immutable** once shipped — never re-use.
+- Names within a Domain must be unique.
+- Deprecated codes get `Deprecated: true` + `ReplacedBy: "EXXXX"` instead of deletion.
+
+### 26.4 Utilization Report
+
+`04-error-code-utilization-report.md` is regenerated weekly: lists every code, the files that emit it, and the count of test cases. Codes with zero emitters for 30+ days trigger a "candidate for removal" flag.
 
 ---
 
