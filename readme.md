@@ -345,7 +345,7 @@ Skip the latest-version probe with `-n` (PowerShell: `... | iex` wrapped in `& (
 
 ## 📚 Documentation
 
-The README intentionally stays under 400 lines. Deep-dives live in `docs/`:
+Deep-dives live in `docs/` (README stays under 400 lines):
 
 | Doc | What's inside |
 |---|---|
@@ -353,13 +353,7 @@ The README intentionally stays under 400 lines. Deep-dives live in `docs/`:
 | [`docs/architecture.md`](docs/architecture.md) | Spec authoring conventions · folder structure · architecture decisions · error management summary |
 | [`docs/author.md`](docs/author.md) | Author bio · Riseup Asia LLC · AI assessments · FAQ · design philosophy |
 
-Plus the live spec tree:
-
-- [`spec/`](spec/) — all 22 top-level folders, browseable.
-- [`spec/health-dashboard.md`](spec/health-dashboard.md) — global self-assessment.
-- [`spec/17-consolidated-guidelines/00-overview.md`](spec/17-consolidated-guidelines/00-overview.md) — master consolidated index.
-
-The built-in **Spec Documentation Viewer** ([screenshot](public/images/spec-viewer-preview.png)) lets you browse, search, and read all spec files with syntax highlighting, keyboard navigation, and fullscreen mode. Recent changes live in [`changelog.md`](changelog.md).
+Live spec tree: [`spec/`](spec/) (22 folders) · [`health-dashboard`](spec/health-dashboard.md) · [`consolidated index`](spec/17-consolidated-guidelines/00-overview.md). The built-in **Spec Documentation Viewer** ([screenshot](public/images/spec-viewer-preview.png)) renders everything with syntax highlighting and keyboard navigation. Changes: [`changelog.md`](changelog.md).
 
 ---
 
