@@ -241,6 +241,7 @@ Both scripts create a versioned release bundle in `release-artifacts/` containin
 
 - [Project Overview](#project-overview)
 - [Install Scripts](#install-scripts)
+- [Bundle Installers](#bundle-installers)
 - [Release Scripts](#release-scripts)
 - [Folder Structure](#folder-structure)
 - [Quick Start — How to Read These Specs](#quick-start--how-to-read-these-specs)
