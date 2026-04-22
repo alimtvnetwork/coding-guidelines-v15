@@ -633,7 +633,7 @@ type ResultMap[K comparable, V any] = Result[map[K]V]
 | Function | When to use |
 |----------|------------|
 | `apperror.Ok(v)` | Success path, return value |
-| `apperror.Err[T](err)` | Failure path, propagate typed `*AppError` |
+| `apperror.Err\[T\](err)` | Failure path, propagate typed `*AppError` |
 | `apperror.Wrap(err)` | Convert any `error` to `*AppError`, capturing stack at this point |
 | `apperror.New(code, msg)` | Construct from scratch with no underlying cause |
 
