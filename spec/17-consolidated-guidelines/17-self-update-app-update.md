@@ -589,4 +589,110 @@ The original inventory below mapped source files 01–16 only. The added section
 
 ---
 
-*Consolidated self-update & app update — v3.2.0 — 2026-04-16*
+---
+
+## §15 Install-Script Version Probe — Runtime Contract (Verbatim)
+
+This section is the **exact runtime contract** for the 20-repo version probe. A blind AI re-implementing or modifying the probe must use these exact identifiers — host integrations and CI tooling depend on them.
+
+### 15.1 Identity-Resolution Regex (Verbatim)
+
+```
+^https?://[^/]+/(?<owner>[^/]+)/(?<base>[A-Za-z0-9._-]+?)-v(?<ver>\d+)/[^/]+/install\.(ps1|sh)(\?.*)?$
+```
+
+**Capture groups:**
+- `owner` — GitHub org/user
+- `base` — repo prefix (e.g., `movie-cli`)
+- `ver` — current numbered version (digits only)
+
+If the URL does not match, the probe logs `version probe disabled (no self-identity)` and falls back to the local install.
+
+### 15.2 Environment Variable Contract
+
+| Variable | Type | Default | Purpose |
+|----------|------|---------|---------|
+| `INSTALL_PROBE_OWNER` | string | (none) | Override owner from URL regex (Step 2 of identity ladder) |
+| `INSTALL_PROBE_BASE` | string | (none) | Override base name |
+| `INSTALL_PROBE_VERSION` | int | (none) | Override current version |
+| `INSTALL_PROBE_HANDOFF_DEPTH` | int | `0` | Recursion guard (max `2` — depth `3` aborts) |
+| `PROBE_OWNER_DEFAULT` | string | (compiled-in) | Built-in fallback for Step 3 |
+| `PROBE_BASE_DEFAULT` | string | (compiled-in) | Built-in fallback for Step 3 |
+
+**Names are case-sensitive and immutable.** Do not abbreviate or rename — host CI systems and support scripts grep for these literal strings.
+
+### 15.3 Compiled-In Constants (Verbatim)
+
+| Constant | Value | Source File | Purpose |
+|----------|-------|-------------|---------|
+| `PROBE_VERSION_FALLBACK` | `14` | `install.sh` line 65, `install.ps1` line ~83 | Fail-open `currentVersion` when identity ladder fully fails |
+| Probe range | `currentVersion+1 .. currentVersion+20` | both scripts | 20 candidates |
+| HEAD timeout | `2` seconds per request | both scripts | Per-request limit |
+| Total settle window | `4` seconds (timeout × 2) | both scripts | Maximum wait before deciding |
+| Success HTTP codes | `200`, `301`, `302` | both scripts | Counts as "responder" |
+| Probe URL template | `https://raw.githubusercontent.com/<owner>/<base>-v<N>/main/install.<ext>` | both scripts | Per-candidate URL |
+| Max handoff depth | `3` | both scripts | Aborts with `Probe loop guard triggered — aborting.` |
+
+### 15.4 Skip Flags (CLI Arguments)
+
+| Flag (Bash) | Flag (PowerShell) | Effect |
+|-------------|-------------------|--------|
+| `-n` | `-n` | Skip probe entirely (alias) |
+| `--no-latest` | `-NoLatest` | Skip probe (long form) |
+| `--no-probe` | `-NoProbe` | Skip probe (alternate long form) |
+
+All three resolve to the same internal `should_skip_probe()` / `Test-ShouldSkipProbe` early-exit.
+
+### 15.5 Identity Ladder (4 Steps, Fail-Open)
+
+```
+1. Parse $0 / $MyInvocation URL via §15.1 regex   → if match, set owner/base/ver
+2. Read INSTALL_PROBE_OWNER/_BASE/_VERSION env    → override any/all from Step 1
+3. Read PROBE_OWNER_DEFAULT/_BASE_DEFAULT consts  → fill any still-missing field
+4. If currentVersion still unset → currentVersion = PROBE_VERSION_FALLBACK (14)
+   If owner OR base still unset  → log "version probe disabled" and skip
+```
+
+### 15.6 Middle-Out Dispatch Order
+
+Although all 20 HEAD requests fire in parallel (ordering is functionally moot), the dispatch sequence is **middle-out** for two reasons documented in the source spec:
+1. **Connection pooling fairness** — first-dispatched requests get sockets first under degraded parallelism.
+2. **Result-scan optimization** — descending sort of responders short-circuits at the first match.
+
+Example for `currentVersion = 24`:
+```
+Dispatch order: 35, 34, 36, 33, 37, 32, 38, 31, 39, 30, 40, 29, 41, 28, 42, 27, 43, 26, 44, 25
+```
+
+### 15.7 Handoff Mechanism
+
+When the probe finds a higher version `N > currentVersion`:
+
+```bash
+export INSTALL_PROBE_HANDOFF_DEPTH=$((depth + 1))
+exec curl -fsSL "https://raw.githubusercontent.com/<owner>/<base>-v${N}/main/install.sh" | bash -s -- "$@"
+```
+
+The depth counter is **incremented before re-exec** so the child sees `depth+1`. If depth reaches `3`, the child aborts with exit code `1` and the message `Probe loop guard triggered — aborting.`
+
+### 15.8 Logging Contract
+
+Support scripts grep for these exact strings — do not change wording:
+
+| Phase | Exact Log Line |
+|-------|----------------|
+| Probe disabled | `version probe disabled (no self-identity)` |
+| Probe skipped (flag) | `version probe skipped via flag` |
+| Probe found newer | `→ found higher version v<N>, handing off` |
+| Probe found nothing | `no higher version found, installing local v<currentVersion>` |
+| Loop guard triggered | `Probe loop guard triggered — aborting.` |
+
+### 15.9 Golden Rule
+
+> **The probe is a courtesy, not a gate.** Any error in the probe path falls back to "install whatever I am right now."
+
+A blind AI must **never** add a hard-fail path inside the probe — every failure mode must degrade gracefully to local install.
+
+---
+
+*Install-Script Probe Runtime Contract added — v3.4.0 — 2026-04-22*
