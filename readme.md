@@ -206,15 +206,7 @@ Why this matters: callers ALWAYS see the same shape, so guard helpers (`HasError
   <a href="bundles.json"><img alt="bundles.json manifest" src="https://img.shields.io/badge/bundles.json-Manifest-14B8A6?style=for-the-badge&logo=json&logoColor=white"/></a>
 </p>
 
-<p align="center">
-  <img
-    src="public/images/install-flow.gif"
-    alt="Terminal animation showing a one-line bundle install: curl piped to bash, the temp directory being populated, target spec folders appearing in the current directory, and the linter exiting green."
-    width="960"
-  />
-</p>
-
-<p align="center"><em>One line. Any bundle. Anywhere — no clone required.</em></p>
+<p align="center"><img src="public/images/install-flow.gif" alt="Terminal animation: curl-piped one-line bundle install, temp dir populated, spec folders copied, linter exits green." width="960"/><br/><em>One line. Any bundle. Anywhere — no clone required.</em></p>
 
 <p align="center">All bundles are <strong>independent</strong>, <strong>idempotent</strong>, <strong>temp-clean</strong>, <strong>versioned</strong> (with <code>checksums.txt</code>), and defined in <a href="bundles.json"><code>bundles.json</code></a>.</p>
 
