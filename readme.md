@@ -59,6 +59,10 @@ A production-grade specification system you can drop into any codebase to enforc
   />
 </p>
 
+<p align="center">
+  <em>(Static fallback for PDF/print: <a href="public/images/coding-guidelines-walkthrough-poster.png">coding-guidelines-walkthrough-poster.png</a>)</em>
+</p>
+
 *Animated walkthrough — the 5 core principles, a before/after refactor, and the 7 install bundles. Loops automatically.*
 
 ---
