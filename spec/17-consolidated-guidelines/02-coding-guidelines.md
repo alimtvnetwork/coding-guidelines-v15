@@ -1181,4 +1181,125 @@ If a rule applies to **all** apps the team builds, it belongs in `01-cross-langu
 
 ---
 
-*Consolidated coding guidelines — v3.2.0 — 2026-04-16*
+
+---
+
+## §34 Validator Inventory — All 16 Linter Assets
+
+This section is the **single canonical reference** for every validator enforced by CI. A blind AI must consult this table before writing code, modifying specs, or bumping dependencies. Skipping any of these will fail the pipeline.
+
+### 34.1 Active Linter Scripts
+
+| # | Asset | Type | Purpose | Config Consumed | Exit Codes | Example Invocation |
+|---|-------|------|---------|-----------------|------------|--------------------|
+| 1 | `linter-scripts/validate-guidelines.py` | Python | Code-Red metrics: zero-nesting, max 2 operands, function 8–15 lines, file < 300 lines, React component < 100 lines | (in-script thresholds) | `0` pass · `1` violation found · `2` config error | `python3 linter-scripts/validate-guidelines.py --root .` |
+| 2 | `linter-scripts/validate-guidelines.go` | Go | Native port of #1 — runs on platforms without Python | (in-binary thresholds) | `0` pass · `1` violation · `2` IO error | `go run linter-scripts/validate-guidelines.go --root .` |
+| 3 | `linter-scripts/check-spec-cross-links.py` | Python | Verifies every internal markdown link resolves to a real file/anchor | `linter-scripts/spec-cross-links.allowlist` | `0` pass · `1` broken link | `python3 linter-scripts/check-spec-cross-links.py --root spec --repo-root .` |
+| 4 | `linter-scripts/check-spec-folder-refs.py` | Python | Verifies every `spec/NN-folder/` reference points to a real folder OR is allowlisted under `[external]` / `[doc-only]` | `linter-scripts/spec-folder-refs.allowlist` | `0` pass · `1` stale reference | `python3 linter-scripts/check-spec-folder-refs.py` |
+| 5 | `linter-scripts/check-axios-version.sh` | Bash | Enforces axios pinning: blocks `1.14.1` and `0.30.4`; allows only `1.14.0` and `0.30.3` | `package.json` | `0` pass · `1` blocked version found | `bash linter-scripts/check-axios-version.sh` |
+| 6 | `linter-scripts/check-forbidden-strings.py` | Python | Scans repo for forbidden tokens (legacy names, deprecated APIs, sensitive markers) | `linter-scripts/forbidden-strings.toml` | `0` pass · `1` forbidden token found | `python3 linter-scripts/check-forbidden-strings.py` |
+| 7 | `linter-scripts/check-forbidden-spec-paths.sh` | Bash | Blocks creation of legacy/deprecated spec folder paths | (hard-coded list) | `0` pass · `1` forbidden path | `bash linter-scripts/check-forbidden-spec-paths.sh` |
+| 8 | `linter-scripts/suggest-spec-cross-link-fixes.py` | Python | Auto-suggests fixes for broken cross-links produced by #3 | `linter-scripts/spec-cross-links.allowlist` | `0` always (advisory) | `python3 linter-scripts/suggest-spec-cross-link-fixes.py` |
+| 9 | `linter-scripts/generate-dashboard-data.cjs` | Node | Produces `spec/dashboard-data.json` consumed by the docs viewer | `version.json`, `spec/**/*.md` | `0` pass · non-zero on IO error | `node linter-scripts/generate-dashboard-data.cjs` |
+| 10 | `linter-scripts/run.sh` | Bash | Orchestrator — runs all linters in sequence on Unix | (delegates) | `0` all pass · first non-zero from any child | `bash linter-scripts/run.sh` |
+| 11 | `linter-scripts/run.ps1` | PowerShell | Orchestrator — Windows equivalent of #10 | (delegates) | `0` all pass · first non-zero | `pwsh linter-scripts/run.ps1` |
+
+### 34.2 Configuration Files
+
+| # | Asset | Format | Purpose | Edit Mode |
+|---|-------|--------|---------|-----------|
+| 12 | `linter-scripts/forbidden-strings.toml` | TOML | Defines forbidden tokens, scope globs, and per-token rationale | Hand-edit; commit triggers #6 |
+| 13 | `linter-scripts/spec-cross-links.allowlist` | Plain-text (one path per line) | Allows links to files outside the spec tree (e.g., `README.md`, `LICENSE`) | Hand-edit |
+| 14 | `linter-scripts/spec-folder-refs.allowlist` | Sectioned text (`[external]`, `[doc-only]`) | Allows references to non-existent or sibling-repo folders | Hand-edit |
+| 15 | `linter-scripts/installer-templates/` | Directory | Versioned `install.sh` / `install.ps1` templates used by release pipeline | Hand-edit per release |
+| 16 | `linter-scripts/README-cross-links.md` | Markdown | Operator guide for cross-link allowlist editing | Hand-edit |
+
+### 34.3 Allowlist Syntax — `spec-folder-refs.allowlist`
+
+```
+[external]
+# Sibling-repo references — owner/repo or relative paths outside this spec tree
+spec/15-domain-migration/
+spec/legacy-archive/
+
+[doc-only]
+# Folders that exist only as documentation pointers, not real spec folders
+spec/folder-structure-root.md
+```
+
+**Resolution rule:** `check-spec-folder-refs.py` exits non-zero with `Stale references found` if a markdown file references a `spec/NN-name/` path that:
+1. Does not exist on disk, AND
+2. Is not listed under `[external]` or `[doc-only]`.
+
+### 34.4 Allowlist Syntax — `spec-cross-links.allowlist`
+
+```
+# One path per line, relative to repo root. Glob not supported.
+README.md
+LICENSE
+.github/CODEOWNERS
+```
+
+### 34.5 Forbidden-Strings Schema — `forbidden-strings.toml`
+
+```toml
+[[forbidden]]
+token = "github.com/mahin/movie-cli"          # bare v1 reference
+reason = "v1 namespace is deprecated; always use movie-cli-v2"
+scope = ["**/*.go", "**/*.md"]
+severity = "error"
+
+[[forbidden]]
+token = "console.log("
+reason = "Use logger.info / logger.debug instead"
+scope = ["src/**/*.ts", "src/**/*.tsx"]
+severity = "error"
+exclude = ["**/*.test.ts"]
+```
+
+### 34.6 Mandatory CI Order
+
+The orchestrator scripts (#10/#11) run linters in this order. **Do not re-order** — later linters depend on earlier linters' invariants:
+
+```
+1. validate-guidelines.py        (code metrics — fastest, fail-fast)
+2. check-axios-version.sh        (dependency pinning)
+3. check-forbidden-strings.py    (token scanner)
+4. check-forbidden-spec-paths.sh (spec-path guard)
+5. check-spec-cross-links.py     (markdown link integrity)
+6. check-spec-folder-refs.py     (folder-reference integrity)
+7. generate-dashboard-data.cjs   (artifact regeneration — last)
+```
+
+### 34.7 Failure Recovery Quick-Reference
+
+| CI Error | Likely Cause | Fix |
+|----------|--------------|-----|
+| `Stale references found` | Markdown links to a deleted/renamed spec folder | Either fix the link, OR add to `[external]`/`[doc-only]` in `spec-folder-refs.allowlist` |
+| `Drift detected in version.json` | Forgot to run sync after editing `package.json` or specs | Run `node scripts/sync-version.mjs && node scripts/sync-spec-tree.mjs` and commit |
+| `missing-file: <path>` | Markdown link to a file that does not exist | Create the file, fix the link, or add to `spec-cross-links.allowlist` |
+| `forbidden token found` | Used a string from `forbidden-strings.toml` | Replace with the suggested alternative in the rule's `reason` field |
+| `axios version blocked` | Bumped to `1.14.1` or `0.30.4` | Pin to `1.14.0` or `0.30.3` exactly |
+| `validate-guidelines: function too long` | Function > 15 lines | Split per Code-Red metrics: 8–15 lines per function |
+
+### 34.8 AI Pre-Flight Checklist
+
+Before opening a PR, a blind AI must run **all 7** orchestrated linters locally:
+
+```bash
+# Unix
+bash linter-scripts/run.sh
+
+# Windows
+pwsh linter-scripts/run.ps1
+
+# After spec edits, also:
+node scripts/sync-version.mjs
+node scripts/sync-spec-tree.mjs
+```
+
+If any linter exits non-zero, **do not push**. Fix or allowlist (with justification in commit message), then re-run.
+
+---
+
+*Validator Inventory added — v3.3.0 — 2026-04-22*
