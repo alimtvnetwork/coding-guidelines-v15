@@ -60,6 +60,7 @@ This folder provides **standalone, self-contained AI-readable references** for e
 | 24 | [24-folder-mapping.md](./24-folder-mapping.md) | **Meta** — Bidirectional folder-by-folder mapping: every source spec folder ↔ consolidated file, with coverage heatmap and blind-spots |
 | 25 | [25-blind-ai-implementability-audit.md](./25-blind-ai-implementability-audit.md) | **Meta** — Critical-gap analysis: where a blind AI receiving only this folder will fail (linter blindness, waiver syntax, sync contracts, error registry) |
 | 26 | [26-blind-ai-audit-v2.md](./26-blind-ai-audit-v2.md) | **Meta** — Post Phase 1–5 re-audit: verified 8/9 gaps closed, 7/8 stress-test pass rate, overall score 96.5 → 99.4/100 |
+| 27 | [27-linter-authoring-guide.md](./27-linter-authoring-guide.md) | **Authoring** — How to add a new linter to `linter-scripts/`: file layout, exit-code contract (0/1/2), output format, allowlist registration, test fixtures, §8 checklist. Closes the final 🟡 from the v2 audit |
 
 ---
 
