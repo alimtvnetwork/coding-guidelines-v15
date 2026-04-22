@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <!-- STAMP:BADGES -->[![Version](https://img.shields.io/badge/version-3.59.0-3B82F6?style=flat-square)](https://github.com/alimtvnetwork/coding-guidelines-v15/releases) [![Spec Files](https://img.shields.io/badge/spec%20files-610-10B981?style=flat-square)](spec/) [![Folders](https://img.shields.io/badge/folders-22-8B5CF6?style=flat-square)](spec/) [![Lines](https://img.shields.io/badge/lines-131%2C442-F59E0B?style=flat-square)](version.json) [![License](https://img.shields.io/badge/license-MIT-22C55E?style=flat-square)](LICENSE) [![AI Ready](https://img.shields.io/badge/AI%20ready-yes-FF6E3C?style=flat-square)](llm.md) [![Updated](https://img.shields.io/badge/updated-2026--04--22-0EA5E9?style=flat-square)](version.json) [![Spec Sections](https://img.shields.io/badge/spec%20sections-22-A855F7?style=flat-square)](spec/)<!-- /STAMP:BADGES -->
+  <!-- STAMP:BADGES -->[![Version](https://img.shields.io/badge/version-3.59.0-3B82F6?style=flat-square)](https://github.com/alimtvnetwork/coding-guidelines-v15/releases) [![Spec Files](https://img.shields.io/badge/spec%20files-610-10B981?style=flat-square)](spec/) [![Folders](https://img.shields.io/badge/folders-22-8B5CF6?style=flat-square)](spec/) [![Lines](https://img.shields.io/badge/lines-131%2C442-F59E0B?style=flat-square)](version.json) [![License](https://img.shields.io/badge/license-MIT-22C55E?style=flat-square)](LICENSE) [![AI Ready](https://img.shields.io/badge/AI%20ready-yes-FF6E3C?style=flat-square)](llm.md) [![Updated](https://img.shields.io/badge/updated-2026--04--22-0EA5E9?style=flat-square)](version.json)<!-- /STAMP:BADGES -->
 </p>
 
 <p align="center">
