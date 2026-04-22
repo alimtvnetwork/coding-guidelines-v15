@@ -61,6 +61,9 @@ This folder provides **standalone, self-contained AI-readable references** for e
 | 25 | [25-blind-ai-implementability-audit.md](./25-blind-ai-implementability-audit.md) | **Meta** — Critical-gap analysis: where a blind AI receiving only this folder will fail (linter blindness, waiver syntax, sync contracts, error registry) |
 | 26 | [26-blind-ai-audit-v2.md](./26-blind-ai-audit-v2.md) | **Meta** — Post Phase 1–5 re-audit: verified 8/9 gaps closed, 7/8 stress-test pass rate, overall score 96.5 → 99.4/100 |
 | 27 | [27-linter-authoring-guide.md](./27-linter-authoring-guide.md) | **Authoring** — How to add a new linter to `linter-scripts/`: file layout, exit-code contract (0/1/2), output format, allowlist registration, test fixtures, §8 checklist. Closes the final 🟡 from the v2 audit |
+| 28 | [28-distribution-and-runner.md](./28-distribution-and-runner.md) | **Module** — Standalone distribution + runner spec: `install.sh`/`.ps1`, root `run.sh`/`.ps1` dispatcher, GitHub Release pipeline, `install-config.json` schema. Phase 6B promotion of `15-distribution-and-runner/` |
+| 29 | [29-blind-ai-audit-v3.md](./29-blind-ai-audit-v3.md) | **Meta** — Post Phase 6A/6B/6D audit: 8/8 stress tests pass, score 99.4 → 99.8/100 (handoff-weighted 99.9). Terminal AI-blind-readiness reached |
+| 30 | [30-readme-improvement-suggestions.md](./30-readme-improvement-suggestions.md) | **Meta** — Prioritised README rewrite plan (22 suggestions in 5 phases). Awaiting approval. Created alongside the v3.55.0 GIFs + Bundle Installers section |
 
 ---
 
