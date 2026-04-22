@@ -712,6 +712,444 @@ Run `linter-scripts/validate-guidelines.py` — zero **CODE-RED** or **STYLE** v
 
 ---
 
+## 22. TypeScript Standards
+
+**Source:** `02-typescript/` (16 files including 7 enum specs, type-safety remediation, ESLint enforcement, discriminated-union patterns, promise/await patterns)
+
+### 22.1 Strict Typing — Required `tsconfig.json` Flags
+
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitReturns": true,
+    "exactOptionalPropertyTypes": true
+  }
+}
+```
+
+- **Forbidden:** `any`, `as` casts (except `as const`), `!` non-null assertion, `// @ts-ignore`.
+- **Required:** explicit return types on all exported functions; named `interface`/`type` for every union variant (no inline literal unions in public APIs).
+
+### 22.2 Discriminated Unions — Named Variants
+
+```ts
+// ❌ FORBIDDEN — inline variant
+type Action = { type: 'load' } | { type: 'save'; data: string };
+
+// ✅ REQUIRED — named interface per variant
+interface LoadAction { type: 'Load' }
+interface SaveAction { type: 'Save'; data: string }
+type Action = LoadAction | SaveAction;
+```
+
+Each variant interface gets its own JSDoc and is independently exportable. Discriminator key is always `type` (PascalCase string values).
+
+### 22.3 Promise / Await Patterns
+
+- Every `Promise` must be `await`ed or explicitly returned. Floating promises are a CODE-RED.
+- No `.then()` chains in application code — use `async`/`await` exclusively.
+- Wrap network/IO awaits in try/catch only at the **boundary**; propagate `Result<T>` shaped errors internally.
+
+### 22.4 Enum Pattern (TypeScript)
+
+TypeScript enums use **string-valued objects with `as const`** plus a derived union type. **Never** use `enum` keyword (banned for tree-shaking + ambiguity reasons).
+
+```ts
+export const ConnectionStatus = {
+  Connected: 'Connected',
+  Disconnected: 'Disconnected',
+  Reconnecting: 'Reconnecting',
+} as const;
+export type ConnectionStatus = typeof ConnectionStatus[keyof typeof ConnectionStatus];
+
+export function parseConnectionStatus(v: unknown): ConnectionStatus {
+  if (typeof v === 'string' && v in ConnectionStatus) return v as ConnectionStatus;
+  throw new Error(`Invalid ConnectionStatus: ${String(v)}`);
+}
+```
+
+Every project enum must ship: `parseX`, `isX`, and an exhaustive `X.values()` helper. See §4 of `04-enum-standards.md` for the full pattern.
+
+### 22.5 ESLint Enforcement
+
+Required rules (non-negotiable): `@typescript-eslint/no-explicit-any: error`, `no-floating-promises: error`, `no-misused-promises: error`, `consistent-type-imports: error`, `no-unsafe-*` family: error.
+
+---
+
+## 23. Go Standards
+
+**Source:** `03-golang/` (13 files: enum specification, boolean standards, HTTPMethod enum, defer rules, string/slice internals, code-severity taxonomy, pathutil/fileutil spec, full standards reference split into 6 modules)
+
+### 23.1 File & Function Size
+
+| Limit | Value |
+|-------|-------|
+| File size | ≤ 300 lines (hard limit) |
+| Function size | 8–15 lines target, 30 line ceiling |
+| Cyclomatic complexity | ≤ 10 per function |
+| Nesting depth | 0 nested `if` (zero-nesting CODE-RED) |
+
+### 23.2 Error Handling — `apperror.Result[T]`
+
+Go does **not** use the dual-return `(T, error)` pattern in this codebase. Every fallible function returns `apperror.Result[T]`:
+
+```go
+func LoadConfig(path string) apperror.Result[Config] {
+    data, err := os.ReadFile(path)
+    if err != nil {
+        return apperror.Err[Config](apperror.Wrap(err).
+            WithCode(apperror.E1001ConfigRead).
+            WithContext("path", path))
+    }
+    var cfg Config
+    if err := json.Unmarshal(data, &cfg); err != nil {
+        return apperror.Err[Config](apperror.Wrap(err).
+            WithCode(apperror.E1002ConfigParse).
+            WithContext("path", path))
+    }
+    return apperror.Ok(cfg)
+}
+```
+
+Result invariants: `result.HasError()` checked at every call site; `result.Unwrap()` panics if `HasError()` — only use after a guard.
+
+### 23.3 Enum Pattern (Go) — Byte-Based with JSON Marshal
+
+Every enum is its own file in an enum-specific subfolder, declared as a **byte-typed constant** with mandatory `String()`, `MarshalJSON()`, `UnmarshalJSON()`, `Parse()`, and `Values()` methods.
+
+```go
+package status
+
+type Status byte
+
+const (
+    StatusUnknown  Status = 0
+    StatusPending  Status = 1
+    StatusComplete Status = 2
+    StatusFailed   Status = 3
+)
+
+func (s Status) String() string { /* switch */ }
+func (s Status) MarshalJSON() ([]byte, error) { return json.Marshal(s.String()) }
+func (s *Status) UnmarshalJSON(b []byte) error { /* parse string → byte */ }
+func ParseStatus(v string) (Status, error) { /* exhaustive switch */ }
+func StatusValues() []Status { return []Status{StatusPending, StatusComplete, StatusFailed} }
+```
+
+JSON wire form is always the **PascalCase string value**, never the byte. See `03-golang/01-enum-specification/` for the full template.
+
+### 23.4 Defer Rules
+
+- One `defer` per resource, declared **immediately after** acquisition.
+- Never `defer` inside a loop — extract to a helper function.
+- `defer` must call a function that itself returns `apperror.Result` or logs via the session logger; never silently discard close errors.
+
+### 23.5 Boolean Standards (Go-Specific)
+
+- Positive guards only: `isReady()`, `hasItems()`, `canRetry()`. **No** `notReady`, `disabled`, `blocked`.
+- Boolean **flag parameters are forbidden** — split into two methods (`Connect()` vs `ConnectVerbose()`).
+- `if` conditions: max 2 operands. Compose with named booleans for ≥ 3.
+
+### 23.6 Forbidden Go Patterns
+
+| ❌ Pattern | ✅ Replacement |
+|----------|---------------|
+| `panic()` in production code | Return `apperror.Result[T]` |
+| `(T, error)` dual return | `apperror.Result[T]` |
+| Magic strings/numbers | Named constants in a dedicated `const` block |
+| `interface{}` / `any` | Concrete types or generics with constraints |
+| Bare `os.Open` without defer Close | Use `pathutil`/`fileutil` wrappers |
+| Nested `if err != nil` chains | Guard returns + early exit |
+
+### 23.7 `golangci-lint` Enforcement
+
+Required linters: `errcheck`, `govet`, `staticcheck`, `gocyclo` (max 10), `gocognit`, `funlen` (60 stmts / 30 lines), `nestif` (max 1), `wrapcheck`, `revive`. Configuration lives in `.golangci.yml` at repo root.
+
+---
+
+## 24. PHP Standards
+
+**Source:** `04-php/` (12 files: enums, forbidden patterns, naming, response array standard, spacing/imports, response key inventory, PHP↔Go consistency audit, full standards reference)
+
+### 24.1 PHP Version & Style
+
+- **PHP 8.1+ required** for backed enums, readonly properties, named arguments, `match` expressions.
+- PSR-12 coding style with project overrides: PascalCase array keys, no underscores in identifiers, strict types declaration mandatory (`declare(strict_types=1);` on every file).
+
+### 24.2 Enum Pattern (PHP) — Backed String Enums
+
+```php
+<?php
+declare(strict_types=1);
+
+enum ConnectionStatus: string
+{
+    case Connected    = 'Connected';
+    case Disconnected = 'Disconnected';
+    case Reconnecting = 'Reconnecting';
+
+    public static function parse(string $v): self
+    {
+        return self::tryFrom($v)
+            ?? throw new \InvalidArgumentException("Invalid ConnectionStatus: {$v}");
+    }
+
+    public static function values(): array
+    {
+        return array_map(fn ($c) => $c->value, self::cases());
+    }
+}
+```
+
+Every PHP enum must define: `parse()` (throws on invalid), `values()` (string array). Backing values are **always PascalCase strings**, never integers.
+
+### 24.3 Response Envelope (PHP REST Handlers)
+
+Every REST endpoint returns the universal envelope (PascalCase keys) via `EnvelopeBuilder`:
+
+```php
+return EnvelopeBuilder::ok($data)
+    ->withMeta(['RequestId' => $requestId])
+    ->build();
+
+// Or on error:
+return EnvelopeBuilder::error(ErrorCode::E2001ValidationFailed)
+    ->withDetail('Field "Email" is required')
+    ->build();
+```
+
+No handler may return raw arrays or call `wp_send_json()` directly.
+
+### 24.4 `safeExecute()` Wrapper
+
+Every public-facing REST handler is wrapped:
+
+```php
+public function handleRequest(\WP_REST_Request $req): \WP_REST_Response
+{
+    return $this->safeExecute(fn () => $this->doWork($req));
+}
+```
+
+`safeExecute()` catches `\Throwable`, logs via `FileLogger` with 6-frame backtrace, and returns the standard error envelope. Plain try/catch is forbidden in handlers.
+
+### 24.5 Forbidden PHP Patterns
+
+| ❌ Pattern | ✅ Replacement |
+|-----------|---------------|
+| `extract()` | Explicit array access |
+| `eval()` | Never — security CODE-RED |
+| `@` error suppression | Proper try/catch with logging |
+| `global $wpdb` in classes | Inject via constructor |
+| String concatenation in SQL | `$wpdb->prepare()` always |
+| `array_merge` in hot loops | Use `+=` operator or pre-allocated array |
+| Magic `__call` / `__get` in app code | Explicit methods |
+
+### 24.6 PHP↔Go Consistency
+
+The PHP delegated server and Go backend share the **same response envelope schema** and the **same error code registry**. Any new error code must be registered in both languages simultaneously (see `03-error-manage/03-error-code-registry/`).
+
+---
+
+## 25. Rust Standards
+
+**Source:** `05-rust/` (10 files: naming, error handling, async patterns, memory safety, testing, FFI/platform)
+
+### 25.1 Identifiers — RFC 430 (snake_case)
+
+Rust is the **only** language in the project that uses snake_case identifiers; this is non-negotiable per `rustfmt` and Clippy. **Database names and enum string discriminants remain PascalCase** for cross-language consistency.
+
+### 25.2 Error Handling — `Result<T, AppError>`
+
+- `unwrap()` and `expect()` are **forbidden** in non-test code (Clippy `unwrap_used = deny`).
+- Use `?` operator with a project `AppError` enum that implements `From<std::io::Error>`, `From<serde_json::Error>`, etc.
+- Every public fn returning `Result` must document the error variants in its `///` doc comment.
+
+### 25.3 Async Patterns
+
+- Tokio is the canonical runtime. `async-std` is forbidden.
+- `.await` only at boundaries; internal helpers stay sync where possible to keep stack traces shallow.
+- Cancellation safety: any `select!` branch must be cancel-safe or wrapped in `tokio::spawn`.
+
+### 25.4 Memory Safety
+
+- `unsafe` blocks require: a `// SAFETY:` comment justifying every invariant, a unit test exercising the unsafe path, and reviewer sign-off.
+- No `Box::leak`, no `mem::transmute` without an FFI justification, no `static mut`.
+
+### 25.5 Testing Standards
+
+- `#[cfg(test)]` modules colocated with source.
+- Property-based tests via `proptest` for parsers and codecs.
+- `cargo nextest run` is the canonical runner; CI must use it (faster + better isolation than `cargo test`).
+
+### 25.6 FFI / Platform
+
+- C ABI exports use `#[no_mangle] pub extern "C"` with `*const c_char` / `*mut c_void` signatures only.
+- All FFI allocations must round-trip through a matched `free` exported from the same crate.
+- Windows-specific code lives in `src/platform/windows/`; Unix in `src/platform/unix/`. No `#[cfg(...)]` scattering in business logic.
+
+---
+
+## 26. AI Optimization
+
+**Source:** `06-ai-optimization/` (5 files: anti-hallucination rules, AI quick-reference checklist, common AI mistakes, condensed master guidelines, enum naming quick reference)
+
+### 26.1 Anti-Hallucination Rules (30+ rules, IDs `AH-N1`…)
+
+Each rule names a specific pattern AI must **never** generate, paired with the required replacement and a link to the canonical spec it enforces. Examples:
+
+| Rule | Forbidden | Required |
+|------|-----------|----------|
+| AH-N1 | `(T, error)` Go return | `apperror.Result[T]` |
+| AH-N2 | `enum` keyword in TS | `as const` object + derived type |
+| AH-N5 | snake_case JSON keys | PascalCase keys everywhere except Rust identifiers |
+| AH-N9 | `unwrap()` in Rust prod code | `?` propagation |
+| AH-N12 | `panic()` in Go prod code | Return error result |
+
+The full rule list is the source of truth — when generating any code block, scan the rules for that language.
+
+### 26.2 AI Quick-Reference Checklist (50 checks)
+
+Run before emitting code: file size, function size, boolean prefix, no negations, enum methods present, no magic strings, error wrapped with code+context, log includes file path, etc. Machine-parseable as `- [ ]` checkboxes in `02-ai-quick-reference-checklist.md`.
+
+### 26.3 Common AI Mistakes (top 15, before/after)
+
+Real mistakes observed in AI-generated PRs, each with a corrected version. Highest-frequency: missing `apperror` wrap, inline union types, swallowed errors via `_`, magic numbers in retry counts, forgetting `defer` close on file handles.
+
+### 26.4 Enum Naming Quick Reference
+
+Cross-language table mapping declaration → naming → usage → validation for Go, TypeScript, PHP. See §22.4, §23.3, §24.2 above for the per-language patterns.
+
+---
+
+## 27. CI/CD Integration (Coding-Side)
+
+**Source:** `06-cicd-integration/` (8 files: SARIF contract, plugin model, language roadmap, CI templates, distribution, rules mapping, performance, FAQ, troubleshooting)
+
+This subfolder governs how **coding-standard violations** flow into CI:
+
+| File | Purpose |
+|------|---------|
+| `01-sarif-contract.md` | Every linter must emit SARIF 2.1.0 with `ruleId`, `level`, `locations`, `message` |
+| `02-plugin-model.md` | Linter plugin contract: stdin = file list, stdout = SARIF JSON |
+| `04-ci-templates.md` | Reusable GitHub Actions workflow templates per language |
+| `06-rules-mapping.md` | Mapping of guideline rule IDs → linter rule IDs (golangci-lint, ESLint, PHPStan, Clippy) |
+| `07-performance.md` | Linter must complete in ≤ 60 s for 100k LOC; cache aggressively |
+
+CI must **fail the build** on any CODE-RED severity finding; STYLE findings are warnings unless explicitly promoted in the repository's `.lint-policy.json`.
+
+---
+
+## 28. C# Standards
+
+**Source:** `07-csharp/` (4 files: naming/conventions, method design, error handling, type safety)
+
+### 28.1 Naming
+
+- PascalCase for types, methods, properties, constants. camelCase for local variables and parameters.
+- File names match the primary type: `UserProfile.cs` contains `class UserProfile`.
+- Async methods suffixed `Async`: `LoadAsync()`, `SaveAsync()`.
+
+### 28.2 Method Design
+
+- One responsibility per method; same 8–15 line target as Go.
+- Out parameters forbidden — return a tuple or a typed result record.
+- Optional parameters preferred over method overloads when defaults are obvious.
+
+### 28.3 Error Handling
+
+- `try/catch` only at boundaries (HTTP handlers, message consumers).
+- Internal failures use a `Result<T, AppError>` record (struct) — same shape as Go/Rust.
+- Never swallow exceptions; either re-throw with context or convert to `Result.Err`.
+
+### 28.4 Type Safety
+
+- Nullable reference types enabled (`<Nullable>enable</Nullable>` in csproj).
+- No `dynamic`, no `object` parameter types in public APIs.
+- Records preferred over classes for DTOs; sealed by default.
+
+---
+
+## 29. File & Folder Naming (Cross-Language)
+
+**Source:** `08-file-folder-naming/` (5 files: cross-language, PHP/WordPress, Go, TS/JS, Rust/C#)
+
+### 29.1 Folder Naming Rule
+
+- All spec and source folders: **lowercase-kebab-case with two-digit numeric prefix** (`01-foo-bar/`).
+- Numeric prefixes are **unique** within a parent folder. Gaps are allowed (e.g., `01`, `03`, `05`).
+- Reserved prefixes: `00-overview.md`, `97-acceptance-criteria.md`, `98-changelog.md`, `99-consistency-report.md` per folder.
+
+### 29.2 Per-Language File Naming Summary
+
+| Language | File Convention | Example |
+|----------|----------------|---------|
+| Go | snake_case | `deploy_path.go`, `user_repository_test.go` |
+| TypeScript / JavaScript | kebab-case | `user-profile.tsx`, `auth-service.ts` |
+| PHP (classes) | PascalCase matching class | `FileLogger.php` |
+| PHP (WP main file) | kebab-case matching slug | `my-plugin.php` |
+| Rust | snake_case | `deploy_path.rs` |
+| C# | PascalCase | `UserProfile.cs` |
+| PowerShell | lowercase-kebab-case | `run-validator.ps1` |
+| Markdown specs | numeric-prefix kebab-case | `02-boolean-principles.md` |
+
+---
+
+## 30. PowerShell Integration
+
+**Source:** `09-powershell-integration/` (cross-references to `spec/11-powershell-integration/` for the runtime)
+
+The coding-side guidance is thin: PowerShell scripts that are **part of the build/CI pipeline** must follow `spec/11-powershell-integration/` (covered in `10-powershell-integration.md` consolidated file). For coding rules, only PascalCase Verb-Noun function naming and lowercase-kebab-case file naming apply.
+
+---
+
+## 31. Coding Research Placement
+
+**Source:** `10-research/` — empirical studies and benchmarks specific to coding rules.
+
+Place research files here when the deliverable is a **decision that updates a coding rule** (e.g., "should we ban `interface{}` in Go?" → benchmark + memo). Otherwise, project-wide research goes to root `spec/10-research/` (covered in `12-root-research.md`).
+
+---
+
+## 32. Security & Dependency Pinning
+
+**Source:** `11-security/` — currently scoped to dependency version control.
+
+### 32.1 Axios Pinning Rule
+
+- **Allowed:** Axios `1.14.0` or `0.30.3` exactly.
+- **Blocked:** Axios `1.14.1`, `0.30.4` (known regressions logged in memory).
+- `package.json` must use exact versions (no `^` or `~`) for security-critical packages.
+
+### 32.2 General Dependency Hygiene
+
+- `npm audit` / `cargo audit` / `govulncheck` must report zero high/critical findings before merge.
+- Lockfiles (`package-lock.json`, `bun.lock`, `Cargo.lock`, `go.sum`) are committed and never hand-edited.
+- Adding a new dependency requires a one-line justification in the PR description.
+
+---
+
+## 33. App-Specific Coding Specs
+
+**Source:** `21-app/`, `22-app-issues/`, `23-app-database/`, `24-app-design-system-and-ui/`
+
+These four subfolders mirror the root-level `spec/21-app/` … `spec/24-app-design-system-and-ui/` folders but contain **coding-specific** rules that only apply to the application layer (not the framework). They are intentionally minimal — most rules live in the cross-language section.
+
+| Subfolder | What goes here | What does NOT |
+|-----------|---------------|---------------|
+| `21-app/` | App feature code style overrides | Feature requirements (those go in root `spec/21-app/`) |
+| `22-app-issues/` | Bug-driven coding rule additions | Issue tickets (those go in root `spec/22-app-issues/`) |
+| `23-app-database/` | App-specific schema patterns | Generic DB rules (those go in `spec/04-database-conventions/`) |
+| `24-app-design-system-and-ui/` | App component coding patterns | Design tokens (those live in root `spec/07-design-system/`) |
+
+If a rule applies to **all** apps the team builds, it belongs in `01-cross-language/` instead.
+
+---
+
 ## Cross-References
 
 | Topic | Full Spec Location |
