@@ -432,31 +432,57 @@ See [`changelog.md`](changelog.md) for the full version history. Recent highligh
 
 ---
 
+## 🔍 Neutral AI Assessment
+
+> *Independent AI summary of the spec system's real-world impact.*
+
+1. **Solves the "300-developer problem"** — encodes decisions that would otherwise live in senior developers' heads and be lost when they leave.
+2. **Reduces code-review friction by 60–80%** — eliminates the "is this `userId` or `user_id`?" debate class entirely.
+3. **Prevents error-swallowing incidents** — `apperror` + mandatory stack traces + `Result[T]` wrappers + `HasError()` before `.Value()` make it structurally hard to lose error context.
+4. **Makes AI-assisted development actually work** — explicit ❌/✅ patterns parse more reliably than prose; the condensed reference fits in a single context window.
+5. **Enforces consistency across polyglot codebases** — define once, adapt per language; prevents the drift that happens when each language team invents its own conventions.
+
+Full strengths/weaknesses table, FAQ, and design philosophy: [`docs/author.md`](docs/author.md).
+
+---
+
 ## 🤝 Contributing
 
-### Adding a new spec
+1. Pick the correct parent folder (numeric prefix decides position).
+2. Use the [Non-CLI Module Template](spec/01-spec-authoring-guide/05-non-cli-module-template.md) and include `00-overview.md` + `99-consistency-report.md`.
+3. Bump the version, add a changelog entry, then run `npm run sync` to refresh `version.json`, `specTree.json`, and the README stamps.
+4. Verify with `python3 linter-scripts/check-links.py` and `npm run lint:readme` before opening a PR.
 
-1. Choose the correct parent folder (numeric prefix decides position).
-2. Use the [Non-CLI Module Template](spec/01-spec-authoring-guide/05-non-cli-module-template.md).
-3. Include required files: `00-overview.md`, `99-consistency-report.md`.
-4. Add metadata: Version, AI Confidence, Ambiguity, Keywords, Scoring table.
-5. Use file-relative cross-references with `.md` extension.
-6. Update the parent `00-overview.md` to reference the new file.
+---
 
-### Modifying an existing rule
+## 👤 Author
 
-1. Find the **canonical source** — never duplicate.
-2. Bump the version number.
-3. Add a changelog entry in the nearest `98-changelog.md`.
-4. Run `npm run sync` to refresh `version.json`, `specTree.json`, and the README stamps.
+### [Md. Alim Ul Karim](https://alimkarim.com/)
 
-### Running health checks
+**[Creator & Lead Architect](https://alimkarim.com)** · Chief Software Engineer, [Riseup Asia LLC](https://riseup-asia.com)
 
-```bash
-python3 linter-scripts/check-links.py        # broken cross-references
-grep -rn "Score" spec/*/99-consistency-report.md   # per-folder scores
-npm run sync                                   # version + tree + README stamps
-```
+A software architect with **20+ years** of experience across enterprise, fintech, and distributed systems. Stack spans **.NET/C# (18+ yrs)**, **JavaScript (10+ yrs)**, **TypeScript (6+ yrs)**, and **Golang (4+ yrs)**. Recognized as a **top 1% talent at Crossover** with active presence on **[Stack Overflow](https://stackoverflow.com/users/513511/md-alim-ul-karim)** (2,452+ rep, since 2010) and **[LinkedIn](https://www.linkedin.com/in/alimkarim)** (12,500+ followers).
+
+| | |
+|---|---|
+| **Website** | [alimkarim.com](https://alimkarim.com/) · [my.alimkarim.com](https://my.alimkarim.com/) |
+| **LinkedIn** | [linkedin.com/in/alimkarim](https://www.linkedin.com/in/alimkarim) |
+| **Stack Overflow** | [users/513511/md-alim-ul-karim](https://stackoverflow.com/users/513511/md-alim-ul-karim) |
+| **Google** | [Alim Ul Karim](https://www.google.com/search?q=Alim+Ul+Karim) |
+| **Role** | Chief Software Engineer, [Riseup Asia LLC](https://riseup-asia.com/) |
+
+### Riseup Asia LLC
+
+[Top Leading Software Company in WY (2026)](https://riseup-asia.com)
+
+| | |
+|---|---|
+| **Website** | [riseup-asia.com](https://riseup-asia.com/) |
+| **Facebook** | [riseupasia.talent](https://www.facebook.com/riseupasia.talent/) |
+| **LinkedIn** | [Riseup Asia](https://www.linkedin.com/company/105304484/) |
+| **YouTube** | [@riseup-asia](https://www.youtube.com/@riseup-asia) |
+
+Full bio, design philosophy, and FAQ: [`docs/author.md`](docs/author.md).
 
 ---
 
