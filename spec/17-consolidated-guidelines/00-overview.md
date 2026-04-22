@@ -59,6 +59,7 @@ This folder provides **standalone, self-contained AI-readable references** for e
 | 23 | [23-generic-cli.md](./23-generic-cli.md) | `13-generic-cli/` — CLI creation blueprint: project structure, subcommands, flags, config, output, errors, help, database, build, testing, shell completion |
 | 24 | [24-folder-mapping.md](./24-folder-mapping.md) | **Meta** — Bidirectional folder-by-folder mapping: every source spec folder ↔ consolidated file, with coverage heatmap and blind-spots |
 | 25 | [25-blind-ai-implementability-audit.md](./25-blind-ai-implementability-audit.md) | **Meta** — Critical-gap analysis: where a blind AI receiving only this folder will fail (linter blindness, waiver syntax, sync contracts, error registry) |
+| 26 | [26-blind-ai-audit-v2.md](./26-blind-ai-audit-v2.md) | **Meta** — Post Phase 1–5 re-audit: verified 8/9 gaps closed, 7/8 stress-test pass rate, overall score 96.5 → 99.4/100 |
 
 ---
 
