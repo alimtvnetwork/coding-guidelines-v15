@@ -983,4 +983,83 @@ INSERT INTO Role (RoleId, Name) VALUES (1,'Admin'),(2,'Editor'),(3,'Viewer');
 
 ---
 
+## 18. Mandatory Free-Text Columns (Rules 10/11/12)
+
+These three rules are **enforced by `linter-scripts/sql-linter/`** (rule IDs `DB-FREETEXT-001` and `MISSING-DESC-001`). Violations block CI.
+
+### Rule 10 — Entity & Reference Tables Need `Description`
+
+Every **entity** table (rows describe a real-world thing — `User`, `Project`, `Plugin`) and every **reference / lookup** table (`StatusType`, `FileType`, `Role`) **MUST** include:
+
+```sql
+Description TEXT NULL
+```
+
+- Type: `TEXT` exactly (never `VARCHAR(N)`).
+- Nullability: `NULL` (never `NOT NULL`).
+- Default: **none** — do not add `DEFAULT ''` or `DEFAULT NULL`.
+
+### Rule 11 — Transactional Tables Need `Notes` + `Comments`
+
+Every **transactional** table (records an event or financial action — `Transaction`, `Payment`, `AuditLog`, `LicenseActivation`) **MUST** include both:
+
+```sql
+Notes    TEXT NULL,
+Comments TEXT NULL
+```
+
+- `Notes` is for **operator-facing context** (free text added by staff).
+- `Comments` is for **system-generated annotations** (set by jobs, hooks, integrations).
+- Both nullable, no default.
+
+### Rule 12 — All Free-Text Columns Are Nullable, No Default
+
+Applies to `Description`, `Notes`, `Comments` and any other free-text column added by application code. Rationale: defaults pollute analytics queries and `NOT NULL ''` makes "absent" indistinguishable from "intentionally blank."
+
+### Exemptions (Join Tables)
+
+Pure join tables (composite-PK, no own attributes) are **exempt** from Rules 10 and 11. Example:
+
+```sql
+CREATE TABLE UserRole (
+    UserId INTEGER NOT NULL REFERENCES User(UserId),
+    RoleId INTEGER NOT NULL REFERENCES Role(RoleId),
+    PRIMARY KEY (UserId, RoleId)
+);
+```
+
+If a join table later acquires attributes (e.g., `AssignedAt`, `AssignedBy`) it stops being a pure join and Rules 10/11 then apply.
+
+### Waiver Mechanism
+
+A column may be waived by adding a comment in the migration:
+
+```sql
+-- linter:waive DB-FREETEXT-001 reason="legacy table, scheduled for removal in v2.0"
+CREATE TABLE LegacyImport ( ... );
+```
+
+Waivers require an issue link in the comment and are reviewed quarterly.
+
+### Enforcement
+
+| Linter Rule | Checks |
+|-------------|--------|
+| `DB-FREETEXT-001` | Presence of `Description` (entities/refs), `Notes`+`Comments` (transactional) |
+| `MISSING-DESC-001` | Presence + Rule 12 compliance (nullable, no default) + waiver syntax validity |
+
+Both rules share a `_lib/` Python module under `linter-scripts/sql-linter/_lib/`.
+
+### Quick Decision Table
+
+| Table Kind | Required Free-Text Columns | Example |
+|------------|---------------------------|---------|
+| Entity | `Description TEXT NULL` | `User`, `Project`, `Plugin` |
+| Reference / lookup | `Description TEXT NULL` | `StatusType`, `Role`, `Country` |
+| Transactional | `Notes TEXT NULL`, `Comments TEXT NULL` | `Transaction`, `AuditLog`, `Payment` |
+| Join (composite PK, no attrs) | None — exempt | `UserRole`, `ProjectTag` |
+| Join with attributes | Treat as transactional → `Notes` + `Comments` | `UserRoleAssignment` |
+
+---
+
 *Consolidated database conventions — v3.2.0 — 2026-04-16*
