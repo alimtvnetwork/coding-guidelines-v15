@@ -364,25 +364,7 @@ Plus the live spec tree:
 - [`spec/health-dashboard.md`](spec/health-dashboard.md) — global self-assessment.
 - [`spec/17-consolidated-guidelines/00-overview.md`](spec/17-consolidated-guidelines/00-overview.md) — master consolidated index.
 
-<p align="center">
-  <img
-    src="public/images/spec-viewer-preview.png"
-    alt="Screenshot of the built-in Spec Documentation Viewer showing the left-hand folder tree, a syntax-highlighted markdown spec in the centre pane, and the keyboard navigation hints in the footer."
-    width="960"
-  />
-</p>
-
-*The built-in Spec Documentation Viewer — browse, search, and read all spec files with syntax highlighting, keyboard navigation, and fullscreen mode.*
-
----
-
-## 🔄 What's New
-
-See [`changelog.md`](changelog.md) for the full version history. Recent highlights:
-
-- **v3.55.0** — Bundle installer matrix + animated GIFs in README; 7 standalone bundles registered in `bundles.json`.
-- **v3.54.0** — Reusable "blind-AI audit" workflow registered as a memory-triggered prompt (`blind audit` / `audit gap`).
-- **v3.51.0** — Phase 6B: extracted `15-distribution-and-runner/` into a standalone module.
+The built-in **Spec Documentation Viewer** ([screenshot](public/images/spec-viewer-preview.png)) lets you browse, search, and read all spec files with syntax highlighting, keyboard navigation, and fullscreen mode. Recent changes live in [`changelog.md`](changelog.md).
 
 ---
 
