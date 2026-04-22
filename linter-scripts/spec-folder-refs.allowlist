@@ -59,3 +59,6 @@
 # --- Removed/historical folders (referenced only in changelog docs) ---
 15-domain-migration
 19-ai-reliability
+
+# --- Allowlist documentation example (used in spec/17-consolidated-guidelines/27-linter-authoring-guide.md §6.1 Format B) ---
+spec/99-future-work
