@@ -168,6 +168,12 @@ order**:
 Section emoji prefixes (📦 🛠️ 📚 🔄 🤝) are **mandatory** — they aid
 visual scanning and AI section-detection.
 
+Section headings MAY use either Markdown (`## …`) or centered HTML
+(`<h2 align="center">…</h2>`). The HTML form is preferred when the
+section opens with a card grid or other centered visual block, so the
+heading visually anchors above its cards. The README linter
+(`linter-scripts/check-root-readme.py`) accepts both forms.
+
 ---
 
 ## §7 — Length & Modularity
