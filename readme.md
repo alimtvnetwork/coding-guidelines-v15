@@ -167,6 +167,45 @@ Edit `folders` to control which directories are downloaded. Files are merged int
 
 ---
 
+## Bundle Installers
+
+Each bundle is an **independent one-line installer** that pulls only the spec folders it needs. Use these instead of `install.sh` when you want a focused subset (e.g. just the error-management spec, or just the slide deck app).
+
+![Install Flow](public/images/install-flow.gif)
+*One line. Any bundle. Anywhere — no clone required.*
+
+| Bundle | What it installs | Bash one-liner | PowerShell one-liner |
+|---|---|---|---|
+| **error-manage** | `spec/01-spec-authoring-guide/` + `spec/03-error-manage/` | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/error-manage-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/error-manage-install.ps1 \| iex` |
+| **splitdb** | `spec/04-database-conventions/` + `spec/05-split-db-architecture/` + `spec/06-seedable-config-architecture/` | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/splitdb-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/splitdb-install.ps1 \| iex` |
+| **slides** | `spec-slides/` source decks + `slides-app/` Vite presentation app | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/slides-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/slides-install.ps1 \| iex` |
+| **linters** | `linters/` (golangci-lint, phpcs, sonarqube, stylecop) + `linters-cicd/` runner pack | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/linters-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/linters-install.ps1 \| iex` |
+| **cli** | `spec/11`–`spec/16` (PowerShell, CI/CD, generic CLI, update, distribution, release) | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/cli-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/cli-install.ps1 \| iex` |
+| **wp** | `spec/18-wp-plugin-how-to/` (WordPress plugin Gold-Standard spec) | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/wp-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/wp-install.ps1 \| iex` |
+| **consolidated** | `spec/01-spec-authoring-guide/` + `spec/03-error-manage/` + `spec/17-consolidated-guidelines/` | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/consolidated-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/consolidated-install.ps1 \| iex` |
+
+All bundles share these traits:
+
+- **Zero dependencies on each other** — install any combination, in any order.
+- **Idempotent** — re-running overwrites in place; nothing gets duplicated.
+- **Temp-clean** — downloads to `/tmp` (or `%TEMP%`), copies only the bundle's folders, then deletes the temp dir even on failure.
+- **Versionable** — every bundle ships in a versioned GitHub Release archive (e.g. `coding-guidelines-error-manage-v1.4.0.zip`) with `checksums.txt`.
+- **Manifest-backed** — defined in [`bundles.json`](bundles.json) at the repo root. Add a new bundle by appending to that file; the per-bundle scripts are generated from it.
+
+### Pick a bundle by goal
+
+| If you want to… | Install |
+|---|---|
+| Adopt the error-management architecture in a new project | `error-manage` |
+| Set up a multi-database (Root / App / Session) backend | `splitdb` |
+| Teach a team the guidelines via slides | `slides` |
+| Add the linter ruleset + CI runners to a polyglot repo | `linters` |
+| Build a cross-platform CLI tool with self-update | `cli` |
+| Author a WordPress plugin to the Gold-Standard spec | `wp` |
+| Get the master consolidated reference (everything in one place) | `consolidated` |
+
+---
+
 ## Release Scripts
 
 This repo now includes local release packager scripts modeled on the gitmap flow:
