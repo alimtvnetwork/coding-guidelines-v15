@@ -1203,6 +1203,7 @@ This section is the **single canonical reference** for every validator enforced 
 | 9 | `linter-scripts/generate-dashboard-data.cjs` | Node | Produces `spec/dashboard-data.json` consumed by the docs viewer | `version.json`, `spec/**/*.md` | `0` pass · non-zero on IO error | `node linter-scripts/generate-dashboard-data.cjs` |
 | 10 | `linter-scripts/run.sh` | Bash | Orchestrator — runs all linters in sequence on Unix | (delegates) | `0` all pass · first non-zero from any child | `bash linter-scripts/run.sh` |
 | 11 | `linter-scripts/run.ps1` | PowerShell | Orchestrator — Windows equivalent of #10 | (delegates) | `0` all pass · first non-zero | `pwsh linter-scripts/run.ps1` |
+| 17 | `linter-scripts/check-memory-mirror-drift.py` | Python | Detects drift between `.lovable/memory/index.md` Core section and §X mirror in `21-lovable-folder-structure.md` (presence check on 21 distinctive tokens) | `.lovable/memory/index.md`, `spec/17-consolidated-guidelines/21-lovable-folder-structure.md` | `0` no drift · `1` drift detected · `2` structural error | `python3 linter-scripts/check-memory-mirror-drift.py` |
 
 ### 34.2 Configuration Files
 
@@ -1269,6 +1270,7 @@ The orchestrator scripts (#10/#11) run linters in this order. **Do not re-order*
 5. check-spec-cross-links.py     (markdown link integrity)
 6. check-spec-folder-refs.py     (folder-reference integrity)
 7. generate-dashboard-data.cjs   (artifact regeneration — last)
+8. check-memory-mirror-drift.py  (memory↔mirror parity — informational)
 ```
 
 ### 34.7 Failure Recovery Quick-Reference
@@ -1281,6 +1283,7 @@ The orchestrator scripts (#10/#11) run linters in this order. **Do not re-order*
 | `forbidden token found` | Used a string from `forbidden-strings.toml` | Replace with the suggested alternative in the rule's `reason` field |
 | `axios version blocked` | Bumped to `1.14.1` or `0.30.4` | Pin to `1.14.0` or `0.30.3` exactly |
 | `validate-guidelines: function too long` | Function > 15 lines | Split per Code-Red metrics: 8–15 lines per function |
+| `memory-mirror-drift: token X not found` | Edited `mem://index.md` Core section without updating §X mirror | Update §X in `21-lovable-folder-structure.md` to include the new rule, OR remove the obsolete token from `EXPECTED_TOKENS` in `check-memory-mirror-drift.py` |
 
 ### 34.8 AI Pre-Flight Checklist
 
