@@ -38,8 +38,6 @@
 
 ---
 
-<h2 align="center">What is this? Who is it for?</h2>
-
 <h2 align="center">📑 Table of Contents</h2>
 
 <p align="center">
