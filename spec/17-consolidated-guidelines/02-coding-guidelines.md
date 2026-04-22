@@ -1203,6 +1203,7 @@ This section is the **single canonical reference** for every validator enforced 
 | 9 | `linter-scripts/generate-dashboard-data.cjs` | Node | Produces `spec/dashboard-data.json` consumed by the docs viewer | `version.json`, `spec/**/*.md` | `0` pass · non-zero on IO error | `node linter-scripts/generate-dashboard-data.cjs` |
 | 10 | `linter-scripts/run.sh` | Bash | Orchestrator — runs all linters in sequence on Unix | (delegates) | `0` all pass · first non-zero from any child | `bash linter-scripts/run.sh` |
 | 11 | `linter-scripts/run.ps1` | PowerShell | Orchestrator — Windows equivalent of #10 | (delegates) | `0` all pass · first non-zero | `pwsh linter-scripts/run.ps1` |
+| 17 | `linter-scripts/check-memory-mirror-drift.py` | Python | Detects drift between `.lovable/memory/index.md` Core section and §X mirror in `21-lovable-folder-structure.md` (presence check on 21 distinctive tokens) | `.lovable/memory/index.md`, `spec/17-consolidated-guidelines/21-lovable-folder-structure.md` | `0` no drift · `1` drift detected · `2` structural error | `python3 linter-scripts/check-memory-mirror-drift.py` |
 
 ### 34.2 Configuration Files
 
