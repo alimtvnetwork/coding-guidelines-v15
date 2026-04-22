@@ -379,4 +379,97 @@ When specs change, update **all three** targets:
 
 ---
 
-*Consolidated spec authoring — v3.2.0 — 2026-04-16*
+---
+
+## §X Version & Sync Workflow — The Mandatory Sequence
+
+This section is the **single canonical reference** for how versions are bumped and how derived artifacts (`version.json`, `src/data/specTree.json`, `spec/dashboard-data.json`) stay synchronized. Skipping any step or running them out of order produces `Drift detected in version.json` and blocks CI.
+
+### X.1 The Three Sync Scripts
+
+| # | Script | Reads | Writes | When to Run |
+|---|--------|-------|--------|-------------|
+| 1 | `scripts/sync-version.mjs` | `package.json`, git HEAD | `version.json` (top-level + per-folder stats) | After **any** version bump or spec change |
+| 2 | `scripts/sync-spec-tree.mjs` | `spec/**/*.md` | `src/data/specTree.json` | After **any** spec file add/rename/delete |
+| 3 | `linter-scripts/generate-dashboard-data.cjs` | `version.json`, `spec/**/*.md` | `spec/dashboard-data.json` | After #1 and #2 (CI runs this automatically) |
+
+### X.2 Mandatory Execution Order
+
+```
+1. Edit spec / source code
+2. Bump package.json version (minor for code changes; patch for doc-only)
+3. node scripts/sync-version.mjs
+4. node scripts/sync-spec-tree.mjs
+5. python3 linter-scripts/check-spec-cross-links.py --root spec --repo-root .
+6. Commit all changed files together (one atomic commit)
+```
+
+**Order is enforced**: #2 must precede #3 (sync reads `package.json`); #3 must precede #4 (tree sync uses version metadata); #5 must run last (validates the synced state).
+
+### X.3 What `sync-version.mjs` Computes
+
+`version.json` fields are split into **computed** (do NOT hand-edit) vs **manual** (hand-edit allowed):
+
+| Field | Source | Edit Mode |
+|-------|--------|-----------|
+| `version` | `package.json` | Auto |
+| `name`, `description` | `package.json` | Manual (in `package.json`) |
+| `git.commit`, `git.branch`, `git.updated` | `git rev-parse` | Auto |
+| `stats.totalFiles`, `totalLines`, `totalFolders`, `totalBytes` | `spec/**` walk | Auto |
+| `folders[].fileCount`, `lineCount`, `byteCount` | per-folder walk | Auto |
+| `folders[].aiConfidence`, `ambiguity` | spec frontmatter | Auto (read from `## Scoring` table) |
+
+**Hand-editing any auto field will be reverted on the next sync run** — and will trigger `Drift detected in version.json` in CI before that.
+
+### X.4 Failure Modes
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| `Drift detected in version.json` | Forgot to run sync after editing specs | Run #3 + #4, commit the diff |
+| `git/updated fields ignored` (in CI diff) | Local sync used a different git commit than CI | Re-run sync on a clean working tree, then commit |
+| `specTree.json` regenerated unexpectedly | Manual edit to `src/data/specTree.json` | Never hand-edit; always regenerate via #4 |
+| Per-folder line count off by 1 | Trailing newline missing | Ensure every spec file ends with `\n` |
+
+### X.5 Allowlist & Waiver Reference
+
+When `check-spec-folder-refs.py` reports `Stale references found`, the fix is **not** always to fix the link. Three valid resolutions:
+
+#### (a) Typo / rename — fix the path in markdown
+Use this when the target folder was renamed or you mistyped the number.
+
+#### (b) Sibling-repo reference — add to `[external]`
+Use this when the path points to a folder in a different repo (e.g., `spec/15-domain-migration/` lives in a sibling repo).
+
+```
+# linter-scripts/spec-folder-refs.allowlist
+[external]
+spec/15-domain-migration/
+spec/legacy-archive/
+```
+
+#### (c) Documentation-only — add to `[doc-only]`
+Use this when the path is a redirect stub or a documentation pointer with no real content.
+
+```
+[doc-only]
+spec/folder-structure-root.md
+```
+
+**Commit message convention**: When adding to either section, the commit message must include `allowlist: <reason>` so reviewers can audit.
+
+### X.6 Cross-Link Allowlist — `spec-cross-links.allowlist`
+
+Plain-text, one path per line, relative to repo root, no globs:
+
+```
+README.md
+LICENSE
+.github/CODEOWNERS
+CHANGELOG.md
+```
+
+Use this when a markdown file links to a non-spec file that exists outside the spec tree.
+
+---
+
+*Version & Sync Workflow appendix added — v3.3.0 — 2026-04-22*

@@ -1062,4 +1062,77 @@ Both rules share a `_lib/` Python module under `linter-scripts/sql-linter/_lib/`
 
 ---
 
-*Consolidated database conventions — v3.2.0 — 2026-04-16*
+---
+
+## §19 SQL Linter Waiver Syntax — Free-Text Column Rules
+
+This section documents the waiver syntax for the two SQL linter rules that enforce Rules 10/11/12 (mandatory free-text columns). Without this reference, a blind AI cannot suppress false positives or document intentional exceptions.
+
+### 19.1 The Two Linter Rules
+
+| Rule ID | Enforces | Triggered When |
+|---------|----------|----------------|
+| `DB-FREETEXT-001` | **Presence**: every entity/transactional table has the required free-text columns | Table missing `Description` (entity/ref) OR missing `Notes` + `Comments` (transactional) |
+| `MISSING-DESC-001` | **Conformance**: free-text columns follow Rule 12 (nullable, no DEFAULT, `TEXT NULL`) | Column declared with `NOT NULL`, with a `DEFAULT`, or with a non-`TEXT` type |
+
+### 19.2 Per-Rule Application
+
+| Table Type | Required Columns | Rule Applied |
+|------------|------------------|--------------|
+| Entity (`User`, `Project`, `Movie`) | `Description TEXT NULL` | DB-FREETEXT-001 + MISSING-DESC-001 |
+| Reference / lookup (`Country`, `Language`) | `Description TEXT NULL` | DB-FREETEXT-001 + MISSING-DESC-001 |
+| Transactional (`Transaction`, `LoginEvent`) | `Notes TEXT NULL` + `Comments TEXT NULL` | DB-FREETEXT-001 + MISSING-DESC-001 |
+| Join / bridge (`UserRole`, `ProjectTag`) | (exempt) | None |
+
+### 19.3 Waiver Syntax
+
+When a table is **legitimately exempt** (e.g., a system-managed audit table where free-text would be a security risk), declare a waiver in the table's create script using a SQL comment block immediately above the `CREATE TABLE`:
+
+```sql
+-- @waiver DB-FREETEXT-001
+-- @reason System audit table: free-text fields would allow log injection.
+-- @approved-by alim
+-- @date 2026-04-15
+CREATE TABLE AuditLog (
+    AuditLogId INTEGER PRIMARY KEY AUTOINCREMENT,
+    EventType TEXT NOT NULL,
+    Payload TEXT NOT NULL,
+    CreatedAt DATETIME NOT NULL
+);
+```
+
+**Required fields** in every waiver:
+- `@waiver <RULE-ID>` — exact rule ID being suppressed
+- `@reason <text>` — single-line justification
+- `@approved-by <handle>` — reviewer who approved
+- `@date YYYY-MM-DD` — approval date
+
+**Multi-rule waivers**: stack them on separate lines:
+
+```sql
+-- @waiver DB-FREETEXT-001
+-- @waiver MISSING-DESC-001
+-- @reason ...
+```
+
+### 19.4 Where Waivers Are Validated
+
+The shared library `linter-scripts/_lib/sql_waivers.py` parses waiver comments. The two rule scripts both call into it before reporting violations. A waiver without all four required fields is itself a violation (`WAIVER-MALFORMED-001`).
+
+### 19.5 Allowlist for Generated Files
+
+Auto-generated SQL (e.g., from migrations or ORM dumps) lives under `db/generated/` and is **fully exempt** from both rules. The allowlist is hard-coded in the rule scripts — do not extend it without RFC.
+
+### 19.6 Failure Recovery
+
+| CI Error | Fix |
+|----------|-----|
+| `DB-FREETEXT-001: <Table> missing Description` | Add `Description TEXT NULL` to the table |
+| `DB-FREETEXT-001: <Table> missing Notes/Comments` | Add both `Notes TEXT NULL` and `Comments TEXT NULL` |
+| `MISSING-DESC-001: <Column> has NOT NULL` | Drop `NOT NULL` — Rule 12 requires nullable |
+| `MISSING-DESC-001: <Column> has DEFAULT` | Drop `DEFAULT` — Rule 12 forbids defaults |
+| `WAIVER-MALFORMED-001` | Add the missing required field (`@waiver`/`@reason`/`@approved-by`/`@date`) |
+
+---
+
+*SQL Linter Waiver Syntax added — v3.3.0 — 2026-04-22*
