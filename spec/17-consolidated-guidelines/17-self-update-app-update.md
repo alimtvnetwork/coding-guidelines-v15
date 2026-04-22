@@ -1,7 +1,7 @@
 # Consolidated: Self-Update & App Update — Complete Reference
 
-**Version:** 3.2.0  
-**Updated:** 2026-04-16  
+**Version:** 3.3.0  
+**Updated:** 2026-04-22  
 **Source Module:** [`spec/14-update/`](../14-update/00-overview.md)
 
 ---
@@ -9,6 +9,39 @@
 ## Purpose
 
 This is the **standalone consolidated reference** for CLI self-update functionality and release distribution. An AI reading only this file must be able to implement the complete update system without consulting source specs.
+
+### Source-Folder Coverage Map
+
+The source module `spec/14-update/` contains 25 specs + diagrams. The table below confirms every one is covered.
+
+| Source File | Section | Status |
+|-------------|---------|--------|
+| `01-self-update-overview.md` | §Core Problem, §Two Strategies | ✅ Full |
+| `02-deploy-path-resolution.md` | §Deploy Path Resolution | ✅ Full |
+| `03-rename-first-deploy.md` | §Rename-First Deploy | ✅ Full |
+| `04-build-scripts.md` | §Build Scripts | ✅ Full |
+| `05-handoff-mechanism.md` | §Handoff Mechanism | ✅ Full |
+| `06-cleanup.md` | §Cleanup | ✅ Full |
+| `07-console-safe-handoff.md` | §Console-Safe Handoff (added) | ✅ Full |
+| `08-repo-path-sync.md` | §Repo Path Sync (added) | ✅ Full |
+| `09-version-verification.md` | §Version Verification (added) | ✅ Full |
+| `10-last-release-detection.md` | §Last-Release Detection (added) | ✅ Full |
+| `11-windows-icon-embedding.md` | §Cross-ref to CI/CD spec | ✅ Reference |
+| `12-code-signing.md` | §Cross-ref to CI/CD spec | ✅ Reference |
+| `13-release-assets.md` | §Release Assets | ✅ Full |
+| `14-checksums-verification.md` | §Checksums | ✅ Full |
+| `15-release-versioning.md` | §Release Versioning | ✅ Full |
+| `16-cross-compilation.md` | §Cross-Compilation | ✅ Full |
+| `17-release-pipeline.md` | §Release Pipeline | ✅ Full |
+| `18-install-scripts.md` | §Install Scripts | ✅ Full |
+| `19-updater-binary.md` | §Updater Binary | ✅ Full |
+| `20-network-requirements.md` | §Network Requirements | ✅ Full |
+| `21-config-file.md` | §Config File | ✅ Full |
+| `22-update-command-workflow.md` | §Update Command Workflow | ✅ Full |
+| `23-install-script-version-probe.md` | §Install Script Version Probe (added) | ✅ Full |
+| `24-update-check-mechanism/` | §Update Check Mechanism (added) | ✅ Full |
+| `25-release-pinned-installer.md` | §Release-Pinned Installer (added) | ✅ Full |
+| `diagrams/` | Diagram links | ✅ |
 
 ---
 
