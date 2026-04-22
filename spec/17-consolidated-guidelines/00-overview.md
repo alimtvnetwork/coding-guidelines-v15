@@ -62,6 +62,7 @@ This folder provides **standalone, self-contained AI-readable references** for e
 | 26 | [26-blind-ai-audit-v2.md](./26-blind-ai-audit-v2.md) | **Meta** — Post Phase 1–5 re-audit: verified 8/9 gaps closed, 7/8 stress-test pass rate, overall score 96.5 → 99.4/100 |
 | 27 | [27-linter-authoring-guide.md](./27-linter-authoring-guide.md) | **Authoring** — How to add a new linter to `linter-scripts/`: file layout, exit-code contract (0/1/2), output format, allowlist registration, test fixtures, §8 checklist. Closes the final 🟡 from the v2 audit |
 | 28 | [28-distribution-and-runner.md](./28-distribution-and-runner.md) | `15-distribution-and-runner/` — Standalone install contract (`install.sh`/`install.ps1`), root runner sub-commands (`lint`/`slides`/`help`), GitHub release pipeline artifacts, `install-config.json` schema. Promoted from inline mention in `17-self-update-app-update.md` (Phase 6B) |
+| 29 | [29-blind-ai-audit-v3.md](./29-blind-ai-audit-v3.md) | **Meta** — Post Phase 6A + 6B + 6D re-audit: 8/8 stress tests pass, 0 actionable gaps, 5/5 root validators clean. Overall score 99.4 → **99.8/100**. Folder declared at terminal AI-blind-readiness |
 
 ---
 
