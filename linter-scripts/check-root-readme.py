@@ -62,9 +62,18 @@ def has_centered_h1(body: str) -> bool:
 
 
 def count_badges(body: str) -> int:
-    md = re.findall(r'!\[[^\]]*\]\(https://img\.shields\.io/', body)
-    html = re.findall(r'<img\s[^>]*src="https://img\.shields\.io/', body)
-    return len(md) + len(html)
+    """Count only the hero badges between the two STAMP markers.
+    Card-style shields in body sections are excluded by design."""
+    total = 0
+    for marker in ("BADGES", "PLATFORM_BADGES"):
+        m = re.search(rf'<!-- STAMP:{marker} -->([\s\S]*?)<!-- /STAMP:{marker} -->', body)
+        if not m:
+            continue
+        block = m.group(1)
+        md = re.findall(r'!\[[^\]]*\]\(https://img\.shields\.io/', block)
+        html = re.findall(r'<img\s[^>]*src="https://img\.shields\.io/', block)
+        total += len(md) + len(html)
+    return total
 
 
 def has_author_block(body: str) -> bool:
