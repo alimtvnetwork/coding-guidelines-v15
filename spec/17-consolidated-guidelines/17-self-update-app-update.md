@@ -459,6 +459,124 @@ Update configuration stored in a config file:
 
 ---
 
+## Console-Safe Handoff
+
+**Source:** `14-update/07-console-safe-handoff.md`
+
+On Windows, when the running CLI hands off to a child updater process, the parent's stdout/stderr handles must be **detached** before the child inherits them — otherwise console output races or hangs. Required steps:
+
+1. Flush all parent buffers (`os.Stdout.Sync()`).
+2. Spawn child with `syscall.SysProcAttr{HideWindow: false, CreationFlags: CREATE_NEW_CONSOLE}`.
+3. Parent exits **immediately** with code 0; do not wait on child.
+4. Child writes status to a pre-agreed temp log file the parent can poll on next launch.
+
+On macOS / Linux this is a no-op — `exec` semantics handle handoff cleanly.
+
+---
+
+## Repo Path Sync
+
+**Source:** `14-update/08-repo-path-sync.md`
+
+When using Strategy 1 (source-based update), the resolved source-repo path is **persisted to the config file** so subsequent updates skip path discovery. Sync rules:
+
+- Path is stored as an **absolute path** (resolve symlinks at write time).
+- If the path becomes invalid (deleted, moved), the next update falls back to Strategy 2 (binary-based) and clears the stale entry.
+- Multiple repos are not supported — the most recently used wins.
+
+---
+
+## Version Verification
+
+**Source:** `14-update/09-version-verification.md`
+
+After deploy completes, the new binary is invoked with `--version` and the output is matched against the expected version string. Mismatch triggers automatic rollback:
+
+1. Restore the renamed `<binary>.old` to `<binary>`.
+2. Delete the failed deploy artifact.
+3. Exit with code 2 + log the version mismatch (expected vs got).
+
+Verification timeout is **5 seconds**; longer indicates the new binary is hung and triggers rollback.
+
+---
+
+## Last-Release Detection
+
+**Source:** `14-update/10-last-release-detection.md`
+
+The CLI caches the last-checked release version in `~/.config/<app>/last-release.json` with a 24-hour TTL:
+
+```json
+{
+  "Version": "v1.5.2",
+  "PublishedAt": "2026-04-20T08:00:00Z",
+  "CheckedAt": "2026-04-22T10:15:00Z",
+  "AssetsByTarget": { "linux/amd64": "...", "windows/amd64": "..." }
+}
+```
+
+Within the TTL, `<binary> update --check` returns instantly without hitting GitHub. After TTL expiry, the cache is refreshed transparently.
+
+---
+
+## Install Script Version Probe
+
+**Source:** `14-update/23-install-script-version-probe.md`
+
+The generated install script has a `--probe` flag that prints the version it would install **without actually installing**. Used by the updater to confirm the install script matches the intended target version before execution. Probe must:
+
+- Exit 0 with the version string on stdout.
+- Never write to the filesystem.
+- Complete in under 2 seconds (no network calls beyond the version manifest fetch).
+
+---
+
+## Update Check Mechanism
+
+**Source:** `14-update/24-update-check-mechanism/`
+
+The proactive update-check runs **once per launch**, in a background goroutine, with the following rules:
+
+| Rule | Value |
+|------|-------|
+| Frequency cap | Max 1 check per 24 hours per user |
+| Network timeout | 3 seconds — fail silently on timeout |
+| Notification | Subtle banner on next interactive command, never blocking |
+| Disable flag | `<binary> config set update.checkOnLaunch false` |
+| CI detection | Skip check entirely when `CI=true` |
+
+The check never auto-installs — user must explicitly run `<binary> update`.
+
+---
+
+## Release-Pinned Installer
+
+**Source:** `14-update/25-release-pinned-installer.md`
+
+For supply-chain integrity, the README install one-liner pins:
+
+1. The release tag (`v1.5.2`, never `latest`).
+2. The install script SHA-256.
+3. The binary checksum file SHA-256.
+
+Example:
+
+```bash
+curl -fsSL https://github.com/org/app/releases/download/v1.5.2/install.sh \
+  | sha256sum -c <(echo "abc123...  -") \
+  | bash
+```
+
+Pinned installers are regenerated per release. Rolling-tag installers (`latest`) are explicitly forbidden — they break reproducibility and enable supply-chain attacks.
+
+---
+
+## Source-File Coverage Update
+
+The original inventory below mapped source files 01–16 only. The added sections above cover source files **07-console-safe-handoff**, **08-repo-path-sync**, **09-version-verification**, **10-last-release-detection**, **23-install-script-version-probe**, **24-update-check-mechanism/**, and **25-release-pinned-installer**.
+
+---
+
 ## Cross-References
 
 | Reference | Location |
