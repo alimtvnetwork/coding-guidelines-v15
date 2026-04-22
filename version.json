@@ -1,18 +1,18 @@
 {
-  "version": "3.47.0",
+  "version": "3.48.0",
   "updated": "2026-04-22",
   "name": "coding-guidelines",
   "description": "Cross-language coding standards, error handling, CI/CD, and self-update specifications. Synced from package.json by scripts/sync-version.mjs.",
   "git": {
-    "sha": "5c75c57f23b27dc9b01cdaed28f362913cc4174c",
-    "shortSha": "5c75c57",
-    "branch": "edit/edt-797457cc-3a28-420c-bffd-f8be3452ad80"
+    "sha": "ed346c12b9b17035646dbdfe2a0ad3617c8f46b9",
+    "shortSha": "ed346c1",
+    "branch": "edit/edt-54dd07a6-f1d3-4f4a-80e0-865af32f7ac9"
   },
   "stats": {
     "totalFiles": 604,
-    "totalLines": 129822,
+    "totalLines": 130033,
     "totalFolders": 22,
-    "totalBytes": 4385516,
+    "totalBytes": 4394552,
     "rootFiles": 5
   },
   "folders": [
@@ -234,8 +234,8 @@
       "aiConfidence": "Production-Ready",
       "ambiguity": "None",
       "fileCount": 27,
-      "lineCount": 13382,
-      "byteCount": 486065
+      "lineCount": 13593,
+      "byteCount": 495101
     },
     {
       "path": "18-wp-plugin-how-to",
