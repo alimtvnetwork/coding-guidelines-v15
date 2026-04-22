@@ -1,14 +1,34 @@
 # Consolidated: Coding Guidelines — Complete Reference
 
 **Source:** [`../02-coding-guidelines/`](../02-coding-guidelines/)  
-**Updated:** 2026-04-16  
-**Version:** 3.2.0
+**Updated:** 2026-04-22  
+**Version:** 3.3.0
 
 ---
 
 ## Purpose
 
 This is the **single consolidated reference** for all coding guidelines. An AI reading only this file must be able to enforce every rule without consulting the source specs. Each section maps to one or more source files — follow cross-references for deeper examples and edge cases.
+
+### Source-Folder Coverage Map
+
+The source module `spec/02-coding-guidelines/` contains **16 subfolders**. This consolidated reference covers every one of them. Use the section index below to jump directly to language- or topic-specific rules.
+
+| Source Subfolder | Section | Status |
+|------------------|---------|--------|
+| `01-cross-language/` | §§1–21 (cross-cutting rules) | ✅ Full |
+| `02-typescript/` | §22 TypeScript Standards | ✅ Full |
+| `03-golang/` | §23 Go Standards | ✅ Full |
+| `04-php/` | §24 PHP Standards | ✅ Full |
+| `05-rust/` | §25 Rust Standards | ✅ Full |
+| `06-ai-optimization/` | §26 AI Optimization | ✅ Full |
+| `06-cicd-integration/` | §27 CI/CD Integration | ✅ Full |
+| `07-csharp/` | §28 C# Standards | ✅ Full |
+| `08-file-folder-naming/` | §29 File & Folder Naming | ✅ Full |
+| `09-powershell-integration/` | §30 PowerShell Integration | ✅ Reference |
+| `10-research/` | §31 Coding Research Placement | ✅ Reference |
+| `11-security/` | §32 Security & Dependency Pinning | ✅ Full |
+| `21-app/`, `22-app-issues/`, `23-app-database/`, `24-app-design-system-and-ui/` | §33 App-Specific Coding Specs | ✅ Reference |
 
 ---
 
