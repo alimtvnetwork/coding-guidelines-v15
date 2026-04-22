@@ -765,4 +765,149 @@ When `localStorage.debugExecutionLog === '1'`, the frontend captures every compo
 
 ---
 
-*Consolidated error management — v3.2.0 — 2026-04-16*
+---
+
+## §27 Live Error Code Registry Snapshot
+
+This is a **point-in-time snapshot** of the canonical error code allocations. Source of truth: `spec/03-error-manage/03-error-code-registry/error-codes-master.json`. A blind AI must consult this section before allocating new error codes to avoid range collisions.
+
+### 27.1 Allocated Ranges by Subsystem (16 modules · 933 codes · 159 retryable)
+
+| Project | Name | Range | Codes | Retryable | Status |
+|---------|------|-------|-------|-----------|--------|
+| `GEN` | General Error Codes | 0–999 | — | — | Special — cross-cutting |
+| `SM` | Spec Management | 2000–2999 | 0 | 0 | ⏳ Pending |
+| `SM` (misc) | Spec Editor + Error Recovery | 6010–6013, 6020–6027 | — | — | Special |
+| `BR` | BRun CLI | 7100–7599 | 0 | 0 | ⏳ Pending |
+| `GS` | GSearch CLI | 7000–7919 | 102 | 37 | ✅ Active |
+| `NF` | Nexus Flow CLI | 8000–8349 | 15 | 1 | ✅ Active |
+| `AB` | AI Bridge CLI | 9000–9999 | 168 | 8 | ✅ Active |
+| `PS/AB` | PowerShell/AB SEO Overlap | 9500–9540 | — | — | Special — format-separated |
+| `WPB` | WP Plugin Builder | 10000–10499 | 70 | 9 | ✅ Active |
+| `SRC` | Spec Reverse CLI | 11000–11999 | 0 | 0 | ⏳ Pending |
+| `WSP` | WP SEO Publish CLI | 12000–12599 | 75 | 4 | ✅ Active |
+| `WPP` | WP Plugin Publish | 13000–13499 | 46 | 1 | ✅ Active |
+| `AIT` | AI Transcribe CLI | 14000–14499 | 141 | 27 | ✅ Active |
+| `EQM` | Exam Manager | 14500–14999 | 57 | 5 | ✅ Active |
+| `LM` | License Manager | 15000–15999 | 0 | 0 | ⏳ Pending |
+| `SM-CG` | Spec Mgmt — Code Generation | 16000–16799 | 79 | 32 | ✅ Active |
+| `SM-PE` | Spec Mgmt — Project Editor | 17000–17999 | 82 | 3 | ✅ Active |
+| `SM-GS` | Spec Mgmt — GSearch (remap) | 18000–18249 | 92 | 32 | ✅ Active — ecosystem remap of GS |
+| `AB-LR` | AI Bridge — Lovable Reasoning | 19000–19049 | 6 | 0 | ✅ Active |
+
+### 27.2 Free Ranges Available for Allocation
+
+| Range | Note |
+|-------|------|
+| 1000–1999 | Reserved (post-GEN buffer — do not allocate without RFC) |
+| 3000–5999 | Reserved (post-SM buffer) |
+| 8350–8999 | Free — between NF and AB |
+| 10500–10999 | Free — between WPB and SRC |
+| 12600–12999 | Free — between WSP and WPP |
+| 13500–13999 | Free — freed from WPP compression |
+| 18250–18999 | Free — after SM-GS |
+| 19050–19999 | Free — after AB-LR |
+
+**Rule:** A new module gets a 500- or 1000-code range from the **Free** list above. Choose the smallest range that fits projected growth × 3.
+
+### 27.3 General Categories (GEN range 0–999)
+
+Cross-cutting categories that every module inherits — never reallocate:
+
+| Category | Example Codes |
+|----------|---------------|
+| Initialization | 0–99 |
+| Authentication | 100–199 |
+| Authorization | 200–299 |
+| Validation | 300–399 |
+| Business Logic | 400–499 |
+| Database | 500–599 |
+| Type Casting | 600–699 |
+| File System | 700–799 |
+| Network | 800–899 |
+| Reserved | 900–999 |
+
+### 27.4 Code Allocation Workflow
+
+```
+1. Pick a free range from §27.2 (or use existing module range if extending)
+2. Edit spec/<your-module>/error-codes.json — add new code(s) following the schema
+3. Run: node spec/03-error-manage/03-error-code-registry/08-linter-scripts/detect-collisions.mjs
+4. Run: node spec/03-error-manage/03-error-code-registry/08-linter-scripts/validate-master-stats.mjs
+5. Run code generators (§27.5) to emit per-language artifacts
+6. Run: node spec/03-error-manage/03-error-code-registry/08-linter-scripts/check-utilization-threshold.mjs
+7. Update error-codes-master.json TotalCodes / RetryableCodes (auto via generate-utilization-report.mjs)
+8. Commit all artifacts together
+```
+
+### 27.5 Code Generators — Per-Language Emitters
+
+| Generator | Reads | Emits | Language |
+|-----------|-------|-------|----------|
+| `gen-go-errcodes` | `spec/<module>/error-codes.json` | `internal/apperror/apperror_codes_generated.go` | Go |
+| `gen-php-errcodes` | `spec/<module>/error-codes.json` | `src/Errors/ErrorCode.php` | PHP |
+| `gen-ts-errcodes` | `spec/<module>/error-codes.json` | `src/lib/errors/errorCodes.generated.ts` | TypeScript |
+| `gen-rust-errcodes` | `spec/<module>/error-codes.json` | `src/errors/error_code_generated.rs` | Rust |
+
+**Invocation pattern** (run from repo root for each module):
+
+```bash
+node scripts/codegen/gen-go-errcodes.mjs   --module GS
+node scripts/codegen/gen-php-errcodes.mjs  --module GS
+node scripts/codegen/gen-ts-errcodes.mjs   --module GS
+node scripts/codegen/gen-rust-errcodes.mjs --module GS
+```
+
+**Drift detection:** CI runs all generators and `git diff --exit-code` on the output paths. Any uncommitted generator output is a CI failure (`Error: generated error code drift in <file>`).
+
+### 27.6 Registry Linter Scripts
+
+| Script | Purpose | Exit Codes |
+|--------|---------|------------|
+| `detect-collisions.mjs` | Verifies no two codes share the same numeric value across modules | `0` clean · `1` collision |
+| `validate-master-stats.mjs` | Checks `error-codes-master.json` `TotalCodes`/`RetryableCodes` match per-module files | `0` clean · `1` drift |
+| `generate-utilization-report.mjs` | Produces `04-error-code-utilization-report.md` | `0` always |
+| `check-utilization-threshold.mjs` | Warns if a module is < 10% utilized (encourages range compression) | `0` clean · `1` under-threshold |
+
+All four live at `spec/03-error-manage/03-error-code-registry/08-linter-scripts/`.
+
+### 27.7 Schema Reference
+
+The per-module `error-codes.json` schema is documented at:
+- `spec/03-error-manage/03-error-code-registry/07-schemas/error-code.schema.json`
+- `spec/03-error-manage/03-error-code-registry/07-schemas/error-codes-index.schema.json`
+
+**Minimum fields per code:**
+```json
+{
+  "Code": 7042,
+  "Name": "RagChunkNotFound",
+  "Category": "RAG",
+  "Retryable": false,
+  "HttpStatus": 404,
+  "MessageTemplate": "RAG chunk %s not found in collection %s",
+  "Severity": "error"
+}
+```
+
+### 27.8 Ecosystem Remap Pattern
+
+A module that uses **local codes** internally (e.g., GS uses 1xxx–12xxx) but participates in the ecosystem **remaps** to a sub-range of `SM-*`. Example:
+
+| Module | Local Range | Ecosystem Remap |
+|--------|-------------|-----------------|
+| GS | 1000–12999 (internal) | SM-GS 18000–18249 |
+
+Remap mapping lives at the module's `EcosystemRemapIndex` path. The remap is **bidirectional** — both indexes must agree, enforced by `detect-collisions.mjs`.
+
+### 27.9 Collision Resolution
+
+13 historical collisions have been resolved (full log: `03-collision-resolution-summary.md`). The two intentional overlaps are:
+- **PS/AB SEO 9500–9540** — format-separated (`PS-9500-00` vs flat `9500`).
+- **GS local vs SM-GS remap** — by design via the ecosystem remap pattern.
+
+**Never** introduce a new intentional collision without RFC.
+
+---
+
+*Live Error Code Registry Snapshot added — v3.3.0 — 2026-04-22 — sourced from `error-codes-master.json` Generated: 2026-02-28*
