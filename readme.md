@@ -333,34 +333,42 @@ When you want **everything** (specs + linters + scripts), use the generic instal
 
 ### Remote one-liner (no clone required)
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.sh | bash
-```
+**🪟 Windows (PowerShell)**
 
 ```powershell
 irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.ps1 | iex
 ```
 
-Skip the latest-version probe (use this exact installer):
+**🐧 Linux / macOS (Bash)**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.sh | bash -s -- -n
+curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.sh | bash
 ```
+
+Skip the latest-version probe with `-n` / `--no-latest`:
 
 ```powershell
 & ([scriptblock]::Create((irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.ps1))) -n
 ```
 
-> **What does `-n` / `--no-latest` do?** By default the installer probes 20 candidate "next" repository versions in parallel (e.g. `coding-guidelines-v15` … `coding-guidelines-v34`) and hands off to the newest one it finds. Pass `-n` to skip that probe entirely.
+```bash
+curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.sh | bash -s -- -n
+```
+
+> By default the installer probes 20 candidate "next" repository versions in parallel and hands off to the newest one it finds. Pass `-n` to skip that probe entirely.
 
 ### Local script (after cloning)
 
-```bash
-chmod +x install.sh && ./install.sh
-```
+**🪟 Windows (PowerShell)**
 
 ```powershell
 .\install.ps1
+```
+
+**🐧 Linux / macOS (Bash)**
+
+```bash
+chmod +x install.sh && ./install.sh
 ```
 
 ### Power-user flags
