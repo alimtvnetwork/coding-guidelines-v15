@@ -1,14 +1,15 @@
 {
   "name": "vite_react_shadcn_ts",
   "private": true,
-  "version": "3.55.0",
+  "version": "3.56.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "sync": "node scripts/sync-version.mjs && node scripts/sync-spec-tree.mjs",
+    "sync": "node scripts/sync-version.mjs && node scripts/sync-spec-tree.mjs && node scripts/sync-readme-stats.mjs",
     "sync:version": "node scripts/sync-version.mjs",
     "sync:specs": "node scripts/sync-spec-tree.mjs",
-    "prebuild": "node scripts/sync-version.mjs && node scripts/sync-spec-tree.mjs",
+    "sync:readme": "node scripts/sync-readme-stats.mjs",
+    "prebuild": "node scripts/sync-version.mjs && node scripts/sync-spec-tree.mjs && node scripts/sync-readme-stats.mjs",
     "prepare": "husky",
     "build": "vite build",
     "build:dev": "vite build --mode development",
