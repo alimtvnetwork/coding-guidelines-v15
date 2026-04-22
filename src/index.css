@@ -39,6 +39,10 @@
     --success: 152 70% 42%;
     --success-foreground: 150 85% 96%;
 
+    /* Brand accent — matches the README icon + GIF art direction (#FF6E3C). */
+    --brand-accent: 15 100% 62%;
+    --brand-accent-foreground: 0 0% 100%;
+
     --sidebar-background: 240 20% 98%;
     --sidebar-foreground: 230 15% 30%;
     --sidebar-primary: 252 85% 60%;
