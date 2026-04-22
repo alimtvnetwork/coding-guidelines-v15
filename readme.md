@@ -344,24 +344,7 @@ chmod +x install.sh && ./install.sh
 
 ### Power-user flags
 
-Both `install.sh` and `install.ps1` support the same set of flags:
-
-| Bash | PowerShell | What it does |
-|---|---|---|
-| `--repo owner/repo` | `-Repo owner/repo` | Override source repository |
-| `--branch main` | `-Branch main` | Override branch (ignored when version is set) |
-| `--version vX.Y.Z` | `-Version vX.Y.Z` | Install a specific release tag |
-| `--folders a,b,c` | `-Folders a,b,c` | Comma/array list of folders |
-| `--dest /path` | `-Dest C:\path` | Install destination (default: cwd) |
-| `--config file.json` | `-ConfigFile file.json` | Use a custom config file |
-| `--prompt` | `-Prompt` | Ask before each overwrite |
-| `--force` | `-Force` | Overwrite all without prompting |
-| `--dry-run` | `-DryRun` | Print what would change; write nothing |
-| `--list-versions` | `-ListVersions` | List available release tags and exit |
-| `--list-folders` | `-ListFolders` | List top-level folders and exit |
-| `--no-probe`, `--no-latest`, `-n` | `-NoProbe`, `-NoLatest`, `-n` | Skip the latest-version auto-probe |
-
-`--prompt` and `--force` are mutually exclusive. The scripts also read `install-config.json` for default `repo` / `branch` / `folders`.
+Both installers accept the same flags: `--repo`/`-Repo`, `--branch`/`-Branch`, `--version`/`-Version`, `--folders`/`-Folders`, `--dest`/`-Dest`, `--config`/`-ConfigFile`, `--prompt`/`-Prompt`, `--force`/`-Force`, `--dry-run`/`-DryRun`, `--list-versions`/`-ListVersions`, `--list-folders`/`-ListFolders`, and `-n`/`-NoProbe` to skip the latest-version probe. `--prompt` and `--force` are mutually exclusive. Defaults can be set in `install-config.json`.
 
 ---
 
