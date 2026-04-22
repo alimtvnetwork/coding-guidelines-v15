@@ -55,3 +55,7 @@
 
 # Add illustrative / historical folder names here. They must never appear
 # as live links — only inside prose, code fences, or example tables.
+
+# --- Removed/historical folders (referenced only in changelog docs) ---
+15-domain-migration
+19-ai-reliability
