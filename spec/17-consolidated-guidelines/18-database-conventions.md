@@ -1135,4 +1135,123 @@ Auto-generated SQL (e.g., from migrations or ORM dumps) lives under `db/generate
 
 ---
 
-*SQL Linter Waiver Syntax added — v3.3.0 — 2026-04-22*
+---
+
+## §20 Database Migrations — Tool, Layout, and Patterns
+
+This section documents the migration framework, file layout, naming conventions, and reversible patterns. A blind AI cannot safely add or alter a column without this reference — direct `ALTER TABLE` statements outside the migration system will desync schema versions across the Root/App/Session split-DB hierarchy.
+
+### 20.1 Migration Tool
+
+| Layer | Tool | Source-of-Truth Path |
+|-------|------|----------------------|
+| **Go services** | GORM AutoMigrate + raw SQL files for irreversible ops | `internal/db/migrations/` |
+| **PHP services** | Hand-written SQL files, applied in lexical order | `db/migrations/` |
+| **TypeScript / Node** | Drizzle-Kit | `drizzle/migrations/` |
+
+GORM AutoMigrate handles **additive** changes (new columns with defaults, new indexes). Anything **destructive or irreversible** (drop column, rename, type change, data backfill) requires a hand-written SQL migration in the same directory.
+
+### 20.2 Migration File Naming
+
+```
+<UTC-timestamp>_<verb>_<scope>.sql
+```
+
+Examples:
+```
+20260422120000_add_LastLoginAt_to_User.sql
+20260422121500_create_AuditLog.sql
+20260422123000_backfill_User_DisplayName.sql
+20260422124500_drop_LegacyToken_from_User.sql
+```
+
+**Rules:**
+- `UTC-timestamp` is `YYYYMMDDHHmmss` — collision-proof and lex-sortable.
+- `verb` is one of: `add`, `drop`, `rename`, `alter`, `create`, `backfill`, `index`.
+- `scope` follows PascalCase: `<Column>_to_<Table>` or just `<Table>`.
+- File extension is always `.sql` (never `.up.sql` / `.down.sql` — see §20.4).
+
+### 20.3 Reversible Migration Pattern
+
+Every migration file contains both forward and reverse SQL, separated by a sentinel marker:
+
+```sql
+-- @migration: add_LastLoginAt_to_User
+-- @up
+ALTER TABLE User ADD COLUMN LastLoginAt DATETIME NULL;
+
+-- @down
+ALTER TABLE User DROP COLUMN LastLoginAt;
+```
+
+**Required headers:**
+- `@migration: <name>` — must match the file name (sans timestamp and `.sql`).
+- `@up` — forward SQL (always required).
+- `@down` — reverse SQL (required unless the migration is non-reversible — then add `@irreversible: <reason>`).
+
+The migration runner (`internal/db/migrate.go` for Go; `db/migrate.php` for PHP) reads these markers.
+
+### 20.4 RLS / Casbin-Safe Column-Add Pattern
+
+When adding a column to a table that has Row-Level Security or Casbin policies attached, follow this 4-step pattern to avoid policy desync:
+
+```sql
+-- @up
+-- 1. Add the column nullable (no default — Rule 12).
+ALTER TABLE Project ADD COLUMN OwnerUserId INTEGER NULL;
+
+-- 2. Backfill from existing relationship.
+UPDATE Project SET OwnerUserId = (SELECT CreatedByUserId FROM Project p2 WHERE p2.ProjectId = Project.ProjectId);
+
+-- 3. Add FK index AFTER backfill to avoid blocking the update.
+CREATE INDEX idx_Project_OwnerUserId ON Project(OwnerUserId);
+
+-- 4. Add Casbin policy rows for the new column (NOT a schema change — data change).
+INSERT INTO casbin_rule (ptype, v0, v1, v2) VALUES ('p', 'owner', 'Project', 'read');
+INSERT INTO casbin_rule (ptype, v0, v1, v2) VALUES ('p', 'owner', 'Project', 'write');
+
+-- @down
+DELETE FROM casbin_rule WHERE v1 = 'Project' AND v2 IN ('read', 'write') AND v0 = 'owner';
+DROP INDEX idx_Project_OwnerUserId;
+ALTER TABLE Project DROP COLUMN OwnerUserId;
+```
+
+**Never** add a `NOT NULL` column to a table with existing rows without a backfill step in the same migration. Rule 12 (free-text columns) requires nullable anyway, so this aligns naturally for `Description`/`Notes`/`Comments`.
+
+### 20.5 Split-DB Migration Routing
+
+Each migration declares its target DB layer via a header:
+
+```sql
+-- @migration: create_AuditLog
+-- @target: app          -- one of: root | app | session
+-- @up
+CREATE TABLE AuditLog (...);
+```
+
+The migration runner routes to the correct SQLite file based on `@target`:
+- `root` → `~/.app/root.db` (cross-app config, license)
+- `app` → `~/.app/<appName>/app.db` (per-app state)
+- `session` → `~/.app/<appName>/sessions/<sessionId>.db` (per-user-session state)
+
+### 20.6 Migration Linter Rules
+
+| Rule ID | Enforces |
+|---------|----------|
+| `MIG-NAMING-001` | File name matches `<timestamp>_<verb>_<scope>.sql` pattern |
+| `MIG-HEADERS-001` | `@migration`, `@up`, and (`@down` OR `@irreversible`) all present |
+| `MIG-TARGET-001` | `@target` declared and is one of `root`/`app`/`session` |
+| `MIG-NULLABLE-001` | New columns are nullable (aligns with Rule 12); waiver same syntax as §19.3 |
+
+### 20.7 Failure Recovery
+
+| Symptom | Fix |
+|---------|-----|
+| `migration X: missing @down marker` | Add `@down` block, or `@irreversible: <reason>` |
+| `migration X: target undeclared` | Add `@target: app` (or `root`/`session`) |
+| `casbin policy missing for new column` | Add INSERT into `casbin_rule` in the same `@up` block |
+| `column NOT NULL on backfilled rows` | Split into 3 migrations: add nullable → backfill → SET NOT NULL |
+
+---
+
+*Database Migrations section added — v3.4.0 — 2026-04-22*
