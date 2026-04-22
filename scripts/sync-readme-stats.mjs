@@ -31,6 +31,12 @@ function loadStats() {
   };
 }
 
+const HEALTH_PATH = resolve(ROOT, "public/health-score.json");
+function loadHealth() {
+  if (!existsSync(HEALTH_PATH)) return { overallScore: null, grade: null, blindAiAudit: { score: null } };
+  return JSON.parse(readFileSync(HEALTH_PATH, "utf8"));
+}
+
 function buildBadges(s) {
   const repo = "alimtvnetwork/coding-guidelines-v15";
   // shields.io uses `--` to render a literal dash in the value segment.
@@ -49,12 +55,21 @@ function buildBadges(s) {
 
 function buildPlatformBadges() {
   const repo = "alimtvnetwork/coding-guidelines-v15";
+  const health = loadHealth();
+  const escDash = (v) => String(v).replace(/-/g, "--");
+  const enc = (v) => encodeURIComponent(escDash(v));
+  const healthLabel = health.overallScore != null
+    ? `${health.overallScore}%2F100%20(${health.grade})`
+    : "unknown";
+  const healthColor = (health.overallScore ?? 0) >= 90 ? "22C55E"
+    : (health.overallScore ?? 0) >= 75 ? "F59E0B" : "EF4444";
+  const auditScore = health.blindAiAudit?.score != null ? `${health.blindAiAudit.score}%2F100` : "unknown";
   return [
     `[![Languages](https://img.shields.io/badge/languages-Go%20%7C%20TS%20%7C%20PHP%20%7C%20Rust%20%7C%20C%23-EC4899?style=flat-square)](spec/02-coding-guidelines/)`,
     `[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-6366F1?style=flat-square)](#-bundle-installers)`,
     `[![Bundles](https://img.shields.io/badge/bundles-7-14B8A6?style=flat-square)](bundles.json)`,
-    `[![Health Score](https://img.shields.io/badge/health-100%2F100-22C55E?style=flat-square)](public/health-score.json)`,
-    `[![Blind%20AI%20Audit](https://img.shields.io/badge/blind%20AI%20audit-99.8%2F100-FF6E3C?style=flat-square)](spec/17-consolidated-guidelines/29-blind-ai-audit-v3.md)`,
+    `[![Health Score](https://img.shields.io/badge/health-${healthLabel}-${healthColor}?style=flat-square)](public/health-score.json)`,
+    `[![Blind%20AI%20Audit](https://img.shields.io/badge/blind%20AI%20audit-${auditScore}-FF6E3C?style=flat-square)](spec/17-consolidated-guidelines/29-blind-ai-audit-v3.md)`,
     `[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-22C55E?style=flat-square)](#-contributing)`,
     `[![Made With Lovable](https://img.shields.io/badge/made%20with-Lovable-FF6E3C?style=flat-square)](https://lovable.dev)`,
     `[![Stars](https://img.shields.io/github/stars/${repo}?style=flat-square&color=F59E0B)](https://github.com/${repo}/stargazers)`,
