@@ -13,6 +13,9 @@ A production-grade, AI-optimized specification system for enforcing coding stand
 ![Spec Viewer Preview](public/images/spec-viewer-preview.png)
 *The built-in Spec Documentation Viewer — browse, search, and read all 495 spec files with syntax highlighting, keyboard navigation, and fullscreen mode.*
 
+![Coding Guidelines Walkthrough](public/images/coding-guidelines-walkthrough.gif)
+*Animated walkthrough — the 5 core principles, a before/after refactor, and the 7 install bundles. Loops automatically.*
+
 ---
 
 ## Install Scripts
