@@ -1,12 +1,12 @@
 ---
 name: README Bundle Installers + GIFs
-description: README has 7 bundle one-liners, walkthrough GIF, install-flow GIF; full improvement plan in spec/17/30
+description: README rewritten to 243 lines in v3.56.0 (Phases A–E shipped). Auto-stamped via scripts/sync-readme-stats.mjs. Long-form moved to docs/{architecture,principles,author}.md. Bundle matrix + AI Agents section + verify/uninstall on root.
 type: feature
 ---
 
-## Status (as of v3.55.0, 2026-04-22)
+## Status (as of v3.56.0, 2026-04-22)
 
-**Shipped:**
+**Shipped in v3.55.0:**
 - `public/images/coding-guidelines-walkthrough.gif` — 7-slide editorial deck (DejaVuSans + LiberationMono, 960×540, 145 KB, 34s loop). Embedded at top of `readme.md` under the Spec Viewer screenshot.
 - `public/images/install-flow.gif` — terminal install demo (144 KB). Embedded inside the new **Bundle Installers** section.
 - `readme.md` **Bundle Installers** section — 7-row matrix with bash + PowerShell one-liners, "pick a bundle by goal" table, traits list. Links to `bundles.json`.
@@ -14,12 +14,18 @@ type: feature
 - All 7 bundles verified present: error-manage, splitdb, slides, linters, cli, wp, consolidated. Each has `<bundle>-install.sh` + `<bundle>-install.ps1` + spec folders + `bundles.json` registration.
 - New consolidated files registered in `spec/17-consolidated-guidelines/00-overview.md`: 28 (distribution-and-runner), 29 (blind-ai-audit-v3), 30 (readme improvement suggestions).
 
-**Pending — driven by `spec/17-consolidated-guidelines/30-readme-improvement-suggestions.md`:**
-- Phase A: Above-the-fold rewrite (auto-stamped file count, elevator pitch, badges)
-- Phase B: Promote bundle matrix to top, add verify + uninstall sections
-- Phase C: Split readme.md into `readme.md` + `docs/*.md` (currently 1379 lines, violates 300-line rule)
-- Phase D: AI-agent canonical-entry-points section
-- Phase E: Visual polish + accessibility
+**Shipped in v3.56.0 (Phases A–E):**
+- `readme.md` rewritten 1397 → **243 lines** (well under 400-line target). Hand-edited content moved into `docs/architecture.md`, `docs/principles.md`, `docs/author.md`.
+- Auto-stamp script: `scripts/sync-readme-stats.mjs` rewrites `<!-- STAMP:KEY -->...<!-- /STAMP:KEY -->` markers from `version.json`. Wired into `npm run sync` and `prebuild`.
+- Stamp keys: VERSION, UPDATED, FILES, FOLDERS, LINES, BADGES.
+- Badges: shields.io with `--` dash escape, AI-Ready uses `%20` space (was malformed before).
+- `## For AI Agents` section lists canonical entry points (llm.md, bundles.json, version.json, condensed master, anti-hallucination rules, consolidated overview, .lovable/memory + prompts).
+- `Verify your install` section with `sha256sum` example + Windows `Get-FileHash`.
+- `Uninstall` section explaining manifest-free removal via `bundles.json`.
+- Phase E a11y: all images use `<img>` with `width="960"` and descriptive alt text; centred via `<p align="center">`.
+
+**Known pre-existing issues (not regressions):**
+- `spec/17-consolidated-guidelines/00-overview.md` references `28-distribution-and-runner.md` and `29-blind-ai-audit-v3.md` — neither file exists yet. These were registered as planned content from prior phases but were never authored. Either create the files or remove the index entries.
 
 ## How to regenerate the GIFs
 
