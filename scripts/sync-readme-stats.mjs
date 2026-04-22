@@ -33,14 +33,16 @@ function loadStats() {
 
 function buildBadges(s) {
   const repo = "alimtvnetwork/coding-guidelines-v15";
-  const enc = (v) => encodeURIComponent(String(v));
+  // shields.io uses `--` to render a literal dash in the value segment.
+  const escDash = (v) => String(v).replace(/-/g, "--");
+  const enc = (v) => encodeURIComponent(escDash(v));
   return [
     `[![Version](https://img.shields.io/badge/version-${enc(s.version)}-3B82F6?style=flat-square)](https://github.com/${repo}/releases)`,
     `[![Spec Files](https://img.shields.io/badge/spec%20files-${enc(s.files)}-10B981?style=flat-square)](spec/)`,
     `[![Folders](https://img.shields.io/badge/folders-${enc(s.folders)}-8B5CF6?style=flat-square)](spec/)`,
     `[![Lines](https://img.shields.io/badge/lines-${enc(s.lines.toLocaleString())}-F59E0B?style=flat-square)](version.json)`,
     `[![License](https://img.shields.io/badge/license-MIT-22C55E?style=flat-square)](LICENSE)`,
-    `[![AI-Ready](https://img.shields.io/badge/AI--ready-yes-FF6E3C?style=flat-square)](llm.md)`,
+    `[![AI Ready](https://img.shields.io/badge/AI%20ready-yes-FF6E3C?style=flat-square)](llm.md)`,
     `[![Updated](https://img.shields.io/badge/updated-${enc(s.updated)}-0EA5E9?style=flat-square)](version.json)`,
   ].join(" ");
 }
