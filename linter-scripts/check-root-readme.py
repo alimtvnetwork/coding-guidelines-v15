@@ -74,7 +74,9 @@ def has_author_block(body: str) -> bool:
 
 
 def section_present(body: str, name: str) -> bool:
-    return bool(re.search(rf'^##\s.*{re.escape(name)}', body, re.MULTILINE))
+    md_heading = re.search(rf'^##\s.*{re.escape(name)}', body, re.MULTILINE)
+    html_heading = re.search(rf'<h2[^>]*>.*{re.escape(name)}', body, re.IGNORECASE)
+    return bool(md_heading or html_heading)
 
 
 def stamp_present(body: str, key: str) -> bool:
