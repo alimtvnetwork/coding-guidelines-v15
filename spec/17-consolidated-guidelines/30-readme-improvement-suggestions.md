@@ -2,7 +2,7 @@
 
 > **Created:** 2026-04-22 (Asia/Kuala_Lumpur)
 > **Owner:** Md. Alim Ul Karim
-> **Status:** Draft — awaiting approval before applying
+> **Status:** ✅ Phases A–E shipped in v3.56.0 (2026-04-22)
 > **Source:** Audit of `readme.md` (1354 lines, last touched in v3.51.0)
 
 ## Purpose
@@ -75,13 +75,13 @@ The two new GIFs (`coding-guidelines-walkthrough.gif`, `install-flow.gif`) and t
 
 If you say **"do improvements"** I will execute in this order, one phase per turn:
 
-1. **Phase A** — Above-the-fold rewrite (#1–#4, #20, #22). Highest visitor impact, low risk.
-2. **Phase B** — Promote bundle matrix + uninstall + verify (#5–#8). Builds on what we shipped today.
-3. **Phase C** — Split into `readme.md` + `docs/*.md` (#9, #10). Larger refactor, needs your sign-off on file boundaries.
-4. **Phase D** — AI-agent section + schema validation (#17–#19). Aligns with your handoff-to-other-AI workflow.
-5. **Phase E** — Visual polish + accessibility (#11–#16, #21). Final coat of paint.
+1. ✅ **Phase A** — Above-the-fold rewrite (badges, elevator pitch, byline, 30-sec tour, auto-stamped counts via `scripts/sync-readme-stats.mjs`). Items #1–#4, #20, #22.
+2. ✅ **Phase B** — Bundle matrix promoted above generic install + Verify-your-install + Uninstall sections. Items #5–#8.
+3. ✅ **Phase C** — README split: `readme.md` (243 lines) + `docs/architecture.md` + `docs/principles.md` + `docs/author.md`. Items #9, #10.
+4. ✅ **Phase D** — `## For AI Agents` canonical-entry-points table (llm.md, bundles.json, version.json, condensed master, anti-hallucination rules, consolidated overview, Lovable memory + prompts). Items #17–#19.
+5. ✅ **Phase E** — `<img>` tags with `width="960"` + descriptive alt text on all three images; badges with `--` dash escapes; AI-Ready badge fixed. Items #11–#16, #21.
 
-Each phase ends with a version bump + this checklist updated to ✅.
+All five phases shipped together as **v3.56.0** (2026-04-22) per the user's "DO all" instruction. Auto-stamping is wired into `npm run sync` so future spec changes refresh the README without hand-editing.
 
 ---
 
