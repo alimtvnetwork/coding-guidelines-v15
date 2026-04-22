@@ -47,6 +47,20 @@ function buildBadges(s) {
   ].join(" ");
 }
 
+function buildPlatformBadges() {
+  const repo = "alimtvnetwork/coding-guidelines-v15";
+  return [
+    `[![Languages](https://img.shields.io/badge/languages-Go%20%7C%20TS%20%7C%20PHP%20%7C%20Rust%20%7C%20C%23-EC4899?style=flat-square)](spec/02-coding-guidelines/)`,
+    `[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-6366F1?style=flat-square)](#-bundle-installers)`,
+    `[![Bundles](https://img.shields.io/badge/bundles-7-14B8A6?style=flat-square)](bundles.json)`,
+    `[![Health Score](https://img.shields.io/badge/health-100%2F100-22C55E?style=flat-square)](spec/health-dashboard.md)`,
+    `[![Blind%20AI%20Audit](https://img.shields.io/badge/blind%20AI%20audit-99.8%2F100-FF6E3C?style=flat-square)](spec/17-consolidated-guidelines/29-blind-ai-audit-v3.md)`,
+    `[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-22C55E?style=flat-square)](#-contributing)`,
+    `[![Made With Lovable](https://img.shields.io/badge/made%20with-Lovable-FF6E3C?style=flat-square)](https://lovable.dev)`,
+    `[![Stars](https://img.shields.io/github/stars/${repo}?style=flat-square&color=F59E0B)](https://github.com/${repo}/stargazers)`,
+  ].join(" ");
+}
+
 function replaceMarker(body, key, value) {
   const re = new RegExp(`<!-- STAMP:${key} -->[\\s\\S]*?<!-- /STAMP:${key} -->`, "g");
   const replacement = `<!-- STAMP:${key} -->${value}<!-- /STAMP:${key} -->`;
@@ -64,6 +78,7 @@ function stampFile(relPath, stats) {
   after = replaceMarker(after, "FOLDERS", String(stats.folders));
   after = replaceMarker(after, "LINES", stats.lines.toLocaleString());
   after = replaceMarker(after, "BADGES", buildBadges(stats));
+  after = replaceMarker(after, "PLATFORM_BADGES", buildPlatformBadges());
   if (after === before) return false;
   writeFileSync(path, after);
   return true;

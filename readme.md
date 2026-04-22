@@ -1,12 +1,40 @@
-# Code Review & Specification System
+<p align="center">
+  <a href="https://github.com/alimtvnetwork/coding-guidelines-v15">
+    <img
+      src="public/images/coding-guidelines-icon.png"
+      alt="Coding Guidelines v15 brand icon — gradient shield with code-bracket symbol"
+      width="160"
+      height="160"
+    />
+  </a>
+</p>
 
-> *Battle-tested coding standards, error handling, and spec architecture for **Go, TypeScript, PHP, Rust, and C#** — engineered for both human developers and AI code generators.*
+<h1 align="center">Coding Guidelines v15</h1>
 
-**By [Md. Alim Ul Karim](https://alimkarim.com/)** — Chief Software Engineer, [Riseup Asia LLC](https://riseup-asia.com/) · [LinkedIn](https://www.linkedin.com/in/alimkarim) · [Stack Overflow](https://stackoverflow.com/users/513511/md-alim-ul-karim)
+<p align="center">
+  <strong>Battle-tested coding standards, error handling, and spec architecture<br/>
+  for <em>Go, TypeScript, PHP, Rust, and C#</em> — engineered for both human developers and AI code generators.</strong>
+</p>
 
-<!-- STAMP:BADGES -->[![Version](https://img.shields.io/badge/version-3.57.0-3B82F6?style=flat-square)](https://github.com/alimtvnetwork/coding-guidelines-v15/releases) [![Spec Files](https://img.shields.io/badge/spec%20files-609-10B981?style=flat-square)](spec/) [![Folders](https://img.shields.io/badge/folders-22-8B5CF6?style=flat-square)](spec/) [![Lines](https://img.shields.io/badge/lines-131%2C210-F59E0B?style=flat-square)](version.json) [![License](https://img.shields.io/badge/license-MIT-22C55E?style=flat-square)](LICENSE) [![AI Ready](https://img.shields.io/badge/AI%20ready-yes-FF6E3C?style=flat-square)](llm.md) [![Updated](https://img.shields.io/badge/updated-2026--04--22-0EA5E9?style=flat-square)](version.json)<!-- /STAMP:BADGES -->
+<p align="center">
+  <!-- STAMP:BADGES -->[![Version](https://img.shields.io/badge/version-3.58.0-3B82F6?style=flat-square)](https://github.com/alimtvnetwork/coding-guidelines-v15/releases) [![Spec Files](https://img.shields.io/badge/spec%20files-610-10B981?style=flat-square)](spec/) [![Folders](https://img.shields.io/badge/folders-22-8B5CF6?style=flat-square)](spec/) [![Lines](https://img.shields.io/badge/lines-131%2C441-F59E0B?style=flat-square)](version.json) [![License](https://img.shields.io/badge/license-MIT-22C55E?style=flat-square)](LICENSE) [![AI Ready](https://img.shields.io/badge/AI%20ready-yes-FF6E3C?style=flat-square)](llm.md) [![Updated](https://img.shields.io/badge/updated-2026--04--22-0EA5E9?style=flat-square)](version.json)<!-- /STAMP:BADGES -->
+</p>
 
-**Stats:** <!-- STAMP:FILES -->609<!-- /STAMP:FILES --> spec files · <!-- STAMP:FOLDERS -->22<!-- /STAMP:FOLDERS --> top-level folders · <!-- STAMP:LINES -->131,210<!-- /STAMP:LINES --> lines · v<!-- STAMP:VERSION -->3.57.0<!-- /STAMP:VERSION --> · updated <!-- STAMP:UPDATED -->2026-04-22<!-- /STAMP:UPDATED -->.
+<p align="center">
+  <!-- STAMP:PLATFORM_BADGES -->[![Languages](https://img.shields.io/badge/languages-Go%20%7C%20TS%20%7C%20PHP%20%7C%20Rust%20%7C%20C%23-EC4899?style=flat-square)](spec/02-coding-guidelines/) [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-6366F1?style=flat-square)](#-bundle-installers) [![Bundles](https://img.shields.io/badge/bundles-7-14B8A6?style=flat-square)](bundles.json) [![Health Score](https://img.shields.io/badge/health-100%2F100-22C55E?style=flat-square)](spec/health-dashboard.md) [![Blind%20AI%20Audit](https://img.shields.io/badge/blind%20AI%20audit-99.8%2F100-FF6E3C?style=flat-square)](spec/17-consolidated-guidelines/29-blind-ai-audit-v3.md) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-22C55E?style=flat-square)](#-contributing) [![Made With Lovable](https://img.shields.io/badge/made%20with-Lovable-FF6E3C?style=flat-square)](https://lovable.dev) [![Stars](https://img.shields.io/github/stars/alimtvnetwork/coding-guidelines-v15?style=flat-square&color=F59E0B)](https://github.com/alimtvnetwork/coding-guidelines-v15/stargazers)<!-- /STAMP:PLATFORM_BADGES -->
+</p>
+
+<p align="center">
+  <strong>By <a href="https://alimkarim.com/">Md. Alim Ul Karim</a></strong> — Chief Software Engineer, <a href="https://riseup-asia.com/">Riseup Asia LLC</a><br/>
+  <a href="https://www.linkedin.com/in/alimkarim">LinkedIn</a> ·
+  <a href="https://stackoverflow.com/users/513511/md-alim-ul-karim">Stack Overflow</a> ·
+  <a href="https://github.com/alimtvnetwork">GitHub</a> ·
+  <a href="docs/author.md">Full bio</a>
+</p>
+
+<p align="center">
+  <em>Stats:</em> <!-- STAMP:FILES -->610<!-- /STAMP:FILES --> spec files · <!-- STAMP:FOLDERS -->22<!-- /STAMP:FOLDERS --> top-level folders · <!-- STAMP:LINES -->131,441<!-- /STAMP:LINES --> lines · v<!-- STAMP:VERSION -->3.58.0<!-- /STAMP:VERSION --> · updated <!-- STAMP:UPDATED -->2026-04-22<!-- /STAMP:UPDATED -->
+</p>
 
 ---
 

@@ -184,6 +184,7 @@ spec/13-wp-plugin/03-exam-manager/
 | 08 | [08-cross-references.md](./08-cross-references.md) | Rules | How to write cross-references, relative paths, and link integrity rules |
 | 09 | [09-exceptions.md](./09-exceptions.md) | Rules | All known exception cases with folder structure examples |
 | 10 | [10-mandatory-linter-infrastructure.md](./10-mandatory-linter-infrastructure.md) | Rules | Mandatory linter scripts — AI must verify presence before validation |
+| 11 | [11-root-readme-conventions.md](./11-root-readme-conventions.md) | Rules | **MANDATORY** root `readme.md` format — centered icon, hero block, author/company template, badges, §9 release-blocker checklist |
 
 ## File Naming Convention (Quick Reference)
 
