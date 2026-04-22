@@ -23,7 +23,13 @@ A production-grade specification system you can drop into any codebase to enforc
 | 🐘 **WordPress plugin dev** | [`wp` bundle](#-bundle-installers) → [`spec/18-wp-plugin-how-to/`](spec/18-wp-plugin-how-to/00-overview.md) |
 | 🤖 **AI agent / LLM** | [`## For AI Agents`](#-for-ai-agents) below — canonical entry points |
 
-![Coding Guidelines Walkthrough](public/images/coding-guidelines-walkthrough.gif)
+<p align="center">
+  <img
+    src="public/images/coding-guidelines-walkthrough.gif"
+    alt="Animated 7-slide walkthrough of the coding guidelines: the 5 core principles, a before/after CODE-RED refactor, and the 7 install bundles. Loops automatically."
+    width="960"
+  />
+</p>
 
 *Animated walkthrough — the 5 core principles, a before/after refactor, and the 7 install bundles. Loops automatically.*
 
@@ -52,7 +58,13 @@ If you are an LLM or autonomous coding agent, these are your **canonical entry p
 
 Each bundle is an **independent one-line installer** that pulls only the spec folders it needs. Use these instead of the full repo install when you want a focused subset.
 
-![Install Flow](public/images/install-flow.gif)
+<p align="center">
+  <img
+    src="public/images/install-flow.gif"
+    alt="Terminal animation showing a one-line bundle install: curl piped to bash, the temp directory being populated, target spec folders appearing in the current directory, and the linter exiting green."
+    width="960"
+  />
+</p>
 
 *One line. Any bundle. Anywhere — no clone required.*
 
@@ -196,7 +208,13 @@ Plus the live spec tree:
 - [`spec/health-dashboard.md`](spec/health-dashboard.md) — global self-assessment.
 - [`spec/17-consolidated-guidelines/00-overview.md`](spec/17-consolidated-guidelines/00-overview.md) — master consolidated index.
 
-![Spec Viewer Preview](public/images/spec-viewer-preview.png)
+<p align="center">
+  <img
+    src="public/images/spec-viewer-preview.png"
+    alt="Screenshot of the built-in Spec Documentation Viewer showing the left-hand folder tree, a syntax-highlighted markdown spec in the centre pane, and the keyboard navigation hints in the footer."
+    width="960"
+  />
+</p>
 
 *The built-in Spec Documentation Viewer — browse, search, and read all spec files with syntax highlighting, keyboard navigation, and fullscreen mode.*
 
