@@ -29,7 +29,9 @@ const OUT_PATH = resolve(ROOT, "public/health-score.json");
 function readDashboardScore() {
   if (!existsSync(DASHBOARD_PATH)) return { score: null, grade: null };
   const body = readFileSync(DASHBOARD_PATH, "utf8");
-  const match = body.match(/Overall Health:\s*\*\*?(\d+)\s*\/\s*100\s*\(([A-F][+-]?)\)/i);
+  // Matches both "Overall Health:** 80/100 (B)" and "**Overall Health:** 80/100 (B)"
+  const match = body.match(/Overall Health:\*\*\s*(\d+)\s*\/\s*100\s*\(([A-F][+-]?)\)/i)
+    || body.match(/Overall Health:\s*(\d+)\s*\/\s*100\s*\(([A-F][+-]?)\)/i);
   if (!match) return { score: null, grade: null };
   return { score: Number(match[1]), grade: match[2] };
 }
