@@ -73,6 +73,7 @@ function buildPlatformBadges() {
     `[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-22C55E?style=flat-square)](#-contributing)`,
     `[![Made With Lovable](https://img.shields.io/badge/made%20with-Lovable-FF6E3C?style=flat-square)](https://lovable.dev)`,
     `[![Stars](https://img.shields.io/github/stars/${repo}?style=flat-square&color=F59E0B)](https://github.com/${repo}/stargazers)`,
+    `[![Issues](https://img.shields.io/github/issues/${repo}?style=flat-square&color=EF4444)](https://github.com/${repo}/issues)`,
   ].join(" ");
 }
 
