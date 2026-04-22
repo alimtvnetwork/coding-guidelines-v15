@@ -90,10 +90,10 @@ These are explicitly **kept open by design** — closing them would create dupli
 
 | Gap | Why Acceptable |
 |-----|----------------|
-| `15-distribution-and-runner/` no standalone consolidated file | ✅ Closed in Phase 6B (2026-04-22) — promoted to [`28-distribution-and-runner.md`](./28-distribution-and-runner.md) once source folder reached 6 files |
+| `15-distribution-and-runner/` no standalone consolidated file | Folded into `17-self-update-app-update.md`; promote only if folder grows beyond 5 source files |
 | `16-generic-release/` folded into CI/CD consolidated | Overlaps heavily with `12-cicd-pipeline-workflows/` |
 | `10-research/`, `21-app/`, `22-app-issues/` placeholder folders | Memory rule: intentional stubs; never write 97/99 files for them |
-| Linter framework internals (how to author a new rule from zero) | ✅ Closed in Phase 6A (2026-04-22) — see [`27-linter-authoring-guide.md`](./27-linter-authoring-guide.md) |
+| Linter framework internals (how to author a new rule from zero) | §34 documents all 16 existing rules and their contracts; framework-internal patterns are reasonably inferred from existing code — full "Linter Authoring Guide" can be a future Phase 6 if requested |
 
 ---
 

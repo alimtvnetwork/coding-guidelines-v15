@@ -202,7 +202,7 @@ gitmap-v3/spec/01-app
 
 [doc-only]
 # Folders intentionally referenced only in prose, never created
-spec/NN-doc-only-example/  # placeholder used only in prose
+spec/99-future-work
 ```
 
 ### §6.2 Mandatory comment header

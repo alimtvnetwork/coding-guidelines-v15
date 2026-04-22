@@ -1,6 +1,6 @@
 # Memory Index
 
-**Updated:** 2026-04-22
+**Updated:** 2026-04-21
 
 # Project Memory
 
@@ -17,13 +17,11 @@
 - Repo: `alimtvnetwork/coding-guidelines-v15`. Install scripts live at repo root (`install.ps1` / `install.sh`).
 - `.lovable/` structure: single-file convention — `plan.md`, `suggestions.md`, `strictly-avoid.md` each hold their full history. Never create per-task folders.
 - Execution: Break complex requests into discrete tasks. Wait for "next" prompt to continue.
-- 🔄 PROMPT TRIGGERS: chat phrases `blind audit` / `audit gap` / `gap audit` / `blind ai audit` invoke `.lovable/prompts/04-blind-audit-prompt.md` — execute Phase 1 only, then wait for `next`. See `mem://workflow/02-blind-audit-trigger.md`.
 
 ## Memory Files
 
 ### Workflow
 - [Plan Tracker](workflow/01-plan-tracker.md) — Mirrors `.lovable/plan.md`; chronological tracker of completed and pending tasks.
-- [Blind-Audit Trigger](workflow/02-blind-audit-trigger.md) — Wires `blind audit` / `audit gap` chat triggers to `.lovable/prompts/04-blind-audit-prompt.md` for phase-by-phase blind-AI implementability audits.
 
 ### Suggestions
 - [Suggestions Tracker](suggestions/01-suggestions-tracker.md) — Mirrors `.lovable/suggestions.md`; tracks active and implemented suggestions.
@@ -33,6 +31,7 @@
 - [Phase 2 — Content Overlap Audit](project/phase2-content-overlap-audit.md)
 - [Phase 3 — Consolidated Structure Design](project/phase3-consolidated-structure-design.md)
 - [v2.2 Error Spec Changes](project/v2.2-error-spec-changes.md)
+- [README Bundle Installers + GIFs (v3.55.0)](project/03-readme-bundle-installers.md)
 
 ### Features
 - [Visual Rendering System](features/visual-rendering-system.md)
