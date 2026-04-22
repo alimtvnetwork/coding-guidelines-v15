@@ -1,7 +1,7 @@
 # Consolidated: CI/CD Pipeline Workflows — Complete Reference
 
-**Version:** 3.2.0  
-**Updated:** 2026-04-16  
+**Version:** 3.3.0  
+**Updated:** 2026-04-22  
 **Source Module:** [`spec/12-cicd-pipeline-workflows/`](../12-cicd-pipeline-workflows/00-overview.md)
 
 ---
@@ -9,6 +9,27 @@
 ## Purpose
 
 This is the **standalone consolidated reference** for all CI/CD pipeline specifications. An AI reading only this file must be able to implement any pipeline described here without consulting source specs.
+
+### Source-Folder Coverage Map
+
+The source module `spec/12-cicd-pipeline-workflows/` contains 13 root specs + 3 subfolders + diagrams. All are summarized below.
+
+| Source File / Folder | Section | Status |
+|----------------------|---------|--------|
+| `01-shared-conventions.md`, `01-ci-pipeline.md` | §§Platform, Triggers, CI Pipeline | ✅ Full |
+| `02-github-release-standard.md`, `02-release-pipeline.md` | §Release Pipeline | ✅ Full |
+| `03-vulnerability-scanning.md` | §Vulnerability Scanning | ✅ Full |
+| `03-reusable-ci-guards/` | §Reusable CI Guards | ✅ Full (added) |
+| `04-install-script-generation.md`, `04-installation-flow.md` | §Install Scripts & Flow | ✅ Full |
+| `05-changelog-integration.md`, `05-code-signing.md` | §Changelog & Code Signing | ✅ Full |
+| `06-self-update-mechanism.md`, `06-version-and-help.md` | §Self-Update & Version | ✅ Reference (full in `17-self-update-app-update.md`) |
+| `07-environment-variable-setup.md`, `07-release-body-and-changelog.md` | §Env Setup & Release Body | ✅ Full |
+| `08-terminal-output-standards.md` | §Terminal Output | ✅ Full |
+| `09-binary-icon-branding.md` | §Binary Icon Branding | ✅ Full |
+| `10-release-pipeline-issues-rca.md` | §Release Issues RCA | ✅ Reference |
+| `01-browser-extension-deploy/` | §Browser Extension Deploy | ✅ Reference |
+| `02-go-binary-deploy/` | §Go Binary Deploy | ✅ Reference |
+| `images/` (mermaid diagrams) | Diagram links throughout | ✅ |
 
 ---
 
