@@ -127,14 +127,6 @@
 
 | Bundle | What it installs | Bash one-liner | PowerShell one-liner |
 |---|---|---|---|
-| <a id="bundle-error-manage"></a>**error-manage** | `spec/01-spec-authoring-guide/` + `spec/03-error-manage/` | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/error-manage-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/error-manage-install.ps1 \| iex` |
-| <a id="bundle-splitdb"></a>**splitdb** | `04-database-conventions/` + `05-split-db-architecture/` + `06-seedable-config-architecture/` | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/splitdb-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/splitdb-install.ps1 \| iex` |
-| <a id="bundle-slides"></a>**slides** | `spec-slides/` decks + `slides-app/` Vite presentation app | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/slides-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/slides-install.ps1 \| iex` |
-| <a id="bundle-linters"></a>**linters** | `linters/` (golangci-lint, phpcs, sonarqube, stylecop) + `linters-cicd/` runner pack | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/linters-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/linters-install.ps1 \| iex` |
-| <a id="bundle-cli"></a>**cli** | `spec/11`–`spec/16` (PowerShell, CI/CD, generic CLI, update, distribution, release) | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/cli-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/cli-install.ps1 \| iex` |
-| <a id="bundle-wp"></a>**wp** | `spec/18-wp-plugin-how-to/` (WordPress plugin Gold-Standard spec) | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/wp-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/wp-install.ps1 \| iex` |
-| <a id="bundle-consolidated"></a>**consolidated** | `01-spec-authoring-guide/` + `03-error-manage/` + `17-consolidated-guidelines/` | `curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/consolidated-install.sh \| bash` | `irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/consolidated-install.ps1 \| iex` |
-
 All bundles share these traits:
 
 - **Zero dependencies on each other** — install any combination, in any order.
