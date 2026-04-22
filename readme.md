@@ -292,38 +292,9 @@ irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/c
 curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/consolidated-install.sh | bash
 ```
 
-### Verify your install
+### Verify & Uninstall
 
-Each release publishes a `checksums.txt` next to the bundle archive. Verify before extracting:
-
-```bash
-# Linux / macOS
-curl -fsSLO https://github.com/alimtvnetwork/coding-guidelines-v15/releases/download/v3.55.0/checksums.txt
-sha256sum -c checksums.txt --ignore-missing
-```
-
-```powershell
-# Windows PowerShell
-Invoke-WebRequest https://github.com/alimtvnetwork/coding-guidelines-v15/releases/download/v3.55.0/checksums.txt -OutFile checksums.txt
-Get-FileHash coding-guidelines-error-manage-v3.55.0.zip -Algorithm SHA256
-# Compare against the matching line in checksums.txt
-```
-
-> **Windows SmartScreen note:** if PowerShell flags the `irm | iex` pattern, run `Unblock-File .\install.ps1` after a manual download, or use `-ExecutionPolicy Bypass` for a single session. The release scripts are unsigned today — script signing is on the roadmap.
-
-### Uninstall
-
-The installers only **add** files — they do not track an uninstall manifest. To remove a bundle, delete the folders it created. For example, the `error-manage` bundle:
-
-```bash
-rm -rf spec/01-spec-authoring-guide spec/03-error-manage
-```
-
-```powershell
-Remove-Item -Recurse -Force spec\01-spec-authoring-guide, spec\03-error-manage
-```
-
-The exact folder list per bundle is in [`bundles.json`](bundles.json) under each bundle's `folders[].dest` field. A scripted `uninstall.sh` / `uninstall.ps1` is on the roadmap (Phase B follow-up).
+Each release publishes a `checksums.txt` next to the bundle archive — verify with `sha256sum -c checksums.txt --ignore-missing` (Unix) or `Get-FileHash … -Algorithm SHA256` (Windows). To uninstall, delete the folders the bundle created (listed under each bundle's `folders[].dest` in [`bundles.json`](bundles.json)). Windows SmartScreen note: if PowerShell flags `irm | iex`, use `-ExecutionPolicy Bypass` for a single session.
 
 ---
 
