@@ -54,6 +54,26 @@
               "stableName":      { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
               "versionedPrefix": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" }
             }
+          },
+          "prebuilt": {
+            "description": "OPTIONAL pre-built artifact baked into the bundle archive. The release workflow runs the build command and includes the output folder under the declared `dest` path. Used for bundles that ship a compiled deliverable (e.g. slides-app dist/).",
+            "type": "object",
+            "required": ["src", "dest"],
+            "additionalProperties": false,
+            "properties": {
+              "src":   { "type": "string", "minLength": 1, "description": "Output folder produced by the build (relative to repo root)." },
+              "dest":  { "type": "string", "minLength": 1, "description": "Where the built folder lands inside the install target." },
+              "build": { "type": "string", "minLength": 1, "description": "Shell command run from repo root to produce src/." }
+            }
+          },
+          "autoOpen": {
+            "description": "OPTIONAL HTML entry the installer opens in the user's default browser after a successful install. Path is resolved relative to the install target. When omitted, no auto-open occurs.",
+            "type": "object",
+            "required": ["entry"],
+            "additionalProperties": false,
+            "properties": {
+              "entry": { "type": "string", "minLength": 1, "description": "Relative path to an HTML file to open (e.g. slides-app/dist/index.html)." }
+            }
           }
         }
       }

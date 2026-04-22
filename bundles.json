@@ -38,7 +38,7 @@
     {
       "name": "slides",
       "title": "Slides App + Decks",
-      "description": "Installs the slides Vite app and the source decks (spec-slides/).",
+      "description": "Installs the slides Vite app, the source decks (spec-slides/), and the pre-built dist/ so index.html opens directly in the browser — no Node/build step required.",
       "intent": ["slides", "presentation", "training", "deck", "teach", "workshop", "onboarding"],
       "audience": "trainer",
       "folders": [
@@ -48,6 +48,14 @@
       "archive": {
         "stableName": "slides",
         "versionedPrefix": "coding-guidelines-slides"
+      },
+      "prebuilt": {
+        "src": "slides-app/dist",
+        "dest": "slides-app/dist",
+        "build": "cd slides-app && bun install --frozen-lockfile && bun run build"
+      },
+      "autoOpen": {
+        "entry": "slides-app/dist/index.html"
       }
     },
     {
