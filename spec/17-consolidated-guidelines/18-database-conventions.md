@@ -1,7 +1,7 @@
 # Consolidated: Database Conventions — Complete Reference
 
-**Version:** 3.2.0  
-**Updated:** 2026-04-16
+**Version:** 3.3.0  
+**Updated:** 2026-04-22
 
 ---
 
@@ -10,6 +10,20 @@
 This is the **standalone consolidated reference** for all database conventions. An AI reading only this file must be able to design, implement, test, and expose correct database schemas without consulting source specs.
 
 **Source:** `spec/04-database-conventions/` (7 files) + `spec/02-coding-guidelines/01-cross-language/07-database-naming.md`
+
+### Source-Folder Coverage Map
+
+| Source File | Section | Status |
+|-------------|---------|--------|
+| `04-database-conventions/01-naming-conventions.md` | §1 Naming | ✅ Full |
+| `04-database-conventions/02-schema-design.md` | §§2–6 PKs, columns, FKs, normalization, booleans | ✅ Full |
+| `04-database-conventions/03-orm-and-views.md` | §§7, 11 Views & ORM | ✅ Full |
+| `04-database-conventions/04-testing-strategy.md` | §13 Testing | ✅ Full |
+| `04-database-conventions/05-relationship-diagrams.md` | §17 Schema Example + diagrams | ✅ Full |
+| `04-database-conventions/06-rest-api-format.md` | §12 REST API | ✅ Full |
+| `04-database-conventions/07-split-db-pattern.md` | §Cross-ref to `05-split-db-architecture.md` | ✅ Reference |
+| `02-coding-guidelines/01-cross-language/07-database-naming.md` | §1 (cross-cutting) | ✅ Full |
+| **NEW:** Mandatory free-text columns (Rules 10/11/12) | §§ 6.5, 18 (added) | ✅ Full |
 
 ---
 
