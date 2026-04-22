@@ -53,17 +53,17 @@ A specification system trusted by production engineering teams. Drop these folde
 
 <p align="center">
   <img
-    src="public/images/coding-guidelines-walkthrough.gif"
-    alt="Animated 7-slide walkthrough of the coding guidelines: the 5 core principles, a before/after CODE-RED refactor, and the 7 install bundles. Loops automatically."
+    src="public/images/coding-guidelines-walkthrough-poster.png"
+    alt="Coding Guidelines v15 walkthrough poster — 5 core principles, CODE-RED refactor example, and 7 install bundles"
     width="960"
   />
 </p>
 
 <p align="center">
-  <em>(Static fallback for PDF/print: <a href="public/images/coding-guidelines-walkthrough-poster.png">coding-guidelines-walkthrough-poster.png</a>)</em>
+  <em>(Animated version: <a href="public/images/coding-guidelines-walkthrough.gif">coding-guidelines-walkthrough.gif</a>)</em>
 </p>
 
-*Animated walkthrough — the 5 core principles, a before/after refactor, and the 7 install bundles. Loops automatically.*
+*Static walkthrough poster — the 5 core principles, a before/after refactor, and the 7 install bundles. Animated GIF available above.*
 
 ---
 
