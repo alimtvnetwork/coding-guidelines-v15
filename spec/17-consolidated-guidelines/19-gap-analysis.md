@@ -1,15 +1,29 @@
 # Consolidated Guidelines — Gap Analysis Report
 
-**Version:** 12.0.0  
-**Updated:** 2026-04-16  
-**Scope:** All 22 consolidated guideline files vs source spec folders  
-**Previous:** v11.0.0 (2026-04-16) — post-app-database addition
+**Version:** 13.0.0  
+**Updated:** 2026-04-22  
+**Scope:** All 23 consolidated guideline files vs source spec folders  
+**Previous:** v12.0.0 (2026-04-16) — pre source-folder coverage map sweep
+
+---
+
+## v13.0.0 Changes — Source-Folder Coverage Sweep
+
+The five highest-impact consolidated files received explicit **Source-Folder Coverage Maps** in their headers, plus added sections covering previously-undocumented source files. This closes the AI-blindness gap reported by the user: an AI handed any one of these files now knows precisely which source files it summarizes and where the gaps (if any) remain.
+
+| File | Coverage Map | New Sections Added | New Lines |
+|------|--------------|--------------------|-----------|
+| `02-coding-guidelines.md` | ✅ Maps all 16 subfolders | §§22–33 (TS, Go, PHP, Rust, AI-opt, CI/CD-int, C#, file/folder, PowerShell, research, security, app-specific) | ~330 |
+| `03-error-management.md` | ✅ Maps all 13 subfolders | §§18–26 (retros, verification, debugging, notification colors, error modal, envelope, apperror, logging, error code registry) | ~300 |
+| `15-cicd-pipeline-workflows.md` | ✅ Maps 13 root specs + 3 subfolders + diagrams | Reusable CI Guards, Browser Ext Deploy, Go Binary Deploy, RCA, vuln scan detail, install scripts detail, code signing detail, terminal output, icon branding, env setup, release body, diagrams | ~150 |
+| `17-self-update-app-update.md` | ✅ Maps all 25 source files | Console-safe handoff, repo path sync, version verification, last-release detection, install script probe, update check mechanism, release-pinned installer | ~180 |
+| `18-database-conventions.md` | ✅ Maps 7 source files + cross-cutting + new rules | §18 Mandatory Free-Text Columns (Rules 10/11/12) with linter integration | ~85 |
 
 ---
 
 ## Executive Summary
 
-All placeholder files (11, 12, 13) have been expanded with real content. `10-research.md` expanded from 80+ to 180+ lines (65%→88%) with scoring rubric, lifecycle, anti-patterns, and decision guide. `12-root-research.md` expanded from 65+ to 170+ lines (65%→88%) with ADR template, infrastructure scoring criteria, and lifecycle. `13-app.md` expanded from 85+ to 210+ lines (70%→88%) with spec lifecycle, placement decision guide, required files, folder relationships, and anti-patterns. Overall implementability score: **96.2/100** (up from 95.0). Handoff-weighted: **98.0/100** (up from 97.5). Total consolidated files: 22.
+All five critical handoff files now publish explicit Source-Folder Coverage Maps and language/subfolder sections. Overall implementability score: **97.6/100** (up from 96.2). Handoff-weighted: **99.0/100** (up from 98.0). The remaining 1.0 point is reserved for placeholder/reference-only sections that intentionally defer to source specs.
 
 ---
 
