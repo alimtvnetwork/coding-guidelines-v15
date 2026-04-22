@@ -31,6 +31,7 @@
 - [Phase 2 — Content Overlap Audit](project/phase2-content-overlap-audit.md)
 - [Phase 3 — Consolidated Structure Design](project/phase3-consolidated-structure-design.md)
 - [v2.2 Error Spec Changes](project/v2.2-error-spec-changes.md)
+- [README Bundle Installers + GIFs (v3.55.0)](project/03-readme-bundle-installers.md)
 
 ### Features
 - [Visual Rendering System](features/visual-rendering-system.md)
