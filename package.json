@@ -1,7 +1,7 @@
 {
   "name": "vite_react_shadcn_ts",
   "private": true,
-  "version": "3.61.0",
+  "version": "3.62.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -32,7 +32,9 @@
     "spec:verify:report:all": "node scripts/spec-verification/generate-coverage-report.mjs --mode all-files --out reports/spec-verification/coverage-all-files.md",
     "spec:verify:ci": "node scripts/spec-verification/generate-coverage-report.mjs --strict --out reports/spec-verification/coverage.md",
     "spec:verify:docs": "node scripts/spec-verification/generate-templates-doc.mjs",
-    "bundles:generate": "node scripts/generate-bundle-installers.mjs"
+    "bundles:generate": "node scripts/generate-bundle-installers.mjs",
+    "migrate:repo": "node scripts/migrate-repo-major-version.mjs",
+    "migrate:repo:dry": "node scripts/migrate-repo-major-version.mjs --dry-run"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
