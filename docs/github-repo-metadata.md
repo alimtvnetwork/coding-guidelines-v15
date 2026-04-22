@@ -18,10 +18,10 @@ gear icon next to "About" → **Description**.
 **Set to (exact text):**
 
 ```
-Battle-tested coding standards, error handling, and spec architecture for Go, TypeScript, PHP, Rust, and C# — engineered for both human developers and AI code generators.
+Production-grade coding standards with zero-nesting enforcement and AI-optimized spec architecture for Go, TypeScript, PHP, Rust, and C# — drop-in conventions for elite engineering teams.
 ```
 
-(196 chars — fits the 350-char GitHub limit comfortably.)
+(198 chars — fits the 350-char GitHub limit comfortably.)
 
 ---
 
@@ -56,6 +56,8 @@ golang
 typescript
 php
 wordpress
+rust
+c-sharp
 ```
 
 ---
