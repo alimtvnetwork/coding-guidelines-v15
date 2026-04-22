@@ -3,18 +3,31 @@
 // generate-bundle-installers.mjs
 //
 // Emits per-bundle one-liner installers (.sh / .ps1) at the repo root.
-// Each generated installer reads its definition from bundles.json
-// (single source of truth) and supports two install paths:
+// Reads bundle definitions from bundles.json (single source of truth).
+//
+// Generated installers support THREE install paths:
 //
 //   1. Versioned install (--version vX.Y.Z) → fetch the stable-named
 //      release archive (`<stableName>.tar.gz` / `.zip`) and extract
 //      with src→dest folder remapping. No git checkout required.
 //
-//   2. Branch install (default) → delegate to install.sh / install.ps1
-//      with the bundle's source folder list (legacy behavior).
+//   2. Main-branch install (default, no --version) → download a
+//      tarball/zip directly from `refs/heads/main` (codeload.github.com)
+//      and extract the same src→dest mapping. No git, no probe, no
+//      delegation. This is the new default — works behind firewalls
+//      that block the install.sh latest-version probe.
 //
-// All scripts also accept `--target <dir>` (alias `-Target`) to override
-// the install destination root.
+//   3. Auto-open (when bundle declares `autoOpen.entry`) → after a
+//      successful install, open the declared HTML entry in the user's
+//      default browser (macOS: open, Linux: xdg-open, Windows: start).
+//      Suppress with --no-open.
+//
+// Cross-platform notes:
+//   • Bash script uses POSIX-compatible parameter expansion and quotes
+//     every variable to survive paths with spaces. Tested on macOS bash
+//     3.2 and Linux bash 4+.
+//   • PowerShell script uses Invoke-WebRequest + Expand-Archive which
+//     ship with both Windows PowerShell 5.1 and PowerShell Core 7+.
 //
 // Source of truth: bundles.json. Edit the manifest, run this script,
 // commit the regenerated <bundle>-install.{sh,ps1} files.
@@ -30,14 +43,21 @@ import { fileURLToPath } from "node:url";
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const MANIFEST_PATH = resolve(REPO_ROOT, "bundles.json");
 const MANIFEST = JSON.parse(readFileSync(MANIFEST_PATH, "utf8"));
-const { rawBase: RAW_BASE, releaseBase: RELEASE_BASE, bundles: BUNDLES } = MANIFEST;
+const { repo: REPO_SLUG, rawBase: RAW_BASE, releaseBase: RELEASE_BASE, bundles: BUNDLES } = MANIFEST;
 const PKG = JSON.parse(readFileSync(resolve(REPO_ROOT, "package.json"), "utf8"));
 const EXAMPLE_VERSION = `v${PKG.version}`;
 
+// ── Bash installer ────────────────────────────────────────────────
 function bashScript(bundle) {
-  const srcList = bundle.folders.map((f) => f.src).join(",");
   const mappingPairs = bundle.folders.map((f) => `${f.src}|${f.dest}`).join(" ");
   const mappingComment = bundle.folders.map((f) => `${f.src} → ${f.dest}`).join("\n#   ");
+  const autoOpenEntry = bundle.autoOpen?.entry ?? "";
+  const autoOpenLine = autoOpenEntry
+    ? `#   • After install, opens ${autoOpenEntry} in your default browser\n#     (suppress with --no-open).\n#`
+    : "#";
+  const prebuiltNote = bundle.prebuilt
+    ? `# Pre-built artifact: ${bundle.prebuilt.dest} ships compiled inside the\n# release archive. No build step required on the user machine.\n#`
+    : "#";
   return `#!/usr/bin/env bash
 # =====================================================================
 # ${bundle.name}-install.sh — ${bundle.title}
@@ -51,9 +71,11 @@ function bashScript(bundle) {
 #
 # Install paths:
 #   • --version vX.Y.Z → fetch ${bundle.archive.stableName}.tar.gz from
-#     the GitHub Release and extract with src→dest folder remapping.
-#   • default          → delegate to install.sh (branch checkout).
-#
+#     the GitHub Release.
+#   • default          → fetch the main-branch tarball directly from
+#     codeload.github.com (no git, no probe, works behind firewalls).
+${autoOpenLine}
+${prebuiltNote}
 # Folder mapping (src in repo → dest under target):
 #   ${mappingComment}
 #
@@ -65,23 +87,31 @@ function bashScript(bundle) {
 set -euo pipefail
 
 BUNDLE_NAME="${bundle.name}"
-BUNDLE_FOLDERS_SRC="${srcList}"
 BUNDLE_MAPPING="${mappingPairs}"
 ARCHIVE_STABLE_NAME="${bundle.archive.stableName}"
 RELEASE_BASE="${RELEASE_BASE}"
-INSTALLER_URL="${RAW_BASE}/install.sh"
+REPO_SLUG="${REPO_SLUG}"
+AUTO_OPEN_ENTRY="${autoOpenEntry}"
 
 VERSION=""
 TARGET="$(pwd)"
-FORWARD_ARGS=()
+DO_OPEN=true
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --version)        VERSION="$2"; FORWARD_ARGS+=("--version" "$2"); shift 2 ;;
-    --target|--dest)  TARGET="$2"; FORWARD_ARGS+=("--dest" "$2");    shift 2 ;;
-    *)                FORWARD_ARGS+=("$1");                          shift   ;;
+    --version)        VERSION="$2"; shift 2 ;;
+    --target|--dest)  TARGET="$2";  shift 2 ;;
+    --no-open)        DO_OPEN=false; shift ;;
+    -h|--help)
+      grep -E '^# ' "$0" | sed 's/^# \\{0,1\\}//'
+      exit 0
+      ;;
+    *) echo "❌ Unknown option: $1" >&2; exit 1 ;;
   esac
 done
+
+mkdir -p "\${TARGET}"
+TARGET="$(cd "\${TARGET}" && pwd)"
 
 echo ""
 echo "════════════════════════════════════════════════════════"
@@ -90,69 +120,139 @@ echo "  Target: \${TARGET}"
 if [[ -n "\${VERSION}" ]]; then
   echo "  Mode:   versioned archive (\${ARCHIVE_STABLE_NAME}.tar.gz @ \${VERSION})"
 else
-  echo "  Mode:   branch checkout via install.sh"
+  echo "  Mode:   main-branch tarball (no release pinned)"
 fi
 echo "════════════════════════════════════════════════════════"
 echo ""
 
-# Skip the latest-installer probe — bundle scripts pin to install.sh as-is.
-export INSTALL_NO_PROBE=1
+# ── Helpers ───────────────────────────────────────────────────────
+have() { command -v "$1" >/dev/null 2>&1; }
 
-install_via_archive() {
-  local archive_url="\${RELEASE_BASE}/download/\${VERSION}/\${ARCHIVE_STABLE_NAME}.tar.gz"
-  local tmp; tmp="$(mktemp -d)"
-  trap "rm -rf \\"\${tmp}\\"" EXIT
-
-  echo "  ▸ downloading \${archive_url}"
-  if ! curl -fsSL -o "\${tmp}/bundle.tar.gz" "\${archive_url}"; then
-    echo "  ⚠️  archive fetch failed — falling back to install.sh" >&2
-    install_via_installer
-    return
-  fi
-
-  mkdir -p "\${tmp}/extract"
-  tar -xzf "\${tmp}/bundle.tar.gz" -C "\${tmp}/extract"
-
-  mkdir -p "\${TARGET}"
-  for pair in \${BUNDLE_MAPPING}; do
-    local src="\${pair%|*}"
-    local dest="\${pair#*|}"
-    if [[ ! -d "\${tmp}/extract/\${src}" ]]; then
-      echo "  ⚠️  archive missing \${src} — skipping" >&2
-      continue
-    fi
-    mkdir -p "\${TARGET}/\${dest}"
-    cp -R "\${tmp}/extract/\${src}/." "\${TARGET}/\${dest}/"
-    echo "  ✓ \${src} → \${TARGET}/\${dest}"
-  done
-}
-
-install_via_installer() {
-  if command -v curl >/dev/null 2>&1; then
-    curl -fsSL "\${INSTALLER_URL}" | bash -s -- --folders "\${BUNDLE_FOLDERS_SRC}" "\${FORWARD_ARGS[@]}"
-  elif command -v wget >/dev/null 2>&1; then
-    wget -qO- "\${INSTALLER_URL}" | bash -s -- --folders "\${BUNDLE_FOLDERS_SRC}" "\${FORWARD_ARGS[@]}"
+download() {
+  # download URL OUT  → 0 success, 1 failure
+  local url="$1" out="$2"
+  if have curl; then
+    curl -fsSL --retry 2 --retry-delay 1 -o "\${out}" "\${url}" && return 0 || return 1
+  elif have wget; then
+    wget -qO "\${out}" "\${url}" && return 0 || return 1
   else
     echo "❌ Neither curl nor wget found. Install one and retry." >&2
     exit 1
   fi
 }
 
+extract_mapping() {
+  # extract mapping from extract_root → TARGET, honoring src|dest pairs.
+  # When src is missing inside the archive, look one level deeper
+  # (codeload tarballs wrap content in <repo>-<ref>/).
+  local extract_root="$1"
+  local archive_root="\${extract_root}"
+  if [[ -d "\${extract_root}" ]]; then
+    local first_child
+    first_child="$(find "\${extract_root}" -mindepth 1 -maxdepth 1 -type d | head -n 1)"
+    if [[ -n "\${first_child}" ]]; then
+      # Heuristic: if none of the mapping srcs exist at root but DO exist
+      # inside first_child, treat first_child as the archive root.
+      local probe="\${BUNDLE_MAPPING%% *}"
+      local probe_src="\${probe%|*}"
+      if [[ ! -d "\${extract_root}/\${probe_src}" && -d "\${first_child}/\${probe_src}" ]]; then
+        archive_root="\${first_child}"
+      fi
+    fi
+  fi
+
+  local pair src dest
+  for pair in \${BUNDLE_MAPPING}; do
+    src="\${pair%|*}"
+    dest="\${pair#*|}"
+    if [[ ! -d "\${archive_root}/\${src}" ]]; then
+      echo "  ⚠️  archive missing \${src} — skipping" >&2
+      continue
+    fi
+    mkdir -p "\${TARGET}/\${dest}"
+    cp -R "\${archive_root}/\${src}/." "\${TARGET}/\${dest}/"
+    echo "  ✓ \${src} → \${TARGET}/\${dest}"
+  done
+}
+
+open_entry() {
+  [[ -z "\${AUTO_OPEN_ENTRY}" ]] && return 0
+  local entry_path="\${TARGET}/\${AUTO_OPEN_ENTRY}"
+  if [[ ! -f "\${entry_path}" ]]; then
+    echo "  ℹ️  entry file not found (\${entry_path}) — skipping auto-open" >&2
+    return 0
+  fi
+  if ! \${DO_OPEN}; then
+    echo "  ℹ️  --no-open set. Open manually: file://\${entry_path}"
+    return 0
+  fi
+  echo ""
+  echo "  ▸ opening \${entry_path}"
+  case "\$(uname -s 2>/dev/null || echo unknown)" in
+    Darwin*) open "\${entry_path}" >/dev/null 2>&1 || true ;;
+    Linux*)
+      if have xdg-open; then xdg-open "\${entry_path}" >/dev/null 2>&1 &
+      else echo "  ℹ️  xdg-open not found. Open manually: file://\${entry_path}"; fi
+      ;;
+    MINGW*|MSYS*|CYGWIN*) start "" "\${entry_path}" >/dev/null 2>&1 || true ;;
+    *) echo "  ℹ️  unknown OS. Open manually: file://\${entry_path}" ;;
+  esac
+}
+
+install_via_archive() {
+  local archive_url="\${RELEASE_BASE}/download/\${VERSION}/\${ARCHIVE_STABLE_NAME}.tar.gz"
+  local tmp; tmp="$(mktemp -d)"
+  trap 'rm -rf "'"\${tmp}"'"' EXIT
+
+  echo "  ▸ downloading \${archive_url}"
+  if ! download "\${archive_url}" "\${tmp}/bundle.tar.gz"; then
+    echo "  ⚠️  release archive not found for \${VERSION} — falling back to main branch" >&2
+    install_via_main_branch
+    return
+  fi
+  mkdir -p "\${tmp}/extract"
+  tar -xzf "\${tmp}/bundle.tar.gz" -C "\${tmp}/extract"
+  extract_mapping "\${tmp}/extract"
+}
+
+install_via_main_branch() {
+  local archive_url="https://codeload.github.com/\${REPO_SLUG}/tar.gz/refs/heads/main"
+  local tmp; tmp="$(mktemp -d)"
+  trap 'rm -rf "'"\${tmp}"'"' EXIT
+
+  echo "  ▸ downloading \${archive_url}"
+  if ! download "\${archive_url}" "\${tmp}/repo.tar.gz"; then
+    echo "❌ failed to download main-branch tarball from \${archive_url}" >&2
+    exit 1
+  fi
+  mkdir -p "\${tmp}/extract"
+  tar -xzf "\${tmp}/repo.tar.gz" -C "\${tmp}/extract"
+  extract_mapping "\${tmp}/extract"
+}
+
 if [[ -n "\${VERSION}" ]]; then
   install_via_archive
 else
-  install_via_installer
+  install_via_main_branch
 fi
 
 echo ""
 echo "✅ \${BUNDLE_NAME} installed."
+open_entry
 `;
 }
 
+// ── PowerShell installer ──────────────────────────────────────────
 function powershellScript(bundle) {
-  const srcList = bundle.folders.map((f) => f.src).join(",");
   const mappingPairs = bundle.folders.map((f) => `${f.src}|${f.dest}`).join(",");
   const mappingComment = bundle.folders.map((f) => `${f.src} → ${f.dest}`).join("\n      ");
+  const autoOpenEntry = bundle.autoOpen?.entry ?? "";
+  const prebuiltLine = bundle.prebuilt
+    ? `\n    Pre-built artifact: ${bundle.prebuilt.dest} ships compiled inside the\n    release archive. No build step required on the user machine.\n`
+    : "";
+  const autoOpenLine = autoOpenEntry
+    ? `\n    After install, opens ${autoOpenEntry} in your default browser\n    (suppress with -NoOpen).\n`
+    : "";
   return `<#
 .SYNOPSIS
     ${bundle.title} — bundle installer (${bundle.name}).
@@ -162,9 +262,10 @@ function powershellScript(bundle) {
 
     Install paths:
       • -Version vX.Y.Z → fetch ${bundle.archive.stableName}.zip from the
-        GitHub Release and extract with src→dest folder remapping.
-      • default         → delegate to install.ps1 (branch checkout).
-
+        GitHub Release.
+      • default         → fetch main-branch zip directly from
+        codeload.github.com (no git, no probe, works behind firewalls).
+${autoOpenLine}${prebuiltLine}
     Folder mapping (src in repo → dest under target):
       ${mappingComment}
 
@@ -182,21 +283,22 @@ function powershellScript(bundle) {
 param(
     [string]$Version = "",
     [string]$Target = "",
-    [Parameter(ValueFromRemainingArguments = $true)]
-    [string[]]$ForwardedArgs = @()
+    [switch]$NoOpen
 )
 
 $ErrorActionPreference = "Stop"
 $ProgressPreference = "SilentlyContinue"
 
 $BundleName = "${bundle.name}"
-$BundleFoldersSrc = "${srcList}"
 $BundleMapping = "${mappingPairs}"
 $ArchiveStableName = "${bundle.archive.stableName}"
 $ReleaseBase = "${RELEASE_BASE}"
-$InstallerUrl = "${RAW_BASE}/install.ps1"
+$RepoSlug = "${REPO_SLUG}"
+$AutoOpenEntry = "${autoOpenEntry}"
 
 if ([string]::IsNullOrEmpty($Target)) { $Target = (Get-Location).Path }
+New-Item -ItemType Directory -Path $Target -Force | Out-Null
+$Target = (Resolve-Path $Target).Path
 
 Write-Host ""
 Write-Host "════════════════════════════════════════════════════════" -ForegroundColor Cyan
@@ -205,12 +307,79 @@ Write-Host "  Target: $Target" -ForegroundColor Cyan
 if ($Version) {
     Write-Host "  Mode:   versioned archive ($ArchiveStableName.zip @ $Version)" -ForegroundColor Cyan
 } else {
-    Write-Host "  Mode:   branch checkout via install.ps1" -ForegroundColor Cyan
+    Write-Host "  Mode:   main-branch zip (no release pinned)" -ForegroundColor Cyan
 }
 Write-Host "════════════════════════════════════════════════════════" -ForegroundColor Cyan
 Write-Host ""
 
-$env:INSTALL_NO_PROBE = "1"
+function Get-MappingPairs {
+    return $BundleMapping.Split(",") | ForEach-Object {
+        $parts = $_.Split("|")
+        [pscustomobject]@{ Src = $parts[0]; Dest = $parts[1] }
+    }
+}
+
+function Resolve-ArchiveRoot {
+    param([string]$ExtractDir)
+    # Codeload zips wrap content in <repo>-<ref>/ — descend if needed.
+    $first = Get-ChildItem -Path $ExtractDir -Directory | Select-Object -First 1
+    if ($first) {
+        $probe = (Get-MappingPairs)[0].Src
+        if (-not (Test-Path (Join-Path $ExtractDir $probe)) -and
+             (Test-Path (Join-Path $first.FullName $probe))) {
+            return $first.FullName
+        }
+    }
+    return $ExtractDir
+}
+
+function Copy-Mapping {
+    param([string]$ExtractDir)
+    $root = Resolve-ArchiveRoot -ExtractDir $ExtractDir
+    foreach ($pair in (Get-MappingPairs)) {
+        $srcPath = Join-Path $root $pair.Src
+        if (-not (Test-Path $srcPath)) {
+            Write-Warning "  archive missing $($pair.Src) — skipping"
+            continue
+        }
+        $destPath = Join-Path $Target $pair.Dest
+        New-Item -ItemType Directory -Path $destPath -Force | Out-Null
+        Copy-Item -Path (Join-Path $srcPath '*') -Destination $destPath -Recurse -Force
+        Write-Host "  ✓ $($pair.Src) → $destPath" -ForegroundColor Green
+    }
+}
+
+function Open-Entry {
+    if (-not $AutoOpenEntry) { return }
+    $entryPath = Join-Path $Target $AutoOpenEntry
+    if (-not (Test-Path $entryPath)) {
+        Write-Host "  ℹ️  entry file not found ($entryPath) — skipping auto-open"
+        return
+    }
+    if ($NoOpen) {
+        Write-Host "  ℹ️  -NoOpen set. Open manually: $entryPath"
+        return
+    }
+    Write-Host ""
+    Write-Host "  ▸ opening $entryPath"
+    try {
+        if ($IsWindows -or $env:OS -eq "Windows_NT") {
+            Start-Process $entryPath
+        } elseif ($IsMacOS) {
+            & open $entryPath
+        } elseif ($IsLinux) {
+            if (Get-Command xdg-open -ErrorAction SilentlyContinue) {
+                & xdg-open $entryPath
+            } else {
+                Write-Host "  ℹ️  xdg-open not found. Open manually: $entryPath"
+            }
+        } else {
+            Start-Process $entryPath
+        }
+    } catch {
+        Write-Host "  ℹ️  could not auto-open. Open manually: $entryPath"
+    }
+}
 
 function Install-ViaArchive {
     $archiveUrl = "$ReleaseBase/download/$Version/$ArchiveStableName.zip"
@@ -222,51 +391,43 @@ function Install-ViaArchive {
         try {
             Invoke-WebRequest -Uri $archiveUrl -OutFile $zipPath -UseBasicParsing
         } catch {
-            Write-Warning "  archive fetch failed — falling back to install.ps1: $($_.Exception.Message)"
-            Install-ViaInstaller
+            Write-Warning "  release archive not found for $Version — falling back to main branch: $($_.Exception.Message)"
+            Install-ViaMainBranch
             return
         }
-
         $extractDir = Join-Path $tmp "extract"
         Expand-Archive -Path $zipPath -DestinationPath $extractDir -Force
-
-        New-Item -ItemType Directory -Path $Target -Force | Out-Null
-        foreach ($pair in $BundleMapping.Split(",")) {
-            $parts = $pair.Split("|")
-            $src = $parts[0]; $dest = $parts[1]
-            $srcPath = Join-Path $extractDir $src
-            if (-not (Test-Path $srcPath)) {
-                Write-Warning "  archive missing $src — skipping"
-                continue
-            }
-            $destPath = Join-Path $Target $dest
-            New-Item -ItemType Directory -Path $destPath -Force | Out-Null
-            Copy-Item -Path (Join-Path $srcPath '*') -Destination $destPath -Recurse -Force
-            Write-Host "  ✓ $src → $destPath" -ForegroundColor Green
-        }
+        Copy-Mapping -ExtractDir $extractDir
     } finally {
         Remove-Item -Path $tmp -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
 
-function Install-ViaInstaller {
-    $installerSource = Invoke-RestMethod -Uri $InstallerUrl -UseBasicParsing
-    $installerBlock = [scriptblock]::Create($installerSource)
-    $folderArray = $BundleFoldersSrc.Split(",")
-    $extra = @()
-    if ($Version) { $extra += @("-Version", $Version) }
-    if ($Target)  { $extra += @("-Dest", $Target) }
-    & $installerBlock -Folders $folderArray @extra @ForwardedArgs
+function Install-ViaMainBranch {
+    $archiveUrl = "https://codeload.github.com/$RepoSlug/zip/refs/heads/main"
+    $tmp = Join-Path ([System.IO.Path]::GetTempPath()) ("bundle-" + [guid]::NewGuid().ToString("N").Substring(0,8))
+    New-Item -ItemType Directory -Path $tmp -Force | Out-Null
+    try {
+        $zipPath = Join-Path $tmp "repo.zip"
+        Write-Host "  ▸ downloading $archiveUrl"
+        Invoke-WebRequest -Uri $archiveUrl -OutFile $zipPath -UseBasicParsing
+        $extractDir = Join-Path $tmp "extract"
+        Expand-Archive -Path $zipPath -DestinationPath $extractDir -Force
+        Copy-Mapping -ExtractDir $extractDir
+    } finally {
+        Remove-Item -Path $tmp -Recurse -Force -ErrorAction SilentlyContinue
+    }
 }
 
 if ($Version) {
     Install-ViaArchive
 } else {
-    Install-ViaInstaller
+    Install-ViaMainBranch
 }
 
 Write-Host ""
 Write-Host "✅ $BundleName installed." -ForegroundColor Green
+Open-Entry
 `;
 }
 

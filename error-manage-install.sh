@@ -6,13 +6,15 @@
 #
 # Quick start:
 #   curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/error-manage-install.sh | bash
-#   curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/error-manage-install.sh | bash -s -- --version v3.41.0
+#   curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/error-manage-install.sh | bash -s -- --version v3.64.0
 #   curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/error-manage-install.sh | bash -s -- --target ./vendor
 #
 # Install paths:
 #   • --version vX.Y.Z → fetch error-manage.tar.gz from
-#     the GitHub Release and extract with src→dest folder remapping.
-#   • default          → delegate to install.sh (branch checkout).
+#     the GitHub Release.
+#   • default          → fetch the main-branch tarball directly from
+#     codeload.github.com (no git, no probe, works behind firewalls).
+#
 #
 # Folder mapping (src in repo → dest under target):
 #   spec/01-spec-authoring-guide → spec/01-spec-authoring-guide
@@ -26,23 +28,31 @@
 set -euo pipefail
 
 BUNDLE_NAME="error-manage"
-BUNDLE_FOLDERS_SRC="spec/01-spec-authoring-guide,spec/03-error-manage"
 BUNDLE_MAPPING="spec/01-spec-authoring-guide|spec/01-spec-authoring-guide spec/03-error-manage|spec/03-error-manage"
 ARCHIVE_STABLE_NAME="error-manage"
 RELEASE_BASE="https://github.com/alimtvnetwork/coding-guidelines-v15/releases"
-INSTALLER_URL="https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.sh"
+REPO_SLUG="alimtvnetwork/coding-guidelines-v15"
+AUTO_OPEN_ENTRY=""
 
 VERSION=""
 TARGET="$(pwd)"
-FORWARD_ARGS=()
+DO_OPEN=true
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --version)        VERSION="$2"; FORWARD_ARGS+=("--version" "$2"); shift 2 ;;
-    --target|--dest)  TARGET="$2"; FORWARD_ARGS+=("--dest" "$2");    shift 2 ;;
-    *)                FORWARD_ARGS+=("$1");                          shift   ;;
+    --version)        VERSION="$2"; shift 2 ;;
+    --target|--dest)  TARGET="$2";  shift 2 ;;
+    --no-open)        DO_OPEN=false; shift ;;
+    -h|--help)
+      grep -E '^# ' "$0" | sed 's/^# \{0,1\}//'
+      exit 0
+      ;;
+    *) echo "❌ Unknown option: $1" >&2; exit 1 ;;
   esac
 done
+
+mkdir -p "${TARGET}"
+TARGET="$(cd "${TARGET}" && pwd)"
 
 echo ""
 echo "════════════════════════════════════════════════════════"
@@ -51,59 +61,122 @@ echo "  Target: ${TARGET}"
 if [[ -n "${VERSION}" ]]; then
   echo "  Mode:   versioned archive (${ARCHIVE_STABLE_NAME}.tar.gz @ ${VERSION})"
 else
-  echo "  Mode:   branch checkout via install.sh"
+  echo "  Mode:   main-branch tarball (no release pinned)"
 fi
 echo "════════════════════════════════════════════════════════"
 echo ""
 
-# Skip the latest-installer probe — bundle scripts pin to install.sh as-is.
-export INSTALL_NO_PROBE=1
+# ── Helpers ───────────────────────────────────────────────────────
+have() { command -v "$1" >/dev/null 2>&1; }
 
-install_via_archive() {
-  local archive_url="${RELEASE_BASE}/download/${VERSION}/${ARCHIVE_STABLE_NAME}.tar.gz"
-  local tmp; tmp="$(mktemp -d)"
-  trap "rm -rf \"${tmp}\"" EXIT
-
-  echo "  ▸ downloading ${archive_url}"
-  if ! curl -fsSL -o "${tmp}/bundle.tar.gz" "${archive_url}"; then
-    echo "  ⚠️  archive fetch failed — falling back to install.sh" >&2
-    install_via_installer
-    return
-  fi
-
-  mkdir -p "${tmp}/extract"
-  tar -xzf "${tmp}/bundle.tar.gz" -C "${tmp}/extract"
-
-  mkdir -p "${TARGET}"
-  for pair in ${BUNDLE_MAPPING}; do
-    local src="${pair%|*}"
-    local dest="${pair#*|}"
-    if [[ ! -d "${tmp}/extract/${src}" ]]; then
-      echo "  ⚠️  archive missing ${src} — skipping" >&2
-      continue
-    fi
-    mkdir -p "${TARGET}/${dest}"
-    cp -R "${tmp}/extract/${src}/." "${TARGET}/${dest}/"
-    echo "  ✓ ${src} → ${TARGET}/${dest}"
-  done
-}
-
-install_via_installer() {
-  if command -v curl >/dev/null 2>&1; then
-    curl -fsSL "${INSTALLER_URL}" | bash -s -- --folders "${BUNDLE_FOLDERS_SRC}" "${FORWARD_ARGS[@]}"
-  elif command -v wget >/dev/null 2>&1; then
-    wget -qO- "${INSTALLER_URL}" | bash -s -- --folders "${BUNDLE_FOLDERS_SRC}" "${FORWARD_ARGS[@]}"
+download() {
+  # download URL OUT  → 0 success, 1 failure
+  local url="$1" out="$2"
+  if have curl; then
+    curl -fsSL --retry 2 --retry-delay 1 -o "${out}" "${url}" && return 0 || return 1
+  elif have wget; then
+    wget -qO "${out}" "${url}" && return 0 || return 1
   else
     echo "❌ Neither curl nor wget found. Install one and retry." >&2
     exit 1
   fi
 }
 
+extract_mapping() {
+  # extract mapping from extract_root → TARGET, honoring src|dest pairs.
+  # When src is missing inside the archive, look one level deeper
+  # (codeload tarballs wrap content in <repo>-<ref>/).
+  local extract_root="$1"
+  local archive_root="${extract_root}"
+  if [[ -d "${extract_root}" ]]; then
+    local first_child
+    first_child="$(find "${extract_root}" -mindepth 1 -maxdepth 1 -type d | head -n 1)"
+    if [[ -n "${first_child}" ]]; then
+      # Heuristic: if none of the mapping srcs exist at root but DO exist
+      # inside first_child, treat first_child as the archive root.
+      local probe="${BUNDLE_MAPPING%% *}"
+      local probe_src="${probe%|*}"
+      if [[ ! -d "${extract_root}/${probe_src}" && -d "${first_child}/${probe_src}" ]]; then
+        archive_root="${first_child}"
+      fi
+    fi
+  fi
+
+  local pair src dest
+  for pair in ${BUNDLE_MAPPING}; do
+    src="${pair%|*}"
+    dest="${pair#*|}"
+    if [[ ! -d "${archive_root}/${src}" ]]; then
+      echo "  ⚠️  archive missing ${src} — skipping" >&2
+      continue
+    fi
+    mkdir -p "${TARGET}/${dest}"
+    cp -R "${archive_root}/${src}/." "${TARGET}/${dest}/"
+    echo "  ✓ ${src} → ${TARGET}/${dest}"
+  done
+}
+
+open_entry() {
+  [[ -z "${AUTO_OPEN_ENTRY}" ]] && return 0
+  local entry_path="${TARGET}/${AUTO_OPEN_ENTRY}"
+  if [[ ! -f "${entry_path}" ]]; then
+    echo "  ℹ️  entry file not found (${entry_path}) — skipping auto-open" >&2
+    return 0
+  fi
+  if ! ${DO_OPEN}; then
+    echo "  ℹ️  --no-open set. Open manually: file://${entry_path}"
+    return 0
+  fi
+  echo ""
+  echo "  ▸ opening ${entry_path}"
+  case "$(uname -s 2>/dev/null || echo unknown)" in
+    Darwin*) open "${entry_path}" >/dev/null 2>&1 || true ;;
+    Linux*)
+      if have xdg-open; then xdg-open "${entry_path}" >/dev/null 2>&1 &
+      else echo "  ℹ️  xdg-open not found. Open manually: file://${entry_path}"; fi
+      ;;
+    MINGW*|MSYS*|CYGWIN*) start "" "${entry_path}" >/dev/null 2>&1 || true ;;
+    *) echo "  ℹ️  unknown OS. Open manually: file://${entry_path}" ;;
+  esac
+}
+
+install_via_archive() {
+  local archive_url="${RELEASE_BASE}/download/${VERSION}/${ARCHIVE_STABLE_NAME}.tar.gz"
+  local tmp; tmp="$(mktemp -d)"
+  trap 'rm -rf "'"${tmp}"'"' EXIT
+
+  echo "  ▸ downloading ${archive_url}"
+  if ! download "${archive_url}" "${tmp}/bundle.tar.gz"; then
+    echo "  ⚠️  release archive not found for ${VERSION} — falling back to main branch" >&2
+    install_via_main_branch
+    return
+  fi
+  mkdir -p "${tmp}/extract"
+  tar -xzf "${tmp}/bundle.tar.gz" -C "${tmp}/extract"
+  extract_mapping "${tmp}/extract"
+}
+
+install_via_main_branch() {
+  local archive_url="https://codeload.github.com/${REPO_SLUG}/tar.gz/refs/heads/main"
+  local tmp; tmp="$(mktemp -d)"
+  trap 'rm -rf "'"${tmp}"'"' EXIT
+
+  echo "  ▸ downloading ${archive_url}"
+  if ! download "${archive_url}" "${tmp}/repo.tar.gz"; then
+    echo "❌ failed to download main-branch tarball from ${archive_url}" >&2
+    exit 1
+  fi
+  mkdir -p "${tmp}/extract"
+  tar -xzf "${tmp}/repo.tar.gz" -C "${tmp}/extract"
+  extract_mapping "${tmp}/extract"
+}
+
 if [[ -n "${VERSION}" ]]; then
   install_via_archive
 else
-  install_via_installer
+  install_via_main_branch
 fi
 
 echo ""
 echo "✅ ${BUNDLE_NAME} installed."
+open_entry

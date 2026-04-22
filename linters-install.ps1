@@ -7,8 +7,9 @@
 
     Install paths:
       • -Version vX.Y.Z → fetch linters.zip from the
-        GitHub Release and extract with src→dest folder remapping.
-      • default         → delegate to install.ps1 (branch checkout).
+        GitHub Release.
+      • default         → fetch main-branch zip directly from
+        codeload.github.com (no git, no probe, works behind firewalls).
 
     Folder mapping (src in repo → dest under target):
       linters → linters
@@ -22,27 +23,28 @@
     irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/linters-install.ps1 | iex
 
 .EXAMPLE
-    & ([scriptblock]::Create((irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/linters-install.ps1))) -Version v3.41.0 -Target .\vendor
+    & ([scriptblock]::Create((irm https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/linters-install.ps1))) -Version v3.64.0 -Target .\vendor
 #>
 
 param(
     [string]$Version = "",
     [string]$Target = "",
-    [Parameter(ValueFromRemainingArguments = $true)]
-    [string[]]$ForwardedArgs = @()
+    [switch]$NoOpen
 )
 
 $ErrorActionPreference = "Stop"
 $ProgressPreference = "SilentlyContinue"
 
 $BundleName = "linters"
-$BundleFoldersSrc = "linters,linters-cicd"
 $BundleMapping = "linters|linters,linters-cicd|linters-cicd"
 $ArchiveStableName = "linters"
 $ReleaseBase = "https://github.com/alimtvnetwork/coding-guidelines-v15/releases"
-$InstallerUrl = "https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.ps1"
+$RepoSlug = "alimtvnetwork/coding-guidelines-v15"
+$AutoOpenEntry = ""
 
 if ([string]::IsNullOrEmpty($Target)) { $Target = (Get-Location).Path }
+New-Item -ItemType Directory -Path $Target -Force | Out-Null
+$Target = (Resolve-Path $Target).Path
 
 Write-Host ""
 Write-Host "════════════════════════════════════════════════════════" -ForegroundColor Cyan
@@ -51,12 +53,79 @@ Write-Host "  Target: $Target" -ForegroundColor Cyan
 if ($Version) {
     Write-Host "  Mode:   versioned archive ($ArchiveStableName.zip @ $Version)" -ForegroundColor Cyan
 } else {
-    Write-Host "  Mode:   branch checkout via install.ps1" -ForegroundColor Cyan
+    Write-Host "  Mode:   main-branch zip (no release pinned)" -ForegroundColor Cyan
 }
 Write-Host "════════════════════════════════════════════════════════" -ForegroundColor Cyan
 Write-Host ""
 
-$env:INSTALL_NO_PROBE = "1"
+function Get-MappingPairs {
+    return $BundleMapping.Split(",") | ForEach-Object {
+        $parts = $_.Split("|")
+        [pscustomobject]@{ Src = $parts[0]; Dest = $parts[1] }
+    }
+}
+
+function Resolve-ArchiveRoot {
+    param([string]$ExtractDir)
+    # Codeload zips wrap content in <repo>-<ref>/ — descend if needed.
+    $first = Get-ChildItem -Path $ExtractDir -Directory | Select-Object -First 1
+    if ($first) {
+        $probe = (Get-MappingPairs)[0].Src
+        if (-not (Test-Path (Join-Path $ExtractDir $probe)) -and
+             (Test-Path (Join-Path $first.FullName $probe))) {
+            return $first.FullName
+        }
+    }
+    return $ExtractDir
+}
+
+function Copy-Mapping {
+    param([string]$ExtractDir)
+    $root = Resolve-ArchiveRoot -ExtractDir $ExtractDir
+    foreach ($pair in (Get-MappingPairs)) {
+        $srcPath = Join-Path $root $pair.Src
+        if (-not (Test-Path $srcPath)) {
+            Write-Warning "  archive missing $($pair.Src) — skipping"
+            continue
+        }
+        $destPath = Join-Path $Target $pair.Dest
+        New-Item -ItemType Directory -Path $destPath -Force | Out-Null
+        Copy-Item -Path (Join-Path $srcPath '*') -Destination $destPath -Recurse -Force
+        Write-Host "  ✓ $($pair.Src) → $destPath" -ForegroundColor Green
+    }
+}
+
+function Open-Entry {
+    if (-not $AutoOpenEntry) { return }
+    $entryPath = Join-Path $Target $AutoOpenEntry
+    if (-not (Test-Path $entryPath)) {
+        Write-Host "  ℹ️  entry file not found ($entryPath) — skipping auto-open"
+        return
+    }
+    if ($NoOpen) {
+        Write-Host "  ℹ️  -NoOpen set. Open manually: $entryPath"
+        return
+    }
+    Write-Host ""
+    Write-Host "  ▸ opening $entryPath"
+    try {
+        if ($IsWindows -or $env:OS -eq "Windows_NT") {
+            Start-Process $entryPath
+        } elseif ($IsMacOS) {
+            & open $entryPath
+        } elseif ($IsLinux) {
+            if (Get-Command xdg-open -ErrorAction SilentlyContinue) {
+                & xdg-open $entryPath
+            } else {
+                Write-Host "  ℹ️  xdg-open not found. Open manually: $entryPath"
+            }
+        } else {
+            Start-Process $entryPath
+        }
+    } catch {
+        Write-Host "  ℹ️  could not auto-open. Open manually: $entryPath"
+    }
+}
 
 function Install-ViaArchive {
     $archiveUrl = "$ReleaseBase/download/$Version/$ArchiveStableName.zip"
@@ -68,48 +137,40 @@ function Install-ViaArchive {
         try {
             Invoke-WebRequest -Uri $archiveUrl -OutFile $zipPath -UseBasicParsing
         } catch {
-            Write-Warning "  archive fetch failed — falling back to install.ps1: $($_.Exception.Message)"
-            Install-ViaInstaller
+            Write-Warning "  release archive not found for $Version — falling back to main branch: $($_.Exception.Message)"
+            Install-ViaMainBranch
             return
         }
-
         $extractDir = Join-Path $tmp "extract"
         Expand-Archive -Path $zipPath -DestinationPath $extractDir -Force
-
-        New-Item -ItemType Directory -Path $Target -Force | Out-Null
-        foreach ($pair in $BundleMapping.Split(",")) {
-            $parts = $pair.Split("|")
-            $src = $parts[0]; $dest = $parts[1]
-            $srcPath = Join-Path $extractDir $src
-            if (-not (Test-Path $srcPath)) {
-                Write-Warning "  archive missing $src — skipping"
-                continue
-            }
-            $destPath = Join-Path $Target $dest
-            New-Item -ItemType Directory -Path $destPath -Force | Out-Null
-            Copy-Item -Path (Join-Path $srcPath '*') -Destination $destPath -Recurse -Force
-            Write-Host "  ✓ $src → $destPath" -ForegroundColor Green
-        }
+        Copy-Mapping -ExtractDir $extractDir
     } finally {
         Remove-Item -Path $tmp -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
 
-function Install-ViaInstaller {
-    $installerSource = Invoke-RestMethod -Uri $InstallerUrl -UseBasicParsing
-    $installerBlock = [scriptblock]::Create($installerSource)
-    $folderArray = $BundleFoldersSrc.Split(",")
-    $extra = @()
-    if ($Version) { $extra += @("-Version", $Version) }
-    if ($Target)  { $extra += @("-Dest", $Target) }
-    & $installerBlock -Folders $folderArray @extra @ForwardedArgs
+function Install-ViaMainBranch {
+    $archiveUrl = "https://codeload.github.com/$RepoSlug/zip/refs/heads/main"
+    $tmp = Join-Path ([System.IO.Path]::GetTempPath()) ("bundle-" + [guid]::NewGuid().ToString("N").Substring(0,8))
+    New-Item -ItemType Directory -Path $tmp -Force | Out-Null
+    try {
+        $zipPath = Join-Path $tmp "repo.zip"
+        Write-Host "  ▸ downloading $archiveUrl"
+        Invoke-WebRequest -Uri $archiveUrl -OutFile $zipPath -UseBasicParsing
+        $extractDir = Join-Path $tmp "extract"
+        Expand-Archive -Path $zipPath -DestinationPath $extractDir -Force
+        Copy-Mapping -ExtractDir $extractDir
+    } finally {
+        Remove-Item -Path $tmp -Recurse -Force -ErrorAction SilentlyContinue
+    }
 }
 
 if ($Version) {
     Install-ViaArchive
 } else {
-    Install-ViaInstaller
+    Install-ViaMainBranch
 }
 
 Write-Host ""
 Write-Host "✅ $BundleName installed." -ForegroundColor Green
+Open-Entry

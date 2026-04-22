@@ -14,6 +14,14 @@
 //       → archive.stableName for the given bundle
 //   node scripts/read-bundles.mjs versioned-prefix <name>
 //       → archive.versionedPrefix for the given bundle
+//   node scripts/read-bundles.mjs prebuilt-src <name>
+//       → prebuilt.src (or empty when bundle has no prebuilt)
+//   node scripts/read-bundles.mjs prebuilt-dest <name>
+//       → prebuilt.dest (or empty)
+//   node scripts/read-bundles.mjs prebuilt-build <name>
+//       → prebuilt.build shell command (or empty)
+//   node scripts/read-bundles.mjs auto-open <name>
+//       → autoOpen.entry path (or empty)
 // =====================================================================
 
 import { readFileSync } from "node:fs";
@@ -47,7 +55,19 @@ switch (command) {
   case "versioned-prefix":
     console.log(findBundle(name).archive.versionedPrefix);
     break;
+  case "prebuilt-src":
+    console.log(findBundle(name).prebuilt?.src ?? "");
+    break;
+  case "prebuilt-dest":
+    console.log(findBundle(name).prebuilt?.dest ?? "");
+    break;
+  case "prebuilt-build":
+    console.log(findBundle(name).prebuilt?.build ?? "");
+    break;
+  case "auto-open":
+    console.log(findBundle(name).autoOpen?.entry ?? "");
+    break;
   default:
-    console.error("Usage: read-bundles.mjs <names|folders|stable-name|versioned-prefix> [name]");
+    console.error("Usage: read-bundles.mjs <names|folders|stable-name|versioned-prefix|prebuilt-src|prebuilt-dest|prebuilt-build|auto-open> [name]");
     process.exit(2);
 }
